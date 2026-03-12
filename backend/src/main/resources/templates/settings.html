@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Storage - Settings</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div th:if="${message}" class="alert alert-success" role="alert">
+                    <span th:text="${message}"></span>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Update Settings</h5>
+                        <form id="changeSettingsForm" th:action="@{/settings/update}" method="post">
+                            <div class="mb-3">
+                                <label for="pageLayout" class="form-label">Page Layout</label>
+                                <select name="pageLayout" id="pageLayout" class="form-select"
+                                        th:field="${settings.pageLayout}">
+                                    <option value="cards">Cards</option>
+                                    <option value="list">List</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="language" class="form-label">Language</label>
+                                <select name="language" id="language" class="form-select"
+                                        th:field="${settings.language}">
+                                    <option value="en">English</option>
+                                    <option value="de">German</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+</body>
+</html>

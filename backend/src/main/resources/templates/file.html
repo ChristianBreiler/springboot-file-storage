@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${file.originalFilename}">File Details</title>
+</head>
+<body class="bg-light">
+<section layout:fragment="content">
+    <div class="container py-5 d-flex justify-content-center">
+        <div class="card shadow-sm p-4" style="max-width: 600px; width: 100%; border-radius: 15px;">
+            <div class="text-center">
+                <div th:if="${file.filetype == Filetype.PNG}">
+                    <img th:src="@{/showimage/{id}(id=${file.id})}" alt="File Image"
+                         class="card-img-top p-4"
+                         style="height: 200px; object-fit: contain;">
+                </div>
+                <div th:if="${file.filetype == Filetype.PDF}">
+                    <img th:src="@{/images/{image}(image=${file.fileImage})}" alt="File Image"
+                         class="card-img-top p-4"
+                         style="height: 200px; object-fit: contain;">
+                </div>
+            </div>
+            <h1 class="text-center fw-bold mb-4" th:text="${file.originalFilename}">Filename</h1>
+            <div class="list-group">
+                <div class="list-group-item d-flex justify-content-between">
+                    <strong>Folder:</strong>
+                    <span th:text="${foldername}"></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <strong>Size:</strong>
+                    <span th:text="${file.size} + ' bytes'"></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <strong>Created At:</strong>
+                    <span th:text="${file.createdAt}"></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between">
+                    <strong>Owner:</strong>
+                    <span th:text="${file.owner.username}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

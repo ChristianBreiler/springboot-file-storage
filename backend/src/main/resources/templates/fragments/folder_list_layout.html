@@ -1,0 +1,89 @@
+<div th:fragment="folder_list_layout(subfolders, files)">
+    <h4 class="mb-3">Folders</h4>
+    <ul class="list-group mb-4">
+        <li class="list-group-item d-flex align-items-center justify-content-between"
+            th:each="folder : ${subfolders}">
+            <a th:href="@{/folder/{id}(id=${folder.id})}" class="text-decoration-none d-flex align-items-center">
+                <img th:src="@{/images/folder_closed.png}" width="32" height="32" class="me-3">
+                <span th:text="${folder.name}">Folder Name</span>
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <img th:src="@{/images/dots.png}" width="20">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li th:if="${folder.countAllElements() == 0}">
+                        <a href="#" class="dropdown-item text-danger"
+                           onclick="confirmDeleteFolder(this)"
+                           th:data-folder-id="${folder.id}"
+                           th:data-folder-name="${folder.name}">
+                            Delete
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item"
+                           onclick="renameFolderModal(this)"
+                           th:data-folder-id="${folder.id}"
+                           th:data-folder-name="${folder.name}">
+                            Rename
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                           th:href="@{/foldertree/{id}(id=${folder.id})}">
+                            Inspect
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+    <h4 class="mb-3">Files</h4>
+    <ul class="list-group">
+        <li class="list-group-item d-flex align-items-center justify-content-between"
+            th:each="file : ${files}"
+            th:data-file-id="${file.id}"
+            th:data-file-name="${file.originalFilename}">
+            <a th:href="@{/open/{id}(id=${file.id})}"
+               target="_blank"
+               class="text-decoration-none d-flex align-items-center">
+                <img th:if="${file.filetype == Filetype.PNG}"
+                     th:src="@{/showimage/{id}(id=${file.id})}"
+                     width="32" height="32"
+                     class="me-3 rounded">
+                <img th:if="${file.filetype == Filetype.PDF}"
+                     th:src="@{/images/{image}(image=${file.fileImage})}"
+                     width="32" height="32"
+                     class="me-3 rounded">
+
+                <span th:text="${file.originalFilename}">File Name</span>
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                    <img th:src="@{/images/dots.png}" width="20">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a href="#" class="dropdown-item text-danger"
+                           onclick="confirmDeleteFile(this)"
+                           th:data-file-id="${file.id}">
+                            Delete
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                           th:href="@{/download/{id}(id=${file.id})}">
+                            Download
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                           th:href="@{/file/{id}(id=${file.id})}">
+                            Inspect
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>

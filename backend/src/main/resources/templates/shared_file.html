@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="|${sharedFile.originalFilename} - shared by ${file_owner.username}|"></title>
+</head>
+<body class="bg-light">
+<section layout:fragment="content">
+    <main class="container py-5">
+        <div class="text-center mb-4">
+            <h1 class="fw-bold" th:text="${sharedFile.originalFilename}">
+                File name
+            </h1>
+            <p class="text-muted mb-0">
+                Shared by <span class="fw-semibold" th:text="${file_owner.username}">username</span>
+            </p>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="card text-center shadow"
+                 style="width: 260px;"
+                 draggable="true"
+                 th:data-file-id="${sharedFile.id}"
+                 th:data-file-name="${sharedFile.originalFilename}">
+                <a th:href="@{/open/{id}(id=${sharedFile.id})}"
+                   target="_blank"
+                   class="text-decoration-none text-dark">
+                    <div th:if="${sharedFile.filetype == Filetype.PNG}">
+                        <img th:src="@{/showimage/{id}(id=${sharedFile.id})}"
+                             alt="File preview"
+                             class="card-img-top p-3"
+                             style="height: 200px; object-fit: contain;">
+                    </div>
+                    <div th:if="${sharedFile.filetype == Filetype.PDF}">
+                        <img th:src="@{/images/{image}(image=${sharedFile.fileImage})}"
+                             alt="PDF preview"
+                             class="card-img-top p-3"
+                             style="height: 200px; object-fit: contain;">
+                    </div>
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title fw-semibold text-truncate"
+                        th:text="${sharedFile.originalFilename}">
+                        File Name
+                    </h6>
+                    <p class="text-muted small mb-0">Click to open</p>
+                    <div class="dropdown mt-2">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="fileMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:src="@{/images/dots.png}"
+                                 alt="Delete Icon"
+                                 width="20"
+                                 height="20"
+                                 class="me-2">
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="fileMenuButton">
+                            <li>
+                                <a class="dropdown-item text-primary d-flex align-items-center gap-2"
+                                   th:href="@{/download/{id}(id=${sharedFile.id})}">
+                                    <img th:src="@{/images/image.png}" alt="Download Icon" width="20" height="20"
+                                         class="me-2">
+                                    <span>Download</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-secondary d-flex align-items-center gap-2"
+                                   th:href="@{/file/{id}(id=${sharedFile.id})}">
+                                    <img th:src="@{/images/{image}(image=${sharedFile.fileImage})}" alt="Inspect Icon"
+                                         width="20"
+                                         height="20" class="me-2">
+                                    <span>Inspect</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+</body>
+</html>

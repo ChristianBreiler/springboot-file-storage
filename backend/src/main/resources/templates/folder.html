@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Storage</title>
+    <link rel="stylesheet" th:href="@{/css/card_highlighter.css}">
+</head>
+<body>
+<section layout:fragment="content">
+    <a th:if="${parentfolders != null}"
+       th:href="@{${parentfolders.size() == 0 ? '/home' : '/folder/' + parentFolderId}}"
+       class="dropdown-item d-flex align-items-center gap-2 mt-4 ms-5 container"
+       th:data-folder-id="${parentFolderId}">
+        <img th:src="@{/images/arrow_back.png}" class="me-2" width="36" height="36" alt="Back">
+        <span class="fs-5">Back</span>
+    </a>
+    <!-- Search -->
+    <div class="search-container my-4">
+        <div class="d-flex align-items-center justify-content-center gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3"
+                        type="button"
+                        id="iconMenuButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <img th:src="@{/images/plus.png}" alt="User" width="28" height="28" class="rounded-circle">
+                    <span class="d-none d-md-inline">New</span>
+                </button>
+                <ul class="dropdown-menu shadow-sm p-3" aria-labelledby="iconMenuButton">
+                    <li class="mb-2">
+                        <button type="button"
+                                class="btn btn-outline-warning w-100 d-flex align-items-center gap-2"
+                                onclick="openFolderModal()">
+                            <img th:src="@{/images/new-folder.png}" width="22" height="22" alt="">
+                            <span>Create folder</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button"
+                                class="btn btn-outline-success w-100 d-flex align-items-center gap-2"
+                                onclick="openFileModal()">
+                            <img th:src="@{/images/add.png}" width="22" height="22" alt="">
+                            <span>Upload file</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Folder layout as Cards -->
+    <div th:if="${isPageLayoutCards}" class="container d-grid gap-5 justify-content-center"
+         style="grid-template-columns: repeat(5, 250px);">
+        <!-- Foldercards -->
+        <div th:each="folder : ${subfolders}" class="card text-center shadow container"
+             style="width: 250px; border-radius: 15px;" th:data-folder-id="${folder.id}">
+            <a th:href="@{/folder/{id}(id=${folder.id})}" class="text-decoration-none text-dark">
+                <img th:src="@{/images/folder_closed.png}" alt="Folder Image"
+                     class="card-img-top p-4"
+                     style="height: 200px; object-fit: contain;"
+                     th:id="'folderImg-' + ${folder.id}">
+            </a>
+            <div class="card-body" th:with="elementCount=${folder.countAllElements()}">
+                <h5 class="card-title fw-bold" th:text="${folder.name}">Folder Name</h5>
+                <h3 th:text="${folder.sizeOfFolderContentInMB()}"></h3>
+                <!-- Delete button for folders with no elements -->
+                <div class="dropdown mt-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="folderMenuButton"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <img th:src="@{/images/dots.png}" alt="Menu Icon" width="20" height="20" class="me-2">
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="folderMenuButton">
+                        <li th:if="${elementCount == 0}">
+                            <a href="#" class="dropdown-item text-danger d-flex align-items-center gap-2"
+                               onclick="confirmDeleteFolder(this)"
+                               th:data-folder-id="${folder.id}"
+                               th:data-folder-name="${folder.name}">
+                                <img th:src="@{/images/delete.png}" alt="Delete Icon" width="20" height="20"
+                                     class="me-2">
+                                <span>Delete</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item text-primary d-flex align-items-center gap-2"
+                               onclick="renameFolderModal(this)"
+                               th:data-folder-id="${folder.id}"
+                               th:data-folder-name="${folder.name}">
+                                <img th:src="@{/images/folder_upload.png}" alt="Rename Icon" width="20" height="20"
+                                     class="me-2">
+                                <span>Rename</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-secondary d-flex align-items-center gap-2"
+                               th:href="@{/foldertree/{id}(id=${folder.id})}">
+                                <img th:src="@{/images/folder_upload.png}" alt="Inspect Icon" width="20"
+                                     height="20" class="me-2">
+                                <span>Inspect</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Filecards -->
+        <div th:each="file : ${files}" class="card text-center shadow draggable"
+             style="width: 250px; border-radius: 15px;" draggable="true" th:data-file-id="${file.id}"
+             th:data-file-name="${file.originalFilename}">
+            <a th:href="@{/open/{id}(id=${file.id})}" target="_blank" class="text-decoration-none text-dark">
+                <div th:if="${file.filetype == Filetype.PNG}">
+                    <img th:src="@{/showimage/{id}(id=${file.id})}" alt="File Image"
+                         class="card-img-top p-4"
+                         style="height: 200px; object-fit: contain;">
+                </div>
+                <div th:if="${file.filetype == Filetype.PDF}">
+                    <img th:src="@{/images/{image}(image=${file.fileImage})}" alt="File Image"
+                         class="card-img-top p-4"
+                         style="height: 200px; object-fit: contain;">
+                </div>
+            </a>
+            <div class="card-body">
+                <h5 class="card-title fw-bold" th:text="${file.originalFilename}">File Name</h5>
+                <div class="dropdown mt-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="fileMenuButton"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <img th:src="@{/images/dots.png}"
+                             alt="Delete Icon"
+                             width="20"
+                             height="20"
+                             class="me-2">
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="fileMenuButton">
+                        <li>
+                            <a class="dropdown-item text-primary d-flex align-items-center gap-2"
+                               th:href="@{/download/{id}(id=${file.id})}">
+                                <img th:src="@{/images/image.png}" alt="Download Icon" width="20" height="20"
+                                     class="me-2">
+                                <span>Download</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-primary d-flex align-items-center gap-2"
+                               onclick="openShareFileModal(this)"
+                               th:data-file-share-link="${file.generateFileShareUrl()}">
+                                <img th:src="@{/images/share.png}" alt="Rename Icon" width="20" height="20"
+                                     class="me-2">
+                                <span>Share file</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item"
+                               onclick="renameFileModal(this)"
+                               th:data-file-id="${file.id}">
+                                Rename
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-secondary d-flex align-items-center gap-2"
+                               th:href="@{/file/{id}(id=${file.id})}">
+                                <img th:src="@{/images/{image}(image=${file.fileImage})}" alt="Inspect Icon" width="20"
+                                     height="20" class="me-2">
+                                <span>Inspect</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item text-danger d-flex align-items-center gap-2"
+                               onclick="confirmDeleteFile(this)"
+                               th:data-file-id="${file.id}"
+                               th:data-file-name="${file.originalFilename}">
+                                <img th:src="@{/images/delete.png}" alt="Delete Icon" width="20" height="20"
+                                     class="me-2">
+                                <span>Delete</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Folder layout as List -->
+    <div th:if="${!isPageLayoutCards}" class="container mt-4">
+        <div th:replace="fragments/folder_list_layout :: folderContent(
+        subfolders=${subfolders},
+        files=${files}
+    )"></div>
+    </div>
+    <br>
+    <!-- Modal to create a new folder -->
+    <div class="modal fade" id="folderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Create Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{${onHomepage ? '/folder/createfolder' : '/folder/createfolder/' + folder.id}}"
+                          method="post" class="d-flex flex-column gap-3">
+                        <div class="mb-3 text-center">
+                            <input type="text" name="folderName" placeholder="Folder Name" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to create a new file -->
+    <div class="modal fade" id="fileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Upload File</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{${onHomepage ? '/upload' : '/upload/' + folder.id}}"
+                          method="post" enctype="multipart/form-data"
+                          class="d-flex flex-column gap-3">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Choose a file</label>
+                            <input type="file" name="file" id="fileInput" class="form-control" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to delete a folder -->
+    <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete folder "<span id="modalFolderName"></span>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmFolderDeleteButton" href="#" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to delete a file -->
+    <div class="modal fade" id="deleteFileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete "<span id="modalFileName"></span>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmFileDeleteButton" href="#" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to rename a folder -->
+    <div class="modal fade" id="renameFolderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rename Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="renameFolderForm" method="post">
+                        <div class="modal-body">
+                            <label for="renameFolderInput">New Folder Name:</label>
+                            <input type="text" id="renameFolderInput" name="newName" placeholder="Folder Name" required>
+                            <br>
+                            <button type="submit" class="btn btn-primary mt-2">Rename</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to rename a file -->
+    <div class="modal fade" id="renameFileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rename Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="renameFileForm" method="post">
+                        <div class="modal-body">
+                            <label for="renameFolderInput">New File Name:</label>
+                            <input type="text" id="renameFileInput" name="newName" placeholder="Folder Name" required>
+                            <br>
+                            <button type="submit" class="btn btn-primary mt-2">Rename</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to drag and drop a file-->
+    <div class="modal fade" id="dragFileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to drop <span id="dragFileName"></span>
+                    into folder <span id="dragFolderName"></span> ?
+                </div>
+                <div class="modal-footer">
+                    <a id="confirmFileDragButton" href="#" class="btn btn-success">Drop</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal to display the share file url -->
+    <div class="modal fade" id="shareFileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mb-3">Use the link below to share your file:</p>
+                    <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border">
+                        <span id="fileShareLink" class="text-truncate me-2" style="max-width: 80%;"></span>
+                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                onclick="navigator.clipboard.writeText(document.getElementById('fileShareLink').textContent)">
+                            Copy
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        Anyone with this link can access the file.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

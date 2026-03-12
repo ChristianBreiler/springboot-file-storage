@@ -1,0 +1,11 @@
+body.login-bg {
+    background-image: url("../images/background.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.card {
+    backdrop-filter: blur(6px);
+}
