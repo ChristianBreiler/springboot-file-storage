@@ -2,14 +2,20 @@ import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
 import Homepage from "./components/DashboardComponents/Homepage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import HomeFolder from "./components/DashboardComponents/HomeFolder";
+import SubFolder from "./components/DashboardComponents/SubFolder";
 
 const router = createBrowserRouter([
   { path: "/", element: <Homepage />, errorElement: <div> 404 Not found</div> },
   {
-    path: "/folder/:id",
-    element: <Homepage />,
+    path: "/folder/home",
+    element: <HomeFolder />,
     errorElement: <div> 404 Not found</div>,
   },
+  {
+  path: "/folders/:id",
+  element: <SubFolder />
+  }
 ]);
 
 function App() {
