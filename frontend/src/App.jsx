@@ -1,7 +1,16 @@
 import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
-import Folders from "./components/DashboardComponents/Folders";
-import Files from "./components/DashboardComponents/Files";
+import Homepage from "./components/DashboardComponents/Homepage";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  { path: "/", element: <Homepage />, errorElement: <div> 404 Not found</div> },
+  {
+    path: "/folder/:id",
+    element: <Homepage />,
+    errorElement: <div> 404 Not found</div>,
+  },
+]);
 
 function App() {
   return (
@@ -9,14 +18,7 @@ function App() {
       <Sidebar />
       <div className="flex flex-1 flex-col">
         <Header />
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="rounded-xl border-2 border-dashed border-gray-200 h-full flex items-center justify-center">
-            <p className="text-gray-400 font-medium italic">Folders</p>
-            <Folders />
-            <p className="text-gray-400 font-medium italic">Files</p>
-            <Files />
-          </div>
-        </main>
+        <RouterProvider router={router} />
       </div>
     </div>
   );
