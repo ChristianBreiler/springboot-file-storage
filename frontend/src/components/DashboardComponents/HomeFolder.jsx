@@ -3,7 +3,19 @@ import api from "../../api/axiosConfig";
 
 {/* Represents the Homefolder with its folders and files */}
 
-const HomeFolder = ({ name }) => {
+const HomeFolder = () => {
+
+    const [folder, setFolder] = useState();
+  
+    const getFolder = async () => {
+      try {
+        const response = await api.get("folders/home");
+        setFolder(response);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
   return (
     <div className="group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-indigo-50 active:bg-indigo-100">
       <div className="flex items-center justify-center">
@@ -16,7 +28,7 @@ const HomeFolder = ({ name }) => {
         />
       </div>
       <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-900 truncate">
-        {name}
+        Test
       </span>
     </div>
   );

@@ -3,6 +3,7 @@ package com.example.springbootfilestorage.security.user;
 import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
+import com.example.springbootfilestorage.dto.UserInformationDTO;
 import com.example.springbootfilestorage.service.MessageService;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,20 @@ public class UserService {
 
     // public User changeUserName(String username) { }
 
+    public UserInformationDTO getUserInformation(Long id) {
+        return createDTO(userRepository.findById(id).orElse(null));
+    }
+
+    private UserInformationDTO createDTO(User user){
+        return new UserInformationDTO(
+                user.getUsername(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmailaddress(),
+                user.getRole(),
+                getInitials(user.getFirstname(), user.getLastname())
+        );
+    }
 
     private String createUsername(String firstname, String lastname) {
         String first = firstname.toLowerCase().trim();
@@ -94,6 +109,15 @@ public class UserService {
                 .collect(Collectors.joining());
 
         return firstPart + last;
+    }
+
+    public String getInitials(String firstname, String lastname) {
+        // TODO: Get user from db
+        if (firstname.isBlank() || lastname.isBlank())
+            throw new IllegalArgumentException("Firstname and lastname must not be empty");
+        String initials = firstname.substring(0, 1) + lastname.substring(0, 1);
+        return initials.toUpperCase();
+        // TODO: Handle something like "Something von Something"
     }
 
     private String generateApiToken() {

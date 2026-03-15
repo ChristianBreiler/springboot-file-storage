@@ -1,40 +1,51 @@
-import { Bell, Search, User, Sun, Plus } from "lucide-react";
+import { Bell, Search, User, Sun, Plus, Command } from "lucide-react";
 
 const Header = () => {
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-      <div className="flex items-center gap-4 bg-gray-100 px-3 py-1.5 rounded-md">
-        <input type="file" className="hidden" />
-        <button className="group flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-full transition-all active:scale-95 shadow-sm shadow-indigo-200">
-          <Plus size={18} strokeWidth={3} />
-          <span className="text-sm font-semibold">New</span>
-        </button>
-        <div className="relative group max-w-md w-full">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search
-              size={16}
-              className="text-slate-400 group-focus-within:text-indigo-500 transition-colors"
-            />
-          </div>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-100 bg-white/70 px-8 backdrop-blur-xl">
+      <div className="flex flex-1 items-center gap-6">
+        <div className="relative group w-full max-w-md">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+          />
           <input
             type="text"
-            placeholder="Search files, folders..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-10 pr-12 text-sm outline-none transition-all focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400 placeholder:text-slate-400"
+            placeholder="Search documents, people, or settings..."
+            className="w-full rounded-xl bg-slate-100/50 border-transparent py-2.5 pl-10 pr-12 text-sm outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-200 placeholder:text-slate-500"
           />
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-slate-200 bg-white px-1.5 font-sans text-[10px] font-medium text-slate-400">
-              <span className="text-xs">⌘</span>K
-            </kbd>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1 px-1.5 py-1 rounded bg-white border border-slate-200 shadow-sm">
+             <Command size={10} className="text-slate-400" />
+             <span className="text-[10px] font-bold text-slate-400">K</span>
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <button className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
-          <Sun size={20} />
+      <div className="flex items-center gap-3">
+        <button className="hidden md:flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl transition-all active:scale-95 shadow-lg shadow-slate-200 mr-2">
+          <Plus size={18} />
+          <span className="text-sm font-semibold tracking-tight">Create New</span>
         </button>
-        <div className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-white ml-2">
-          <User size={18} />
+        <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block" />
+        <div className="flex items-center gap-1">
+          <button className="group flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-orange-500 transition-all">
+            <Sun size={20} />
+          </button>
+          <button className="group relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-blue-600 transition-all">
+            <Bell size={20} />
+            <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-white bg-red-500"></span>
+          </button>
         </div>
+        <button className="flex items-center gap-2 p-1 pl-3 rounded-2xl hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200">
+          <div className="hidden lg:block text-right">
+            <p className="text-xs font-bold text-slate-900 leading-none">Alex Rivera</p>
+            <p className="text-[10px] text-slate-500 mt-1">Admin Account</p>
+          </div>
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-[2px]">
+            <div className="h-full w-full rounded-[10px] bg-white flex items-center justify-center text-indigo-600 font-bold">
+              AR
+            </div>
+          </div>
+        </button>
       </div>
     </header>
   );
