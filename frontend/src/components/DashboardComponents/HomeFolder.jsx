@@ -1,35 +1,56 @@
-import { Folder as FolderIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
-
-{/* Represents the Homefolder with its folders and files */}
+import Folder from "./Folder";
+import File from "./File";
 
 const HomeFolder = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [folder, setFolder] = useState();
-  
-    const getFolder = async () => {
+  useEffect(() => {
+    const fetchFolderData = async () => {
       try {
         const response = await api.get("folders/home");
-        setFolder(response);
+        setData(response.data); 
       } catch (err) {
-        console.log(err);
+        console.error("Failed to fetch folders:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
+    fetchFolderData();
+  }, []);
+
+  // TODO: Dedicated Loading page
+  if (loading) return <div className="p-8 text-slate-500">Loading</div>;
+
   return (
-    <div className="group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-indigo-50 active:bg-indigo-100">
-      <div className="flex items-center justify-center">
-        <FolderIcon
-          size={20}
-          className="text-slate-400 group-hover:text-indigo-600 transition-colors duration-200"
-          fill="currentColor"
-          fillOpacity={0}
-          strokeWidth={2}
-        />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Folders</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {data?.folders?.map((folder) => (
+          <Folder 
+            key={folder.id} 
+            id={folder.id} 
+            name={folder.name} 
+          />
+        ))}
       </div>
-      <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-900 truncate">
-        Test
-      </span>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Files</h1>
+      {data?.files?.map((file) => (
+        <File
+          key={file.id}
+          originalFilename={file.originalFilename}
+          size={file.size}
+          filetype={file.filetype}
+        />
+      ))}
+        {data?.folders?.length === 0 && data?.files?.length === 0 && (
+        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+          <p className="text-slate-400">This Folder is Empty</p>
+        </div>
+      )}
     </div>
   );
 };

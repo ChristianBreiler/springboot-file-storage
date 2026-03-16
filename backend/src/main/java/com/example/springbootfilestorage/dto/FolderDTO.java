@@ -11,8 +11,8 @@ import java.util.List;
 public class FolderDTO {
     Long id;
     String name;
-    Long parentId;
     Long ownerId;
+    List<ParentFolderDTO> parentFolders;
     List<FolderSummaryDTO> folders;
-    List<UploadedFileDTO> fileIds;
+    List<UploadedFileDTO> files;
 }

@@ -3,6 +3,7 @@ package com.example.springbootfilestorage.service;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.FolderDTO;
+import com.example.springbootfilestorage.dto.ParentFolderDTO;
 import com.example.springbootfilestorage.dto.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
@@ -80,12 +81,16 @@ public class FolderService {
         return new FolderDTO(
                 folder.getId(),
                 folder.getName(),
-                folder.getParent() != null ? folder.getParent().getId() : null,
-                // TODO: Change this later to the user id
+                // TODO: Change later on
                 null,
+                folder.allParents().stream().map(this::createParentFolderDTO).toList(),
                 folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList(),
                 folder.getFiles().stream().map(this::createUploadedFileDTO).toList()
         );
+    }
+
+    private ParentFolderDTO createParentFolderDTO(Folder folder) {
+        return new ParentFolderDTO(folder.getId(), folder.getName());
     }
 
     public FolderDTO findByDTOId(Long id) {

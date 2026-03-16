@@ -87,6 +87,7 @@ public class FileController {
             return ResponseEntity.badRequest().build();
         }
         UploadedFile updatedFile = fileService.saveFile(file, folderId);
+        if (updatedFile == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(updatedFile);
     }
 

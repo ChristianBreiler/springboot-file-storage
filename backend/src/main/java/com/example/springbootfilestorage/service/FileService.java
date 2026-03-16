@@ -94,7 +94,6 @@ public class FileService {
         return uploadedFile;
     }
 
-    // Create a unique file name based on the original filename to be stored on the server
     private String generateUniqueFileName(String originalFilename) {
         String extension = "";
         int dotIndex = originalFilename.lastIndexOf('.');

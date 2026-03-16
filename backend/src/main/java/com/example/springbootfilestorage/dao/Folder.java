@@ -37,4 +37,14 @@ public class Folder extends BaseDAO {
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<UploadedFile> files = new ArrayList<>();
+
+    public List<Folder> allParents() {
+        List<Folder> parents = new ArrayList<>();
+        Folder currentFolder = this;
+        while (currentFolder.getParent() != null) {
+            parents.add(currentFolder.getParent());
+            currentFolder = currentFolder.getParent();
+        }
+        return parents;
+    }
 }
