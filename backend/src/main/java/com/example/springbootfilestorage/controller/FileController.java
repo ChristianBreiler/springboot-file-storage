@@ -46,7 +46,7 @@ public class FileController {
     }
 
     // Show a file image for pngs in the browser
-    @GetMapping("/showimage/{id}")
+    @GetMapping("/show_image/{id}")
     public ResponseEntity<Resource> showFileImage(@PathVariable Long id) {
         UploadedFile file = fileService.findById(id);
         try {

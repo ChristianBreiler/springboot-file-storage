@@ -1,9 +1,23 @@
 import { FileText, FileImage, File as FileIcon, MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
+import api from "../../api/axiosConfig";
 
 const File = ({ id, originalFilename, size, filetype }) => {
-  
+  const [imgUrl, setImgUrl] = useState(null);
+
+  useEffect(() => {
+    if (filetype === "JPG") {
+      api.get(`/folders/open/${id}`, { responseType: 'blob' })
+        .then(res => {
+          const url = URL.createObjectURL(res.data);
+          setImgUrl(url);
+        })
+        .catch(err => console.error("Preview failed", err));
+    }
+    return () => { if (imgUrl) URL.revokeObjectURL(imgUrl); };
+  }, [id, filetype]);
+
   const formatSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
@@ -25,11 +39,13 @@ const File = ({ id, originalFilename, size, filetype }) => {
 
   return (
     <div className="group flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all mb-2">
-      <Link 
-        to={`/file/${id}`} 
-        className="flex items-center gap-4 flex-1 min-w-0">
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${iconConfig.bg} ${iconConfig.color}`}>
-          {iconConfig.icon}
+      <Link to={`/file/${id}`} className="flex items-center gap-4 flex-1 min-w-0">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden ${iconConfig.bg} ${iconConfig.color}`}>
+          {imgUrl ? (
+            <img src={imgUrl} alt="preview" className="h-full w-full object-cover" />
+          ) : (
+            iconConfig.icon
+          )}
         </div>
         <div className="flex flex-col min-w-0">
           <span className="text-sm font-semibold text-slate-700 truncate">
@@ -41,7 +57,7 @@ const File = ({ id, originalFilename, size, filetype }) => {
             <span>{formatSize(size)}</span>
           </div>
         </div>
-      </Link>
+      </Link>  
       <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
         <MoreVertical size={16} />
       </button>

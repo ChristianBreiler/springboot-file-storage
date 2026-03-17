@@ -4,12 +4,12 @@ import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
 import com.example.springbootfilestorage.repository.SettingsRepository;
-import com.example.springbootfilestorage.security.user.Role;
-import com.example.springbootfilestorage.security.user.User;
-import com.example.springbootfilestorage.security.user.UserRepository;
+import com.example.springbootfilestorage.security.model.Role;
+import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.repository.UserRepository;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -29,7 +29,7 @@ import java.time.LocalDate;
  * - Create and persist an admin user with pre-configured values if none exists.
  * - Exit the application after the process completes.
  */
-@SpringBootApplication
+@Component
 public class CreateAdminRunner {
 
     public static void main(String[] args) {

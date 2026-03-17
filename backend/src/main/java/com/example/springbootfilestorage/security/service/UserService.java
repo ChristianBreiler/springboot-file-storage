@@ -1,9 +1,13 @@
-package com.example.springbootfilestorage.security.user;
+package com.example.springbootfilestorage.security.service;
 
 import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
+import com.example.springbootfilestorage.dto.ProfileDTO;
 import com.example.springbootfilestorage.dto.UserInformationDTO;
+import com.example.springbootfilestorage.security.model.Role;
+import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.service.MessageService;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -78,10 +83,11 @@ public class UserService {
     // public User changeUserName(String username) { }
 
     public UserInformationDTO getUserInformation(Long id) {
-        return createDTO(userRepository.findById(id).orElse(null));
+        return createUserInformationDTO(userRepository.findById(id).orElse(null));
     }
 
-    private UserInformationDTO createDTO(User user){
+    private UserInformationDTO createUserInformationDTO(User user) {
+        if (user == null) return null;
         return new UserInformationDTO(
                 user.getUsername(),
                 user.getFirstname(),
@@ -113,11 +119,25 @@ public class UserService {
 
     public String getInitials(String firstname, String lastname) {
         // TODO: Get user from db
-        if (firstname.isBlank() || lastname.isBlank())
+        if (firstname == null || lastname == null || firstname.isBlank() || lastname.isBlank())
             throw new IllegalArgumentException("Firstname and lastname must not be empty");
-        String initials = firstname.substring(0, 1) + lastname.substring(0, 1);
-        return initials.toUpperCase();
-        // TODO: Handle something like "Something von Something"
+
+        String[] names = Stream.concat(
+                Arrays.stream(firstname.split("\\s+")),
+                Arrays.stream(lastname.split("\\s+"))
+        ).toArray(String[]::new);
+
+        if (names.length == 2) return (String.valueOf(names[0].charAt(0) + names[1].charAt(0))).toUpperCase();
+        else {
+            // Handle Special names like Something von Something
+            String firstLetter = (String.valueOf(names[0].charAt(0))).toUpperCase();
+            String lastLetter = (String.valueOf(names[names.length - 1].charAt(0))).toUpperCase();
+            StringBuilder restLetters = new StringBuilder();
+            for (int i = 1; i < names.length - 1; i++) {
+                restLetters.append(String.valueOf(names[i].charAt(0)).toLowerCase());
+            }
+            return firstLetter + restLetters.toString() + lastLetter;
+        }
     }
 
     private String generateApiToken() {
@@ -169,5 +189,9 @@ public class UserService {
 
     private boolean isEmailaddressTaken(String emailaddress) {
         return userRepository.isEmailaddressTaken(emailaddress.toLowerCase().trim());
+    }
+
+    public ProfileDTO getProfile() {
+        return null;
     }
 }

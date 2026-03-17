@@ -47,7 +47,6 @@ const SubFolder = () => {
             </Link>
           </div>
         ))}
-
         {data.name && (
           <div className="flex items-center">
             <ChevronRight size={14} className="mx-1 text-slate-400 flex-shrink-0" />

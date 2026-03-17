@@ -7,7 +7,7 @@ import com.example.springbootfilestorage.dto.UploadedFileDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
-import com.example.springbootfilestorage.security.user.UserRepository;
+import com.example.springbootfilestorage.security.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

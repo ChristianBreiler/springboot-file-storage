@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.dao;
 
-import com.example.springbootfilestorage.security.user.User;
+import com.example.springbootfilestorage.security.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,4 +1,6 @@
 import { Bell, Search, User, Sun, Plus, Command } from "lucide-react";
+import CreateDropdown from "../DashboardComponents/CreateDropdown";
+import ProfileDropdown from "../DashboardComponents/ProfileDropdown";
 
 const Header = () => {
   return (
@@ -21,10 +23,7 @@ const Header = () => {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <button className="hidden md:flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl transition-all active:scale-95 shadow-lg shadow-slate-200 mr-2">
-          <Plus size={18} />
-          <span className="text-sm font-semibold tracking-tight">Create New</span>
-        </button>
+        <CreateDropdown />
         <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block" />
         <div className="flex items-center gap-1">
           <button className="group flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-orange-500 transition-all">
@@ -35,17 +34,7 @@ const Header = () => {
             <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-white bg-red-500"></span>
           </button>
         </div>
-        <button className="flex items-center gap-2 p-1 pl-3 rounded-2xl hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200">
-          <div className="hidden lg:block text-right">
-            <p className="text-xs font-bold text-slate-900 leading-none">Alex Rivera</p>
-            <p className="text-[10px] text-slate-500 mt-1">Admin Account</p>
-          </div>
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-[2px]">
-            <div className="h-full w-full rounded-[10px] bg-white flex items-center justify-center text-indigo-600 font-bold">
-              AR
-            </div>
-          </div>
-        </button>
+        <ProfileDropdown />
       </div>
     </header>
   );

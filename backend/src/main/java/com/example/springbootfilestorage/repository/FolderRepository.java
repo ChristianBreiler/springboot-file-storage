@@ -18,4 +18,7 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     @Query("SELECT f FROM Folder f WHERE f.parent.id = ?1 AND f.name LIKE %?2%")
     List<Folder> searchFoldersByName(Long parentFolderId, String name);
+
+    @Query("SELECT COUNT(f) FROM Folder f")
+    int numberOfFolders();
 }

@@ -6,12 +6,11 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserInformationDTO {
+public class ProfileDTO {
     String username;
     String firstname;
     String lastname;
     String email;
     Role role;
-    String initials;
-    // TODO: Profile pic
+    String profilePictureUrl;
 }

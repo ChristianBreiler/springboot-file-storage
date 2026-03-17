@@ -1,7 +1,6 @@
 package com.example.springbootfilestorage.repository;
 
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.security.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -30,7 +29,7 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE f.fileShareCode = ?1 AND f.deleted = false")
     UploadedFile finaByFileShareCode(String fileShareCode);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.owner.id = ?1 AND f.deleted = false")
+    @Query("SELECT f FROM UploadedFile f WHERE f.deleted = false")
     List<UploadedFile> findAllDeletedFiles();
 
     @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.finalDeletionDate <= ?1")
@@ -38,4 +37,10 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
 
     @Query("SELECT f.storagePath FROM UploadedFile f WHERE f.isProfilePic = false AND f.owner.id = ?1 AND f.deleted = false")
     String findStoragePath(Long id);
+
+    @Query("SELECT COUNT(f) FROM UploadedFile f WHERE f.deleted = false")
+    int numberOfFiles();
+
+    @Query("SELECT f FROM UploadedFile f ORDER BY f.size DESC LIMIT 5")
+    List<UploadedFile> fiveBiggestFiles();
 }

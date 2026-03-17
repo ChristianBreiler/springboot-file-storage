@@ -1,7 +1,7 @@
 package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dto.UserInformationDTO;
-import com.example.springbootfilestorage.security.user.UserService;
+import com.example.springbootfilestorage.security.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

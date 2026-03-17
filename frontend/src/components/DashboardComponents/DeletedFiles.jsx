@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
+import api from "../../api/axiosConfig";
+import { Link } from "react-router-dom";
+import { ChevronRight, Home } from "lucide-react";
+import File from "./File";
 
 const DeletedFiles = () => {
 
+    const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
 
     useEffect(() => {
@@ -23,7 +28,7 @@ const DeletedFiles = () => {
 
 
     if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading storage...</div>;
-    if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;
+    if (!data) return <div className="p-8 text-red-500">Error while loading deleted Folders</div>;
 
     return (
     <div className="p-6">

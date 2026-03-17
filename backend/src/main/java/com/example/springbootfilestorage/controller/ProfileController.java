@@ -1,7 +1,8 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.security.user.User;
-import com.example.springbootfilestorage.security.user.UserService;
+import com.example.springbootfilestorage.dto.ProfileDTO;
+import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.service.UserService;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.MessageService;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,10 @@ public class ProfileController {
     }
 
     @GetMapping("")
-    public ResponseEntity<User> show() {
-        return new ResponseEntity<User>(new User(), HttpStatus.OK);
+    public ResponseEntity<ProfileDTO> show() {
+        ProfileDTO profile = userService.getProfile();
+        if (profile == null) return ResponseEntity.badRequest().build();
+        return new ResponseEntity<ProfileDTO>(profile, HttpStatus.OK);
     }
 
     @PostMapping("/change_username")

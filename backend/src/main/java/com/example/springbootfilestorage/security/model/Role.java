@@ -1,4 +1,4 @@
-package com.example.springbootfilestorage.security.user;
+package com.example.springbootfilestorage.security.model;
 
 public enum Role {
     USER,

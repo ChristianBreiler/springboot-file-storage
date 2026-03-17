@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.dao;
 
-import com.example.springbootfilestorage.security.user.User;
+import com.example.springbootfilestorage.security.model.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -41,7 +41,10 @@ public class Folder extends BaseDAO {
     public List<Folder> allParents() {
         List<Folder> parents = new ArrayList<>();
         Folder currentFolder = this;
-        while (currentFolder.getParent() != null) {
+        int MAX_DEPTH = 10;
+        int depth = 0;
+        while (currentFolder.getParent() != null && depth++ < MAX_DEPTH) {
+            depth++;
             parents.add(currentFolder.getParent());
             currentFolder = currentFolder.getParent();
         }
