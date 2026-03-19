@@ -1,6 +1,117 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axiosConfig";
 
 const Register = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-}
+  const isEmailAddressValid = (email) => {
+        const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        return regex.test(email);
+    };
+    
+    /**
+     * At least one lowercase letter, one uppercase letter,
+     * one digit, one special character, and must be at least 8 characters long.
+     */
+    const isPasswordValid = (password) =>{
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/;
+        return regex.test(password)
+    };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if(!isEmailAddressValid){
+        setError("Invalid Email")
+        return
+    }
+    if(!isPasswordValid){
+        setError("Invalid Password")
+        return
+    }
+
+    try {
+      const response = await api.post("auth/register", { email, password, firstname, lastname });
+
+      if (response) {
+        navigate("/");
+      } else {
+        setError("Error registering")
+      }
+    } catch (err) {
+      setError(err);
+      console.error("Login Error:", err);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
+      <form
+        onSubmit={handleRegister}
+        className="w-full max-w-sm bg-white p-8 rounded-xl shadow-lg space-y-5"
+      >
+        <h2 className="text-2xl font-semibold text-center text-gray-800">
+          Sign Up!
+        </h2>
+
+        {error && (
+          <div className="bg-red-100 text-red-600 text-sm p-2 rounded text-center">
+            {error}
+          </div>
+        )}
+
+        <input
+  type="email"
+  placeholder="Email address"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  required
+  className="w-full p-3 border border-gray-300 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+/>
+
+<input
+  type="text"
+  placeholder="Firstname"
+  value={firstname}
+  onChange={(e) => setFirstname(e.target.value)}
+  required
+  className="w-full p-3 border border-gray-300 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+/>
+
+<input
+  type="text"
+  placeholder="Lastname"
+  value={lastname}
+  onChange={(e) => setLastname(e.target.value)}
+  required
+  className="w-full p-3 border border-gray-300 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+/>
+
+<input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  required
+  className="w-full p-3 border border-gray-300 rounded-md text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+/>
+
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition"
+        >
+          Sign Up
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default Register;

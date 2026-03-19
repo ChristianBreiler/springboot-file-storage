@@ -9,8 +9,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Initializes the folder on the server machine to store the files if that folder does not already exist
- * Runs everytime the Application starts
+ * InitializeFolder is a Spring Component that implements CommandLineRunner.
+ * It is responsible for creating and initializing specific folders in the user's home directory
+ * upon application startup.
+ * <p>
+ * The class ensures that a root folder named "file_storage_folder" exists,
+ * and within it, another folder named "profile_pics" is created.
+ * If these folders already exist, it logs their locations.
+ * <p>
+ * If the root folder "file_storage_folder" does not exist during the initialization
+ * of "profile_pics", a runtime exception is thrown.
+ * <p>
+ * This functionality is triggered during the application startup phase.
  */
 @Component
 public class InitializeFolder implements CommandLineRunner {

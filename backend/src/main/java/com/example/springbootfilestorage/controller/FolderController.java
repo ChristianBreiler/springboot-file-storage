@@ -60,9 +60,9 @@ public class FolderController {
     }
 
     @PostMapping({"/createfolder", "/createfolder/{folderId}"})
-    public ResponseEntity<Folder> createFolder(@RequestParam String folderName,
+    public ResponseEntity<FolderDTO> createFolder(@RequestParam String folderName,
                                                @PathVariable(required = false) Long folderId) {
-        Folder updatedFolder = folderService.saveFolder(folderName, folderId);
+        FolderDTO updatedFolder = folderService.saveFolder(folderName, folderId);
         return ResponseEntity.ok(updatedFolder);
     }
 }

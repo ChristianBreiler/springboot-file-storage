@@ -51,7 +51,7 @@ public class FileService {
     }
 
     // TODO: Fix nulls here
-    public UploadedFile saveFile(MultipartFile file, Long folderId) {
+    public UploadedFileDTO saveFile(MultipartFile file, Long folderId) {
         if (file.isEmpty() || fileExists(file.getOriginalFilename(), folderId)) return null;
 
         UploadedFile uploadedFile = new UploadedFile();
@@ -91,7 +91,7 @@ public class FileService {
         uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setDeleted(false);
         fileRepository.save(uploadedFile);
-        return uploadedFile;
+        return createDTO(uploadedFile);
     }
 
     private String generateUniqueFileName(String originalFilename) {
@@ -243,11 +243,6 @@ public class FileService {
         file.setOriginalFilename(newName);
         fileRepository.save(file);
         return file;
-    }
-
-    public void deleteDeletedFiles() {
-        List<UploadedFile> files = fileRepository.findAllFilesToBeDeletedToday(LocalDate.now());
-        files.forEach(f -> deleteFilePermanently(f.getId()));
     }
 
     private UploadedFileDTO createDTO(UploadedFile file) {

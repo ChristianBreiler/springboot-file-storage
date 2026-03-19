@@ -11,13 +11,20 @@ import java.nio.file.Paths;
 @Component
 public class StoragePathBean {
 
-    public Path getStorageFolderPath() {
+    private final Path storageFolder;
+    private final Path profilePicFolder;
+
+    public StoragePathBean() {
         String homeDir = System.getProperty("user.home");
-        return Paths.get(homeDir, "file_storage_folder");
+        this.storageFolder = Paths.get(homeDir, "file_storage_folder");
+        this.profilePicFolder = Paths.get(homeDir, "file_storage_folder", "profile_pics");
+    }
+
+    public Path getStorageFolderPath() {
+        return storageFolder;
     }
 
     public Path getProfilePicFolderPath() {
-        String homeDir = System.getProperty("user.home");
-        return Paths.get(homeDir, "file_storage_folder", "profile_pics");
+        return profilePicFolder;
     }
 }

@@ -80,14 +80,18 @@ public class FileController {
                 .body(resource);
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UploadedFile> upload(
-            @RequestParam("file") MultipartFile file, @RequestParam(value = "folderId", required = false) Long folderId) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        UploadedFile updatedFile = fileService.saveFile(file, folderId);
+    @PostMapping(
+            value = {"/upload", "/upload/{folderId}"},
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<UploadedFileDTO> upload(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable(required = false) Long folderId) {
+        if (file.isEmpty()) return ResponseEntity.badRequest().build();
+
+        UploadedFileDTO updatedFile = fileService.saveFile(file, folderId);
         if (updatedFile == null) return ResponseEntity.badRequest().build();
+
         return ResponseEntity.ok(updatedFile);
     }
 

@@ -1,17 +1,19 @@
 package com.example.springbootfilestorage.repository;
 
-import com.example.springbootfilestorage.dto.storage.StorageDetailDTO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StorageRepository extends JpaRepository<Long, Long> {
+public class StorageRepository {
 
-    // TODO: specify user here
-    @Query("SELECT SUM(f.size) FROM UploadedFile f")
-    Long usedSpace();
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Query("SELECT COUNT(f) FROM UploadedFile f")
-    StorageDetailDTO storageDetails();
+    public Long usedSpace() {
+        return entityManager.createQuery(
+                "SELECT SUM(f.size) FROM UploadedFile f",
+                Long.class
+        ).getSingleResult();
+    }
 }

@@ -23,7 +23,7 @@ public class FolderService {
         this.fileRepository = fileRepository;
     }
 
-    public Folder saveFolder(String name, Long parentId) {
+    public FolderDTO saveFolder(String name, Long parentId) {
         Folder folder = new Folder();
         folder.setName(name);
         folder.setOwner(null);
@@ -31,9 +31,12 @@ public class FolderService {
             Folder parent = folderRepository.findById(parentId).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
             folder.setParent(parent);
+        } else {
+            // Homepage folders
+            folder.setParent(null);
         }
         folderRepository.save(folder);
-        return folder;
+        return createDTO(folder);
     }
 
     public Folder renameFolder(Long id, String newName) {
@@ -48,7 +51,7 @@ public class FolderService {
 
     public void deleteFolder(Long id) {
         Folder folder = folderRepository.findById(id).orElse(null);
-        if (folder == null) return;
+        if (folder == null) throw new RuntimeException("Folder to be deleted not found");
         folderRepository.delete(folder);
     }
 

@@ -38,12 +38,9 @@ public class UserService {
         if (firstname.isBlank() || lastname.isBlank() || emailaddress.isBlank() || password.isBlank())
             throw new IllegalArgumentException("All fields must be filled");
 
-        if (!isEmailaddressValid(emailaddress.trim())) throw new RuntimeException("Invalid email address");
-        if (isEmailaddressTaken(emailaddress)) throw new RuntimeException("Email address already taken");
 
         String username = createUsername(firstname, lastname);
         if (isUsernameTaken(username)) username = createValidUserName(username);
-        if (!isPasswordValid(password)) throw new RuntimeException("Invalid password");
 
         User user = new User();
         user.setFirstname(firstname);
@@ -82,8 +79,9 @@ public class UserService {
 
     // public User changeUserName(String username) { }
 
-    public UserInformationDTO getUserInformation(Long id) {
-        return createUserInformationDTO(userRepository.findById(id).orElse(null));
+    public UserInformationDTO getUserInformation() {
+        // TODO: Get current user here
+        return createUserInformationDTO(null);
     }
 
     private UserInformationDTO createUserInformationDTO(User user) {
@@ -170,28 +168,15 @@ public class UserService {
         return candidate;
     }
 
-
-    /**
-     * At least one lowercase letter, one uppercase letter,
-     * one digit, one special character, and must be at least 8 characters long.
-     */
-    private boolean isPasswordValid(String password) {
-        return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
-    }
-
-    private boolean isEmailaddressValid(String emailaddress) {
-        return emailaddress.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
-
     private boolean isUsernameTaken(String username) {
         return userRepository.existsByUsername(username);
     }
 
-    private boolean isEmailaddressTaken(String emailaddress) {
-        return userRepository.isEmailaddressTaken(emailaddress.toLowerCase().trim());
-    }
-
     public ProfileDTO getProfile() {
         return null;
+    }
+
+    public List<User> allUsers() {
+        return userRepository.findAll();
     }
 }
