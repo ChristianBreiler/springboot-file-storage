@@ -1,17 +1,13 @@
 package com.example.springbootfilestorage.dto;
 
-import com.example.springbootfilestorage.security.model.Role;
+import com.example.springbootfilestorage.security.dao.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class UserInformationDTO {
-    String username;
-    String firstname;
-    String lastname;
-    String email;
+    String fullName;
     Role role;
-    String initials;
-    // TODO: Profile pic
+    String profilePictureUrl;
 }

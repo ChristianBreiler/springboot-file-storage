@@ -1,21 +1,16 @@
 package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dto.ProfileDTO;
-import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.service.UserService;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.MessageService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Controller
 @RequestMapping("/profile")
+@RestController
 public class ProfileController {
 
     private final FileService fileService;
@@ -32,9 +27,11 @@ public class ProfileController {
 
     @GetMapping("")
     public ResponseEntity<ProfileDTO> show() {
+        System.out.println("Showing profile");
         ProfileDTO profile = userService.getProfile();
         if (profile == null) return ResponseEntity.badRequest().build();
-        return new ResponseEntity<ProfileDTO>(profile, HttpStatus.OK);
+        System.out.println(profile);
+        return ResponseEntity.ok(profile);
     }
 
     @PostMapping("/change_username")

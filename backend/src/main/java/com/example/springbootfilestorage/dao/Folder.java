@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.dao;
 
-import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.dao.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;

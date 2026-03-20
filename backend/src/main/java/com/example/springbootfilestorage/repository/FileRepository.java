@@ -1,6 +1,7 @@
 package com.example.springbootfilestorage.repository;
 
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.security.dao.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -43,4 +44,7 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
 
     @Query("SELECT f FROM UploadedFile f ORDER BY f.size DESC LIMIT 5")
     List<UploadedFile> fiveBiggestFiles();
+
+    @Query("SELECT f FROM UploadedFile f WHERE f.owner = ?1 AND f.deleted = false")
+    List<UploadedFile> findAllFiles(User authenticatedUser);
 }

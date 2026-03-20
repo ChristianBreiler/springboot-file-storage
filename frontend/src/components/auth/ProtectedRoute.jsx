@@ -1,11 +1,20 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem('token');
+  const auth = useAuth();
+
+  if (!auth) {
+    console.error("Auth context is not available!");
+    return null; 
+  }
+
+  const { token } = auth;
 
   if (!token) {
     return <Navigate to="/login" replace />;
   }
+
   return <Outlet />;
 };
 

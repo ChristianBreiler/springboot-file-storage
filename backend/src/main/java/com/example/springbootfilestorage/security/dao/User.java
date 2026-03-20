@@ -1,4 +1,4 @@
-package com.example.springbootfilestorage.security.model;
+package com.example.springbootfilestorage.security.dao;
 
 import com.example.springbootfilestorage.dao.BaseDAO;
 import com.example.springbootfilestorage.dao.Settings;

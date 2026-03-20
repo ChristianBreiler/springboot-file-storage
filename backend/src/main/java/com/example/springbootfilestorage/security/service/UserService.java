@@ -1,61 +1,26 @@
 package com.example.springbootfilestorage.security.service;
 
-import com.example.springbootfilestorage.dao.Language;
-import com.example.springbootfilestorage.dao.PageLayout;
-import com.example.springbootfilestorage.dao.Settings;
 import com.example.springbootfilestorage.dto.ProfileDTO;
 import com.example.springbootfilestorage.dto.UserInformationDTO;
-import com.example.springbootfilestorage.security.model.Role;
-import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.dao.Role;
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
-import com.example.springbootfilestorage.service.MessageService;
-import com.example.springbootfilestorage.service.SettingsService;
+import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final MessageService messageService;
-    private final SettingsService settingsService;
+    private final UserContext userContext;
 
-    public UserService(UserRepository userRepository,
-                       MessageService messageService, SettingsService settingsService) {
+    public UserService(UserRepository userRepository, UserContext userContext) {
         this.userRepository = userRepository;
-        this.messageService = messageService;
-        this.settingsService = settingsService;
-    }
-
-    public String registerUser(String firstname, String lastname, String emailaddress, String password) {
-        if (firstname.isBlank() || lastname.isBlank() || emailaddress.isBlank() || password.isBlank())
-            throw new IllegalArgumentException("All fields must be filled");
-
-
-        String username = createUsername(firstname, lastname);
-        if (isUsernameTaken(username)) username = createValidUserName(username);
-
-        User user = new User();
-        user.setFirstname(firstname);
-        user.setLastname(lastname);
-        user.setEmailaddress(emailaddress.trim());
-        user.setUsername(username);
-        // TODO: Generate a random token and save it in the database
-        user.setPassword(password);
-        Settings settings = generateDefaultSettings();
-        user.setSettings(settings);
-        user.setRole(Role.USER);
-        // Profile pic null at first
-        user.setCreatedAt(LocalDate.now());
-        userRepository.save(user);
-        return username;
+        this.userContext = userContext;
     }
 
     public List<User> getAllNonAdminUsers() {
@@ -77,22 +42,23 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    // public User changeUserName(String username) { }
+    public User changeUserName(String username) {
+        User user = userContext.getAuthenticatedUser();
+        user.setUsername(username);
+        userRepository.save(user);
+        return user;
+    }
 
     public UserInformationDTO getUserInformation() {
-        // TODO: Get current user here
-        return createUserInformationDTO(null);
+        return createUserInformationDTO(userContext.getAuthenticatedUser());
     }
 
     private UserInformationDTO createUserInformationDTO(User user) {
         if (user == null) return null;
         return new UserInformationDTO(
-                user.getUsername(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getEmailaddress(),
+                user.getFirstname() + " " + user.getLastname(),
                 user.getRole(),
-                getInitials(user.getFirstname(), user.getLastname())
+                user.getProfilePic().getStoragePath()
         );
     }
 
@@ -115,45 +81,6 @@ public class UserService {
         return firstPart + last;
     }
 
-    public String getInitials(String firstname, String lastname) {
-        // TODO: Get user from db
-        if (firstname == null || lastname == null || firstname.isBlank() || lastname.isBlank())
-            throw new IllegalArgumentException("Firstname and lastname must not be empty");
-
-        String[] names = Stream.concat(
-                Arrays.stream(firstname.split("\\s+")),
-                Arrays.stream(lastname.split("\\s+"))
-        ).toArray(String[]::new);
-
-        if (names.length == 2) return (String.valueOf(names[0].charAt(0) + names[1].charAt(0))).toUpperCase();
-        else {
-            // Handle Special names like Something von Something
-            String firstLetter = (String.valueOf(names[0].charAt(0))).toUpperCase();
-            String lastLetter = (String.valueOf(names[names.length - 1].charAt(0))).toUpperCase();
-            StringBuilder restLetters = new StringBuilder();
-            for (int i = 1; i < names.length - 1; i++) {
-                restLetters.append(String.valueOf(names[i].charAt(0)).toLowerCase());
-            }
-            return firstLetter + restLetters.toString() + lastLetter;
-        }
-    }
-
-    private String generateApiToken() {
-        byte[] bytes = new byte[16];
-        SecureRandom sr = new SecureRandom();
-        sr.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private Settings generateDefaultSettings() {
-        Settings settings = new Settings();
-        settings.setPageLayout(PageLayout.CARDS);
-        settings.setLanguage(Language.EN);
-        settings.setDeleteFilesAfterXWeeks(2);
-        settingsService.saveSettings(settings);
-        return settings;
-    }
-
     private String createValidUserName(String baseName) {
         if (baseName == null || baseName.isBlank()) throw new IllegalArgumentException("Username cannot be empty");
 
@@ -173,7 +100,18 @@ public class UserService {
     }
 
     public ProfileDTO getProfile() {
-        return null;
+        return createProfileDTO(userContext.getAuthenticatedUser());
+    }
+
+    private ProfileDTO createProfileDTO(User user) {
+        return new ProfileDTO(
+                user.getUsername(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmailaddress(),
+                user.getRole(),
+                user.getProfilePic().getStoredName()
+        );
     }
 
     public List<User> allUsers() {

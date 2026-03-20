@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequestMapping("/files")
@@ -25,6 +26,19 @@ public class FileController {
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<UploadedFileDTO>> index() {
+        return ResponseEntity.ok(fileService.findAll());
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UploadedFileDTO> show(@PathVariable Long id) {
+        UploadedFileDTO file = fileService.findDTOById(id);
+        if (file == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(file);
     }
 
     @GetMapping("/download/{id}")
@@ -80,26 +94,15 @@ public class FileController {
                 .body(resource);
     }
 
-    @PostMapping(
-            value = {"/upload", "/upload/{folderId}"},
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public ResponseEntity<UploadedFileDTO> upload(
-            @RequestParam("file") MultipartFile file,
-            @PathVariable(required = false) Long folderId) {
+    @PostMapping(value = {"/upload", "/upload/{folderId}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UploadedFileDTO> upload(@RequestParam("file") MultipartFile file,
+                                                  @PathVariable(required = false) Long folderId) {
         if (file.isEmpty()) return ResponseEntity.badRequest().build();
 
         UploadedFileDTO updatedFile = fileService.saveFile(file, folderId);
         if (updatedFile == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(updatedFile);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UploadedFileDTO> show(@PathVariable Long id) {
-        UploadedFileDTO file = fileService.findDTOById(id);
-        if (file == null) return ResponseEntity.badRequest().build();
-        return new ResponseEntity<UploadedFileDTO>(file, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

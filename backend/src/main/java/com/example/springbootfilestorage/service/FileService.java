@@ -7,7 +7,9 @@ import com.example.springbootfilestorage.dto.UploadedFileDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
+import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,9 +32,11 @@ public class FileService {
     private final Path PROFILE_PIC_DIR;
     private final UserRepository userRepository;
     private final SettingsService settingsService;
+    private final UserContext userContext;
 
     public FileService(FileRepository fileRepository, FolderService folderService, FolderRepository folderRepository,
-                       StoragePathBean storagePathBean, UserRepository userRepository, SettingsService settingsService) {
+                       StoragePathBean storagePathBean, UserRepository userRepository, SettingsService settingsService,
+                       UserContext userContext) {
         this.fileRepository = fileRepository;
         this.folderService = folderService;
         this.folderRepository = folderRepository;
@@ -40,6 +44,7 @@ public class FileService {
         PROFILE_PIC_DIR = storagePathBean.getProfilePicFolderPath();
         this.userRepository = userRepository;
         this.settingsService = settingsService;
+        this.userContext = userContext;
     }
 
     public UploadedFile getFileByFileShareCode(String fileShareCode) {
@@ -63,8 +68,7 @@ public class FileService {
         uploadedFile.setStoredName(storedName);
         uploadedFile.setSize(file.getSize());
 
-        // User user = userContextService.getCurrentUser();
-        uploadedFile.setOwner(null);
+        uploadedFile.setOwner(userContext.getAuthenticatedUser());
         uploadedFile.setProfilePic(false);
 
         Path filePath = UPLOAD_DIR.resolve(storedName);
@@ -201,12 +205,13 @@ public class FileService {
         uploadedFile.setStoredName(storedName);
         uploadedFile.setSize(file.getSize());
 
-        // User user = userContextService.getCurrentUser();
-        uploadedFile.setOwner(null);
-        //  user.setProfilePic(uploadedFile);
+        User user = userContext.getAuthenticatedUser();
+        uploadedFile.setOwner(user);
+        user.setProfilePic(uploadedFile);
+        UploadedFile oldProfilePic = user.getProfilePic();
         uploadedFile.setProfilePic(true);
 
-        // TODO: when uploading a new profile pic, delete the old one if it exists
+        deleteFilePermanently(oldProfilePic.getId());
 
         Path filePath = PROFILE_PIC_DIR.resolve(storedName);
         try {
@@ -261,5 +266,13 @@ public class FileService {
 
     public UploadedFile findById(Long id) {
         return fileRepository.findById(id).orElse(null);
+    }
+
+    public List<UploadedFileDTO> findAll() {
+        return fileRepository
+                .findAllFiles(userContext.getAuthenticatedUser())
+                .stream()
+                .map(this::createDTO)
+                .toList();
     }
 }

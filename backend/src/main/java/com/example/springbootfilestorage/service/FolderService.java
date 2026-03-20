@@ -8,6 +8,7 @@ import com.example.springbootfilestorage.dto.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
+import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,16 +18,18 @@ public class FolderService {
 
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
+    private final UserContext userContext;
 
-    public FolderService(FolderRepository folderRepository, FileRepository fileRepository) {
+    public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext) {
         this.folderRepository = folderRepository;
         this.fileRepository = fileRepository;
+        this.userContext = userContext;
     }
 
     public FolderDTO saveFolder(String name, Long parentId) {
         Folder folder = new Folder();
         folder.setName(name);
-        folder.setOwner(null);
+        folder.setOwner(userContext.getAuthenticatedUser());
         if (parentId != null) {
             Folder parent = folderRepository.findById(parentId).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
@@ -41,7 +44,7 @@ public class FolderService {
 
     public Folder renameFolder(Long id, String newName) {
         Folder folder = folderRepository.findById(id).orElse(null);
-        if (folder == null) return null;
+        if (folder == null) throw new RuntimeException("Folder to be renamed not found");
 
         folder.setName(newName);
         folderRepository.save(folder);
@@ -60,8 +63,7 @@ public class FolderService {
     }
 
     public List<Folder> findAllFoldersWithNoParents() {
-        //  Long userId = userContextService.getCurrentUserId();
-        return folderRepository.findAllFoldersWithNoParents();
+        return folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
     }
 
     public List<Folder> searchFoldersByName(Long parentFolderId, String name) {
@@ -101,10 +103,10 @@ public class FolderService {
     }
 
     public FolderDTO findHomeDTO() {
-        List<Folder> folders = folderRepository.findAllFoldersWithNoParents();
+        List<Folder> folders = folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
         List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder();
         Folder homeFolder = new Folder();
-        homeFolder.setOwner(null);
+        homeFolder.setOwner(userContext.getAuthenticatedUser());
         homeFolder.setParent(null);
         homeFolder.setSubfolders(folders);
         homeFolder.setFiles(subfolderIds);

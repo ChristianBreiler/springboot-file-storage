@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.security.controller;
 
-import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

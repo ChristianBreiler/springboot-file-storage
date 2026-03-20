@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.security.repository;
 
-import com.example.springbootfilestorage.security.model.User;
+import com.example.springbootfilestorage.security.dao.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

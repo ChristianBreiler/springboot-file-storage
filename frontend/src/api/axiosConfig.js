@@ -2,10 +2,8 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8080",
-  headers: { "ngrok-skip-browser-warning": "true" },
 });
 
-// Attach token to request automatically
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -19,5 +17,17 @@ api.interceptors.request.use(
   }
 );
 
-export default api;
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401 || err.response?.status === 403) {
+      localStorage.removeItem("token");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(err);
+  }
+);
 
+export default api;

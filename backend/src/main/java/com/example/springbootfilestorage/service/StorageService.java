@@ -7,6 +7,7 @@ import com.example.springbootfilestorage.dto.storage.StorageDetailDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.repository.StorageRepository;
+import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +23,18 @@ public class StorageService {
     private final StorageRepository storageRepository;
     private final FileRepository fileRepository;
     private final FolderRepository folderRepository;
+    private final UserContext userContext;
 
-    public StorageService(StorageRepository storageRepository, FileRepository fileRepository, FolderRepository folderRepository) {
+    public StorageService(StorageRepository storageRepository, FileRepository fileRepository,
+                          FolderRepository folderRepository, UserContext userContext) {
         this.storageRepository = storageRepository;
         this.fileRepository = fileRepository;
         this.folderRepository = folderRepository;
+        this.userContext = userContext;
     }
 
     public StorageDTO getStorage() {
-        Long usedSpaceVal = storageRepository.usedSpace();
+        Long usedSpaceVal = storageRepository.usedSpace(userContext.getAuthenticatedUser());
         double totalSpace = 100;
         if (usedSpaceVal == null) return new StorageDTO(0, totalSpace);
         double usedSpace = usedSpaceVal.doubleValue();
@@ -40,7 +44,7 @@ public class StorageService {
 
     public StorageDetailDTO getStorageDetails() {
         // TODO: This is very inefficient too many queries -> Fix later
-        Long usedSpaceVal = storageRepository.usedSpace();
+        Long usedSpaceVal = storageRepository.usedSpace(userContext.getAuthenticatedUser());
         double totalSpace = 100;
         double usedSpace;
         if (usedSpaceVal == null) usedSpace = 0;
