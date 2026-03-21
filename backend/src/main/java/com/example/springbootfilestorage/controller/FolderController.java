@@ -31,12 +31,12 @@ public class FolderController {
     // Retrieves the home folder details for the current user
     @GetMapping("/home")
     public ResponseEntity<FolderDTO> home() {
-        return new ResponseEntity<FolderDTO>(folderService.findHomeDTO(), HttpStatus.OK);
+        return ResponseEntity.ok(folderService.findHomeDTO());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FolderDTO> show(@PathVariable Long id) {
-        return new ResponseEntity<FolderDTO>(folderService.findByDTOId(id), HttpStatus.OK);
+        return ResponseEntity.ok(folderService.findByDTOId(id));
     }
 
     @GetMapping("/{id}/search")

@@ -34,12 +34,14 @@ public class StorageService {
     }
 
     public StorageDTO getStorage() {
-        Long usedSpaceVal = storageRepository.usedSpace(userContext.getAuthenticatedUser());
-        double totalSpace = 100;
-        if (usedSpaceVal == null) return new StorageDTO(0, totalSpace);
-        double usedSpace = usedSpaceVal.doubleValue();
-        // TODO: specify total space somewhere
-        return new StorageDTO(usedSpace, totalSpace);
+        Long bytes = storageRepository.usedSpace(userContext.getAuthenticatedUser());
+        double totalSpaceGB = 100.0;
+
+        if (bytes == null || bytes <= 0) return new StorageDTO(0.0, totalSpaceGB);
+
+        double usedSpaceGB = bytes / (1024.0 * 1024.0 * 1024.0);
+
+        return new StorageDTO(usedSpaceGB, totalSpaceGB);
     }
 
     public StorageDetailDTO getStorageDetails() {

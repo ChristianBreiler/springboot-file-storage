@@ -4,15 +4,15 @@ import com.example.springbootfilestorage.security.dao.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "folders")
 @NoArgsConstructor
@@ -31,11 +31,9 @@ public class Folder extends BaseDAO {
     private User owner;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<Folder> subfolders = new ArrayList<>();
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<UploadedFile> files = new ArrayList<>();
 
     public List<Folder> allParents() {
@@ -44,7 +42,6 @@ public class Folder extends BaseDAO {
         int MAX_DEPTH = 10;
         int depth = 0;
         while (currentFolder.getParent() != null && depth++ < MAX_DEPTH) {
-            depth++;
             parents.add(currentFolder.getParent());
             currentFolder = currentFolder.getParent();
         }

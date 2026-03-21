@@ -4,11 +4,11 @@ import com.example.springbootfilestorage.dto.storage.StorageDTO;
 import com.example.springbootfilestorage.dto.storage.StorageDetailDTO;
 import com.example.springbootfilestorage.service.StorageService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/storage")
 public class StorageController {
 

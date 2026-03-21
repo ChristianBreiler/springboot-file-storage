@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.controller;
 
+import com.example.springbootfilestorage.dto.EditProfileDTO;
 import com.example.springbootfilestorage.dto.ProfileDTO;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.service.UserService;
@@ -27,10 +28,8 @@ public class ProfileController {
 
     @GetMapping("")
     public ResponseEntity<ProfileDTO> show() {
-        System.out.println("Showing profile");
         ProfileDTO profile = userService.getProfile();
         if (profile == null) return ResponseEntity.badRequest().build();
-        System.out.println(profile);
         return ResponseEntity.ok(profile);
     }
 
@@ -42,6 +41,11 @@ public class ProfileController {
 
         // User user = userService.changeUserName(username);
         return ResponseEntity.ok(new User());
+    }
+
+    @PostMapping("/edit")
+    public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO editedProfile) {
+        return null;
     }
 
     @PostMapping("/uploadProfilePic")

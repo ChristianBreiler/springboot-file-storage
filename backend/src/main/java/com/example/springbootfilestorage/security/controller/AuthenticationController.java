@@ -1,8 +1,8 @@
 package com.example.springbootfilestorage.security.controller;
 
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.dto.LoginUserDTO;
 import com.example.springbootfilestorage.security.dto.RegisterUserDTO;
-import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.response.LoginResponse;
 import com.example.springbootfilestorage.security.service.AuthenticationService;
 import com.example.springbootfilestorage.security.service.JwtService;
@@ -24,9 +24,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDTO registerUserDTO) {
-        User registeredUser = authenticationService.signUp(registerUserDTO);
-        return ResponseEntity.ok(registeredUser);
+    public ResponseEntity<?> register(@RequestBody RegisterUserDTO registerUserDTO) {
+        if (authenticationService.signUp(registerUserDTO)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/login")

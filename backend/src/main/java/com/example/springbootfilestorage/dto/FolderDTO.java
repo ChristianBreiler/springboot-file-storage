@@ -3,10 +3,12 @@ package com.example.springbootfilestorage.dto;
 import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class FolderDTO {
     Long id;

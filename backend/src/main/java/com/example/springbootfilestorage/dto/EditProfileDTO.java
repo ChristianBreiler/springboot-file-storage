@@ -1,16 +1,13 @@
 package com.example.springbootfilestorage.dto;
 
-import com.example.springbootfilestorage.security.dao.Role;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserInformationDTO {
+public class EditProfileDTO {
     String firstname;
     String lastname;
-    Role role;
+    String email;
     String profilePictureUrl;
 }

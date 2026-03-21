@@ -5,10 +5,13 @@ import api from "../../api/axiosConfig";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatedPassword, setRepeatedPassword] = useState("")
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatedPassword, setShowRepeatedPassword] = useState(false);
   const navigate = useNavigate();
 
   const isEmailAddressValid = (email) => {
@@ -26,6 +29,10 @@ const Register = () => {
     return regex.test(password);
   };
 
+  const isPasswordRepeated = () => {
+    return password === repeatedPassword;
+  }
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -36,6 +43,10 @@ const Register = () => {
     }
     if (!isPasswordValid(password)) {
       setError("Password must be 8+ chars with uppercase, lowercase, number, and special char");
+      return;
+    }
+    if (!isPasswordRepeated()){
+      setError("Repeat Password");
       return;
     }
 
@@ -108,17 +119,56 @@ const Register = () => {
               className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-            />
-          </div>
+
+<div className="relative">
+  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+      className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
+    >
+      {showPassword ? (
+        <span className="text-xs font-bold uppercase">Hide</span>
+      ) : (
+        <span className="text-xs font-bold uppercase">Show</span>
+      )}
+    </button>
+  </div>
+</div>
+
+<div className="relative">
+  <label className="block text-sm font-medium text-gray-700 mb-1">Repeat Password</label>
+  <div className="relative">
+    <input
+      type={showRepeatedPassword ? "text" : "password"}
+      placeholder="••••••••"
+      value={repeatedPassword}
+      onChange={(e) => setRepeatedPassword(e.target.value)}
+      required
+      className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+    />
+    <button
+      type="button"
+      onClick={() => setShowRepeatedPassword(!showRepeatedPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
+    >
+      {showRepeatedPassword ? (
+        <span className="text-xs font-bold uppercase">Hide</span>
+      ) : (
+        <span className="text-xs font-bold uppercase">Show</span>
+      )}
+    </button>
+  </div>
+</div>
           <button
             type="submit"
             disabled={isLoading}

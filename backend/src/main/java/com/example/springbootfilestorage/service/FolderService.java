@@ -11,6 +11,7 @@ import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,6 +31,8 @@ public class FolderService {
         Folder folder = new Folder();
         folder.setName(name);
         folder.setOwner(userContext.getAuthenticatedUser());
+        folder.setCreatedAt(LocalDate.now());
+        folder.setUpdatedAt(LocalDate.now());
         if (parentId != null) {
             Folder parent = folderRepository.findById(parentId).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
@@ -59,11 +62,7 @@ public class FolderService {
     }
 
     public Folder findById(Long id) {
-        return folderRepository.findById(id).orElse(null);
-    }
-
-    public List<Folder> findAllFoldersWithNoParents() {
-        return folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
+        return folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
     }
 
     public List<Folder> searchFoldersByName(Long parentFolderId, String name) {
@@ -81,25 +80,28 @@ public class FolderService {
         folderRepository.save(folder);
     }
 
+    public FolderDTO findByDTOId(Long id) {
+        return createDTO(folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found")));
+    }
+
     private FolderDTO createDTO(Folder folder) {
         if (folder == null) return null;
         return new FolderDTO(
                 folder.getId(),
                 folder.getName(),
-                // TODO: Change later on
-                null,
-                folder.allParents().stream().map(this::createParentFolderDTO).toList(),
-                folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList(),
-                folder.getFiles().stream().map(this::createUploadedFileDTO).toList()
+                userContext.getAuthenticatedUser().getId(),
+                folder.allParents() != null ?
+                        folder.allParents().stream().map(this::createParentFolderDTO).toList() : List.of(),
+                folder.getSubfolders() != null ?
+                        folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList() : List.of(),
+                folder.getFiles() != null ?
+                        folder.getFiles().stream().map(this::createUploadedFileDTO).toList() : List.of()
         );
     }
 
     private ParentFolderDTO createParentFolderDTO(Folder folder) {
+        if (folder == null) return null;
         return new ParentFolderDTO(folder.getId(), folder.getName());
-    }
-
-    public FolderDTO findByDTOId(Long id) {
-        return createDTO(folderRepository.findById(id).orElse(null));
     }
 
     public FolderDTO findHomeDTO() {

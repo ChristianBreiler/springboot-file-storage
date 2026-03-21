@@ -24,7 +24,7 @@ public class DeletedFileController {
         return new ResponseEntity<>(fileService.findAllDeletedFiles(), HttpStatus.OK);
     }
 
-    @PostMapping("/restore_file/{id}")
+    @PostMapping("/restore/{id}")
     public ResponseEntity<UploadedFileDTO> restoreFile(@PathVariable Long id) {
         UploadedFileDTO restoredFile = fileService.restoreFile(id);
         if (restoredFile == null) return ResponseEntity.badRequest().build();
@@ -32,7 +32,7 @@ public class DeletedFileController {
         return ResponseEntity.ok(restoredFile);
     }
 
-    @DeleteMapping("/delete_file_permanently/{id}")
+    @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFilePermanently(@PathVariable Long id) {
         fileService.deleteFilePermanently(id);

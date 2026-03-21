@@ -1,51 +1,66 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
 
 function ProfileDropdown() {
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
 
   const logOut = () => {
-    localStorage.removeItem("token")
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
   useEffect(() => {
     const fetchUserInformation = async () => {
-      const response = await api.get("userinformation");
-      setData(response.data)
-    }
-    fetchUserInformation()
-  });
+      try {
+        const response = await api.get("userinformation");
+        setData(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUserInformation();
+  }, []);
 
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 p-1 pl-3 rounded-2xl hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200">
+      <button className="flex items-center gap-3 p-1 pl-3 rounded-2xl hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200">
         <div className="hidden lg:block text-right">
-          <p className="text-xs font-bold text-slate-900 leading-none">{data?.fullName}</p>
-          <p className="text-[10px] text-slate-500 mt-1">{data?.role}</p>
+          <p className="text-xs font-bold text-slate-900 leading-none">
+            {data?.firstname} {data?.lastname}
+          </p>
+          <p className="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-wider">
+            {data?.role || "User"}
+          </p>
         </div>
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-[2px]">
-          <div className="h-full w-full rounded-[10px] bg-white flex items-center justify-center text-indigo-600 font-bold">
-            AR
-          </div>
-        </div>
+        <div className="shrink-0 h-10 w-10">
+          <img
+            src={`https://ui-avatars.com/api/?name=${data?.firstname}+${data?.lastname}&background=random&size=128`}
+            alt="Profile"
+            className="w-full h-full rounded-xl border-2 border-white shadow-xl object-cover bg-gray-200"
+          />
+        </div>  
+        <ChevronDown size={14} className="text-slate-400 mr-1" />
       </button>
-      <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">      
-        <Link to={`/profile`}>
-          <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-          <User size={16} />
-          Profile
-        </button>
-        </Link>
-        <div className="border-t border-slate-200" />
-        <button onClick={logOut} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
-          <LogOut size={16} />
-          Logout
-        </button>
+      <div className="absolute right-0 mt-2 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50 overflow-hidden">
+        <div className="p-2">
+          <Link to="/profile">
+            <button className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">
+              <User size={18} className="text-slate-400" />
+              View Profile
+            </button>
+          </Link>
+          <div className="my-1 border-t border-slate-100" />
+          <button
+            onClick={logOut}
+            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
+        </div>
       </div>
     </div>
   );

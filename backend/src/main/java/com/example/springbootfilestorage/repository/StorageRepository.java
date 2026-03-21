@@ -12,9 +12,17 @@ public class StorageRepository {
     private EntityManager entityManager;
 
     public Long usedSpace(User user) {
-        return entityManager.createQuery(
-                "SELECT SUM(f.size) FROM UploadedFile f WHERE f.owner = :user AND f.deleted = false",
-                Long.class
-        ).getSingleResult();
+        try {
+            Long result = entityManager.createQuery(
+                            "SELECT SUM(f.size) FROM UploadedFile f WHERE f.owner = :user AND f.deleted = false",
+                            Long.class
+                    )
+                    .setParameter("user", user)
+                    .getSingleResult();
+
+            return result != null ? result : 0L;
+        } catch (Exception e) {
+            return 0L;
+        }
     }
 }

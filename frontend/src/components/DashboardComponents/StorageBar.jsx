@@ -9,8 +9,9 @@ const StorageBar = () => {
   useEffect(() => {
     const fetchStorage = async () => {
       try {
-        const { data: storageData } = await api.get(`storage`);
-        setData(storageData);
+        // Change "storage" to the exact endpoint your Spring Boot controller uses
+        const response = await api.get(`storage`); 
+        setData(response.data);
       } catch (err) {
         console.error("Failed to fetch storage data:", err);
       } finally {
@@ -22,50 +23,58 @@ const StorageBar = () => {
 
   if (loading) {
     return (
-      <div className="w-full space-y-2 animate-pulse">
-        <div className="h-3 w-full bg-slate-200 rounded-full" />
-        <div className="h-3 w-24 bg-slate-100 rounded-full" />
+      <div className="w-full space-y-3 px-2 py-4 animate-pulse">
+        <div className="flex justify-between">
+          <div className="h-3 w-16 bg-slate-800 rounded" />
+          <div className="h-3 w-12 bg-slate-800 rounded" />
+        </div>
+        <div className="h-2 w-full bg-slate-800 rounded-full" />
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) return (
+    <div className="px-2 py-4 text-[10px] text-slate-600 italic">
+      Storage info unavailable
+    </div>
+  );
 
-  const percentage = Math.min((data.usedSpace / data.totalSpace) * 100, 100);
+  const used = data.usedSpace || 0;
+  const total = data.totalSpace || 1;
+  const percentage = Math.min((used / total) * 100, 100);
 
   const getBarColor = () => {
-    if (percentage > 90) return "bg-red-500";
-    if (percentage > 70) return "bg-amber-500";
-    return "bg-blue-600";
+    if (percentage > 90) return "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]";
+    if (percentage > 70) return "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]";
+    return "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]";
   };
 
   return (
-    <div className="w-full font-sans p-1">
-      <div className="flex justify-between items-end mb-2">
+    <div className="w-full font-sans px-2 py-4 bg-slate-900/40 rounded-xl border border-slate-800/50">
+      <div className="flex justify-between items-end mb-3">
         <div>
-          <span className="text-sm font-semibold text-slate-700">
-            {data.usedSpace.toFixed(1)} GB
-          </span>
-          <span className="text-xs text-slate-500 ml-1">used of {data.totalSpace} GB</span>
+          <p className="text-xs font-bold text-slate-100">
+            {used.toFixed(1)} GB <span className="text-slate-500 font-normal">/ {total} GB</span>
+          </p>
         </div>
         <Link 
-          to="storage_details" 
-          className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+          to="/storage_details"
+          className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-tight"
         >
-          View Details →
+         Details
         </Link>
       </div>
 
-      <div className="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+      <div className="relative w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all duration-500 ease-out ${getBarColor()}`}
+          className={`h-full transition-all duration-700 ease-in-out ${getBarColor()}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
 
       {percentage > 90 && (
-        <p className="mt-1.5 text-[10px] text-red-600 font-medium">
-          Running low on space. Consider upgrading.
+        <p className="mt-2 text-[10px] text-red-400 font-medium leading-tight">
+          Storage almost full!
         </p>
       )}
     </div>

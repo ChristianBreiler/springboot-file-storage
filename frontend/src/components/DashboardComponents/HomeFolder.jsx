@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
 import Folder from "./Folder";
 import File from "./File";
+import LoadingBar from "../loading/LoadingBar";
 
 const HomeFolder = () => {
   const [data, setData] = useState(null);
@@ -22,8 +23,7 @@ const HomeFolder = () => {
     fetchFolderData();
   }, []);
 
-  // TODO: Dedicated Loading page
-  if (loading) return <div className="p-8 text-slate-500">Loading</div>;
+  if (loading) return <LoadingBar />
 
   return (
     <div className="p-6">

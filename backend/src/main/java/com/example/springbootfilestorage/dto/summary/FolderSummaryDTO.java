@@ -2,12 +2,11 @@ package com.example.springbootfilestorage.dto.summary;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * A Data Transfer Object (DTO) representing a summary of a folder.
- * This class provides the basic details of a folder such as its identifier and name for display purposes.
- */
+// Used in the frontend for the clickable folders
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class FolderSummaryDTO {
     Long id;

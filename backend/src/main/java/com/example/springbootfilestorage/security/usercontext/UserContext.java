@@ -27,7 +27,9 @@ public class UserContext {
         }
 
         try {
-            return (User) auth.getPrincipal();
+            User currentUser = (User) auth.getPrincipal();
+            if (currentUser == null) throw new RuntimeException("User is not available");
+            return currentUser;
         } catch (ClassCastException e) {
             throw new RuntimeException("Principal is not a User object: " + auth.getPrincipal());
         }

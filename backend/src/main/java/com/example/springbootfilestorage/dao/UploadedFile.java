@@ -2,15 +2,15 @@ package com.example.springbootfilestorage.dao;
 
 import com.example.springbootfilestorage.security.dao.User;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "files")
 public class UploadedFile extends BaseDAO {
