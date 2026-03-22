@@ -1,4 +1,4 @@
-package com.example.springbootfilestorage.dto;
+package com.example.springbootfilestorage.dto.search;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;

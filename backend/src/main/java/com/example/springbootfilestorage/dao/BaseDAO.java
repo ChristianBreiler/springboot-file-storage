@@ -19,5 +19,4 @@ public class BaseDAO {
 
     @Column(name = "updated_at")
     private LocalDate updatedAt;
-
 }

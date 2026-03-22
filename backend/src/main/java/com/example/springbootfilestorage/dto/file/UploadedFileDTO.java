@@ -1,4 +1,4 @@
-package com.example.springbootfilestorage.dto;
+package com.example.springbootfilestorage.dto.file;
 
 import com.example.springbootfilestorage.dao.Filetype;
 import lombok.AllArgsConstructor;

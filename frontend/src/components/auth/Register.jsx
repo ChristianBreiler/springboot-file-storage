@@ -89,7 +89,6 @@ const Register = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
               <input
                 type="text"
-                placeholder="John"
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
                 required
@@ -100,7 +99,6 @@ const Register = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
               <input
                 type="text"
-                placeholder="Doe"
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
                 required
@@ -112,7 +110,6 @@ const Register = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
-              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -125,7 +122,6 @@ const Register = () => {
   <div className="relative">
     <input
       type={showPassword ? "text" : "password"}
-      placeholder="••••••••"
       value={password}
       onChange={(e) => setPassword(e.target.value)}
       required
@@ -150,7 +146,6 @@ const Register = () => {
   <div className="relative">
     <input
       type={showRepeatedPassword ? "text" : "password"}
-      placeholder="••••••••"
       value={repeatedPassword}
       onChange={(e) => setRepeatedPassword(e.target.value)}
       required

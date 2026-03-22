@@ -1,7 +1,7 @@
 package com.example.springbootfilestorage.security.service;
 
-import com.example.springbootfilestorage.dto.ProfileDTO;
-import com.example.springbootfilestorage.dto.UserInformationDTO;
+import com.example.springbootfilestorage.dto.profile.ProfileDTO;
+import com.example.springbootfilestorage.dto.user.UserInformationDTO;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;

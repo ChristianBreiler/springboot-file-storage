@@ -1,4 +1,4 @@
-package com.example.springbootfilestorage.dto;
+package com.example.springbootfilestorage.dto.profile;
 
 import com.example.springbootfilestorage.security.dao.Role;
 import lombok.AllArgsConstructor;

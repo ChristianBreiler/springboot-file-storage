@@ -3,7 +3,7 @@ package com.example.springbootfilestorage.service;
 import com.example.springbootfilestorage.dao.Filetype;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.dto.UploadedFileDTO;
+import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;

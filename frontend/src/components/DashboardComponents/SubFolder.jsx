@@ -16,8 +16,6 @@ const SubFolder = () => {
       setLoading(true); 
       try {
         const response = await api.get(`folders/${id}`);
-        console.log(response)
-        console.log(response.data)
         setData(response.data);
       } catch (err) {
         // TODO: Render Erro page here?

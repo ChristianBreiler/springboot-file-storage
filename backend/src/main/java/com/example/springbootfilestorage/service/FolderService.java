@@ -2,9 +2,9 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.dto.FolderDTO;
-import com.example.springbootfilestorage.dto.ParentFolderDTO;
-import com.example.springbootfilestorage.dto.UploadedFileDTO;
+import com.example.springbootfilestorage.dto.folder.FolderDTO;
+import com.example.springbootfilestorage.dto.folder.ParentFolderDTO;
+import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
@@ -12,7 +12,10 @@ import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collector;
 
 @Service
 public class FolderService {
@@ -71,6 +74,17 @@ public class FolderService {
                 folderRepository.findFoldersByNameOnHomePage(name);
     }
 
+    public FolderDTO findHomeDTO() {
+        List<Folder> folders = folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
+        List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder();
+        Folder homeFolder = new Folder();
+        homeFolder.setOwner(userContext.getAuthenticatedUser());
+        homeFolder.setParent(null);
+        homeFolder.setSubfolders(folders);
+        homeFolder.setFiles(subfolderIds);
+        return createDTO(homeFolder);
+    }
+
     public void moveFolderToFolder(Long folderId, long folderTargetId) {
         Folder folder = folderRepository.findById(folderId).orElse(null);
         if (folder == null) throw new IllegalArgumentException("Folder not found");
@@ -90,8 +104,12 @@ public class FolderService {
                 folder.getId(),
                 folder.getName(),
                 userContext.getAuthenticatedUser().getId(),
-                folder.allParents() != null ?
-                        folder.allParents().stream().map(this::createParentFolderDTO).toList() : List.of(),
+                // Do this so the breadcrumb order is correct and not reversed
+                allParents(folder).stream().map(this::createParentFolderDTO).collect(Collector.of(LinkedList::new,
+                        LinkedList::addFirst, (a, b) -> {
+                            b.addAll(a);
+                            return b;
+                        })),
                 folder.getSubfolders() != null ?
                         folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList() : List.of(),
                 folder.getFiles() != null ?
@@ -99,20 +117,22 @@ public class FolderService {
         );
     }
 
+    private List<Folder> allParents(Folder folder) {
+        List<Folder> parents = new ArrayList<>();
+        Folder currentFolder = folder;
+        // Add max depth to prevent infinite loop
+        int MAX_DEPTH = 10;
+        int depth = 0;
+        while (currentFolder.getParent() != null && depth++ < MAX_DEPTH) {
+            parents.add(currentFolder.getParent());
+            currentFolder = currentFolder.getParent();
+        }
+        return parents;
+    }
+
     private ParentFolderDTO createParentFolderDTO(Folder folder) {
         if (folder == null) return null;
         return new ParentFolderDTO(folder.getId(), folder.getName());
-    }
-
-    public FolderDTO findHomeDTO() {
-        List<Folder> folders = folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
-        List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder();
-        Folder homeFolder = new Folder();
-        homeFolder.setOwner(userContext.getAuthenticatedUser());
-        homeFolder.setParent(null);
-        homeFolder.setSubfolders(folders);
-        homeFolder.setFiles(subfolderIds);
-        return createDTO(homeFolder);
     }
 
     private FolderSummaryDTO createFolderSummaryDTO(Folder folder) {
@@ -122,13 +142,9 @@ public class FolderService {
     // TODO: Duplicate from Fileservice
     private UploadedFileDTO createUploadedFileDTO(UploadedFile file) {
         if (file == null) return null;
-
-        // TODO: Fix later
-        Long folderId = file.getFolder() != null ? file.getFolder().getId() : null;
-
         return new UploadedFileDTO(
                 file.getId(),
-                folderId,
+                file.getFolder() != null ? file.getFolder().getId() : null,
                 file.getOriginalFilename(),
                 file.getSize(),
                 file.getFiletype());

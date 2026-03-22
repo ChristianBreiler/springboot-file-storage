@@ -1,7 +1,7 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.dto.FolderDTO;
-import com.example.springbootfilestorage.dto.SearchResultDTO;
+import com.example.springbootfilestorage.dto.folder.FolderDTO;
+import com.example.springbootfilestorage.dto.search.SearchResultDTO;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.scripts.view_beans.SettingsViewBean;
@@ -61,7 +61,7 @@ public class FolderController {
 
     @PostMapping({"/createfolder", "/createfolder/{folderId}"})
     public ResponseEntity<FolderDTO> createFolder(@RequestParam String folderName,
-                                               @PathVariable(required = false) Long folderId) {
+                                                  @PathVariable(required = false) Long folderId) {
         FolderDTO updatedFolder = folderService.saveFolder(folderName, folderId);
         return ResponseEntity.ok(updatedFolder);
     }

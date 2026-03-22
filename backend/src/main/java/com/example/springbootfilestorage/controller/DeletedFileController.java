@@ -1,6 +1,6 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.dto.UploadedFileDTO;
+import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.service.FileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
