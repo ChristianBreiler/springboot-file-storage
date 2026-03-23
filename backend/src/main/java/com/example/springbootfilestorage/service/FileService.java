@@ -4,6 +4,7 @@ import com.example.springbootfilestorage.dao.Filetype;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
+import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
@@ -33,10 +34,11 @@ public class FileService {
     private final UserRepository userRepository;
     private final SettingsService settingsService;
     private final UserContext userContext;
+    private final UploadFileDTOMapper uploadFileDTOMapper;
 
     public FileService(FileRepository fileRepository, FolderService folderService, FolderRepository folderRepository,
                        StoragePathBean storagePathBean, UserRepository userRepository, SettingsService settingsService,
-                       UserContext userContext) {
+                       UserContext userContext, UploadFileDTOMapper uploadFileDTOMapper) {
         this.fileRepository = fileRepository;
         this.folderService = folderService;
         this.folderRepository = folderRepository;
@@ -45,6 +47,7 @@ public class FileService {
         this.userRepository = userRepository;
         this.settingsService = settingsService;
         this.userContext = userContext;
+        this.uploadFileDTOMapper = uploadFileDTOMapper;
     }
 
     public UploadedFile getFileByFileShareCode(String fileShareCode) {
@@ -52,7 +55,7 @@ public class FileService {
     }
 
     public UploadedFileDTO findDTOById(Long id) {
-        return createDTO(fileRepository.findById(id).orElse(null));
+        return uploadFileDTOMapper.apply(fileRepository.findById(id).orElse(null));
     }
 
     // TODO: Fix nulls here
@@ -95,7 +98,7 @@ public class FileService {
         uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setDeleted(false);
         fileRepository.save(uploadedFile);
-        return createDTO(uploadedFile);
+        return uploadFileDTOMapper.apply(uploadedFile);
     }
 
     private String generateUniqueFileName(String originalFilename) {
@@ -130,7 +133,7 @@ public class FileService {
     public List<UploadedFileDTO> findAllDeletedFiles() {
         // User user = userContextService.getCurrentUser();
         return fileRepository.findAllDeletedFiles().stream()
-                .map(this::createDTO)
+                .map(uploadFileDTOMapper)
                 .toList();
     }
 
@@ -155,7 +158,7 @@ public class FileService {
         if (file.getFolder() != null && folderRepository.existsById(file.getFolder().getId()))
             file.setFolder(null);
         fileRepository.save(file);
-        return createDTO(file);
+        return uploadFileDTOMapper.apply(file);
     }
 
     public void deleteFilePermanently(Long fileId) {
@@ -250,16 +253,6 @@ public class FileService {
         return file;
     }
 
-    private UploadedFileDTO createDTO(UploadedFile file) {
-        if (file == null) return null;
-        return new UploadedFileDTO(
-                file.getId(),
-                file.getFolder().getId(),
-                file.getOriginalFilename(),
-                file.getSize(),
-                file.getFiletype());
-    }
-
     public String findStoragePath(Long id) {
         return fileRepository.findStoragePath(id);
     }
@@ -272,7 +265,7 @@ public class FileService {
         return fileRepository
                 .findAllFiles(userContext.getAuthenticatedUser())
                 .stream()
-                .map(this::createDTO)
+                .map(uploadFileDTOMapper)
                 .toList();
     }
 }

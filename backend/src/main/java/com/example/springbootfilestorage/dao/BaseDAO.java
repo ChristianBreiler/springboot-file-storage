@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Setter
 @MappedSuperclass
 public class BaseDAO {
+    // TODO: Change this to UUID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

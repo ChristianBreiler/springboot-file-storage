@@ -3,19 +3,15 @@ package com.example.springbootfilestorage.service;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
-import com.example.springbootfilestorage.dto.folder.ParentFolderDTO;
-import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
-import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
+import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
+import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collector;
 
 @Service
 public class FolderService {
@@ -23,11 +19,16 @@ public class FolderService {
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
     private final UserContext userContext;
+    private final UploadFileDTOMapper uploadFileDTOMapper;
+    private final FolderDTOMapper folderDTOMapper;
 
-    public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext) {
+    public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext,
+                         UploadFileDTOMapper uploadFileDTOMapper, FolderDTOMapper folderDTOMapper) {
         this.folderRepository = folderRepository;
         this.fileRepository = fileRepository;
         this.userContext = userContext;
+        this.uploadFileDTOMapper = uploadFileDTOMapper;
+        this.folderDTOMapper = folderDTOMapper;
     }
 
     public FolderDTO saveFolder(String name, Long parentId) {
@@ -45,7 +46,7 @@ public class FolderService {
             folder.setParent(null);
         }
         folderRepository.save(folder);
-        return createDTO(folder);
+        return folderDTOMapper.apply(folder);
     }
 
     public Folder renameFolder(Long id, String newName) {
@@ -82,7 +83,7 @@ public class FolderService {
         homeFolder.setParent(null);
         homeFolder.setSubfolders(folders);
         homeFolder.setFiles(subfolderIds);
-        return createDTO(homeFolder);
+        return folderDTOMapper.apply(homeFolder);
     }
 
     public void moveFolderToFolder(Long folderId, long folderTargetId) {
@@ -95,58 +96,6 @@ public class FolderService {
     }
 
     public FolderDTO findByDTOId(Long id) {
-        return createDTO(folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found")));
-    }
-
-    private FolderDTO createDTO(Folder folder) {
-        if (folder == null) return null;
-        return new FolderDTO(
-                folder.getId(),
-                folder.getName(),
-                userContext.getAuthenticatedUser().getId(),
-                // Do this so the breadcrumb order is correct and not reversed
-                allParents(folder).stream().map(this::createParentFolderDTO).collect(Collector.of(LinkedList::new,
-                        LinkedList::addFirst, (a, b) -> {
-                            b.addAll(a);
-                            return b;
-                        })),
-                folder.getSubfolders() != null ?
-                        folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList() : List.of(),
-                folder.getFiles() != null ?
-                        folder.getFiles().stream().map(this::createUploadedFileDTO).toList() : List.of()
-        );
-    }
-
-    private List<Folder> allParents(Folder folder) {
-        List<Folder> parents = new ArrayList<>();
-        Folder currentFolder = folder;
-        // Add max depth to prevent infinite loop
-        int MAX_DEPTH = 10;
-        int depth = 0;
-        while (currentFolder.getParent() != null && depth++ < MAX_DEPTH) {
-            parents.add(currentFolder.getParent());
-            currentFolder = currentFolder.getParent();
-        }
-        return parents;
-    }
-
-    private ParentFolderDTO createParentFolderDTO(Folder folder) {
-        if (folder == null) return null;
-        return new ParentFolderDTO(folder.getId(), folder.getName());
-    }
-
-    private FolderSummaryDTO createFolderSummaryDTO(Folder folder) {
-        return new FolderSummaryDTO(folder.getId(), folder.getName());
-    }
-
-    // TODO: Duplicate from Fileservice
-    private UploadedFileDTO createUploadedFileDTO(UploadedFile file) {
-        if (file == null) return null;
-        return new UploadedFileDTO(
-                file.getId(),
-                file.getFolder() != null ? file.getFolder().getId() : null,
-                file.getOriginalFilename(),
-                file.getSize(),
-                file.getFiletype());
+        return folderDTOMapper.apply(folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found")));
     }
 }
