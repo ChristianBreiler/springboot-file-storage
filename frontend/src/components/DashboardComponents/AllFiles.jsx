@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import File from "./File";
 
 const AllFiles = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchFolderData = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const response = await api.get(`files`);
         setData(response.data);
@@ -21,7 +21,7 @@ const AllFiles = () => {
     };
 
     fetchFolderData();
-  }, []); 
+  }, []);
 
   if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading files...</div>;
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;

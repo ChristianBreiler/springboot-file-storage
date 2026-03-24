@@ -1,6 +1,8 @@
 package com.example.springbootfilestorage.controller;
 
+import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
+import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.search.SearchResultDTO;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
@@ -19,7 +21,6 @@ public class FolderController {
 
     private final FolderService folderService;
     private final FileService fileService;
-    private final int MAX_PARENT_FOLDERS = 5;
     private final SettingsViewBean settingsViewBean;
 
     public FolderController(FolderService folderService, FileService fileService, SettingsViewBean settingsViewBean) {
@@ -28,7 +29,6 @@ public class FolderController {
         this.settingsViewBean = settingsViewBean;
     }
 
-    // Retrieves the home folder details for the current user
     @GetMapping("/home")
     public ResponseEntity<FolderDTO> home() {
         return ResponseEntity.ok(folderService.findHomeDTO());
@@ -48,21 +48,20 @@ public class FolderController {
     }
 
     @PostMapping("/rename/{id}")
-    public ResponseEntity<Folder> renameFolder(@PathVariable Long id, @RequestParam String newName) {
-        Folder updatedFolder = folderService.renameFolder(id, newName);
-        return ResponseEntity.ok(updatedFolder);
+    public ResponseEntity<Folder> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable Long id) {
+        if (renameFolderDTO.folderName().trim().isEmpty()) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(folderService.renameFolder(id, renameFolderDTO.folderName()));
     }
 
-    @DeleteMapping("/deleteFolder/{id}")
+    @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204 No Content
     public void deleteFolderHome(@PathVariable Long id) {
         folderService.deleteFolder(id);
     }
 
-    @PostMapping({"/createfolder", "/createfolder/{folderId}"})
-    public ResponseEntity<FolderDTO> createFolder(@RequestParam String folderName,
+    @PostMapping({"/create", "/create/{folderId}"})
+    public ResponseEntity<FolderDTO> createFolder(@RequestBody CreateFolderDTO createFolderDTO,
                                                   @PathVariable(required = false) Long folderId) {
-        FolderDTO updatedFolder = folderService.saveFolder(folderName, folderId);
-        return ResponseEntity.ok(updatedFolder);
+        return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderId));
     }
 }

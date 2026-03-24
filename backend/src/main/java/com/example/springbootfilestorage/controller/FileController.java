@@ -1,6 +1,7 @@
 package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.file.CreateFileDTO;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.service.FileService;
 import org.springframework.core.io.Resource;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -95,11 +95,11 @@ public class FileController {
     }
 
     @PostMapping(value = {"/upload", "/upload/{folderId}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UploadedFileDTO> upload(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<UploadedFileDTO> upload(@ModelAttribute CreateFileDTO createFileDTO,
                                                   @PathVariable(required = false) Long folderId) {
-        if (file.isEmpty()) return ResponseEntity.badRequest().build();
+        if (createFileDTO == null || createFileDTO.file().isEmpty()) return ResponseEntity.badRequest().build();
 
-        UploadedFileDTO updatedFile = fileService.saveFile(file, folderId);
+        UploadedFileDTO updatedFile = fileService.saveFile(createFileDTO, folderId);
         if (updatedFile == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(updatedFile);
@@ -115,10 +115,5 @@ public class FileController {
     public ResponseEntity<UploadedFile> rename(@PathVariable Long id, @RequestParam String newName) {
         UploadedFile updatedFile = fileService.renameFile(id, newName);
         return ResponseEntity.ok(updatedFile);
-    }
-
-    // Only allow files up to 1GB
-    private boolean fileTooBig(MultipartFile file) {
-        return file.getSize() > 1073741824;
     }
 }

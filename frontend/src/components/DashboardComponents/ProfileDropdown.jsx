@@ -41,7 +41,7 @@ function ProfileDropdown() {
             alt="Profile"
             className="w-full h-full rounded-xl border-2 border-white shadow-xl object-cover bg-gray-200"
           />
-        </div>  
+        </div>
         <ChevronDown size={14} className="text-slate-400 mr-1" />
       </button>
       <div className="absolute right-0 mt-2 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 z-50 overflow-hidden">

@@ -1,8 +1,8 @@
 import api from "../../api/axiosConfig";
 import { ChevronRight, Home } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom"; 
-import Folder from "./Folder"; 
+import { Link, useParams } from "react-router-dom";
+import Folder from "./Folder";
 import File from "./File";
 import LoadingBar from "../loading/LoadingBar";
 
@@ -13,7 +13,7 @@ const SubFolder = () => {
 
   useEffect(() => {
     const fetchFolderData = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const response = await api.get(`folders/${id}`);
         setData(response.data);
@@ -26,7 +26,7 @@ const SubFolder = () => {
     };
 
     fetchFolderData();
-  }, [id]); 
+  }, [id]);
 
   if (loading) return <LoadingBar />
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;

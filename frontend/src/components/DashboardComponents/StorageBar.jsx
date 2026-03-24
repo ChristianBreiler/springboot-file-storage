@@ -10,7 +10,7 @@ const StorageBar = () => {
     const fetchStorage = async () => {
       try {
         // Change "storage" to the exact endpoint your Spring Boot controller uses
-        const response = await api.get(`storage`); 
+        const response = await api.get(`storage`);
         setData(response.data);
       } catch (err) {
         console.error("Failed to fetch storage data:", err);
@@ -57,11 +57,11 @@ const StorageBar = () => {
             {used.toFixed(1)} GB <span className="text-slate-500 font-normal">/ {total} GB</span>
           </p>
         </div>
-        <Link 
+        <Link
           to="/storage_details"
           className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-tight"
         >
-         Details
+          Details
         </Link>
       </div>
 

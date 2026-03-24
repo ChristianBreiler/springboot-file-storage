@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.security.usercontext;
 
+import com.example.springbootfilestorage.security.dao.Role;
 import com.example.springbootfilestorage.security.dao.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,5 +34,9 @@ public class UserContext {
         } catch (ClassCastException e) {
             throw new RuntimeException("Principal is not a User object: " + auth.getPrincipal());
         }
+    }
+
+    public boolean isAdmin() {
+        return getAuthenticatedUser().getRole().equals(Role.ADMIN);
     }
 }

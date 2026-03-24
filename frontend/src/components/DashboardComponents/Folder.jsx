@@ -16,7 +16,7 @@ const Folder = ({ id, name = "New Folder" }) => {
           </span>
         </div>
       </div>
-      <button 
+      <button
         onClick={(e) => {
           e.preventDefault();
           console.log("Open options");

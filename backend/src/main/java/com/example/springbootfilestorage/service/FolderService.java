@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
@@ -21,6 +22,7 @@ public class FolderService {
     private final UserContext userContext;
     private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
+    private final int MAX_PARENT_FOLDERS = 5;
 
     public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext,
                          UploadFileDTOMapper uploadFileDTOMapper, FolderDTOMapper folderDTOMapper) {
@@ -31,9 +33,9 @@ public class FolderService {
         this.folderDTOMapper = folderDTOMapper;
     }
 
-    public FolderDTO saveFolder(String name, Long parentId) {
+    public FolderDTO saveFolder(CreateFolderDTO createFolderDTO, Long parentId) {
         Folder folder = new Folder();
-        folder.setName(name);
+        folder.setName(createFolderDTO.folderName());
         folder.setOwner(userContext.getAuthenticatedUser());
         folder.setCreatedAt(LocalDate.now());
         folder.setUpdatedAt(LocalDate.now());
@@ -41,8 +43,9 @@ public class FolderService {
             Folder parent = folderRepository.findById(parentId).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
             folder.setParent(parent);
+            if (parent.getSubfolders().size() >= MAX_PARENT_FOLDERS)
+                throw new IllegalArgumentException("Maximum number of subfolders reached");
         } else {
-            // Homepage folders
             folder.setParent(null);
         }
         folderRepository.save(folder);
@@ -50,8 +53,7 @@ public class FolderService {
     }
 
     public Folder renameFolder(Long id, String newName) {
-        Folder folder = folderRepository.findById(id).orElse(null);
-        if (folder == null) throw new RuntimeException("Folder to be renamed not found");
+        Folder folder = folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
 
         folder.setName(newName);
         folderRepository.save(folder);

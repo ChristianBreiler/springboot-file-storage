@@ -53,7 +53,7 @@ public class User extends BaseDAO implements UserDetails {
     @JoinColumn(name = "profile_pic_id")
     private UploadedFile profilePic;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     private Role role;
 
     @OneToOne(fetch = FetchType.LAZY)

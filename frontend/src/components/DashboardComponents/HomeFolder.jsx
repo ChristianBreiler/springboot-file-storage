@@ -12,7 +12,7 @@ const HomeFolder = () => {
     const fetchFolderData = async () => {
       try {
         const response = await api.get("folders/home");
-        setData(response.data); 
+        setData(response.data);
       } catch (err) {
         console.error("Failed to fetch folders:", err);
       } finally {
@@ -30,10 +30,10 @@ const HomeFolder = () => {
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Folders</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {data?.folders?.map((folder) => (
-          <Folder 
-            key={folder.id} 
-            id={folder.id} 
-            name={folder.name} 
+          <Folder
+            key={folder.id}
+            id={folder.id}
+            name={folder.name}
           />
         ))}
       </div>
@@ -46,7 +46,7 @@ const HomeFolder = () => {
           filetype={file.filetype}
         />
       ))}
-        {data?.folders?.length === 0 && data?.files?.length === 0 && (
+      {data?.folders?.length === 0 && data?.files?.length === 0 && (
         <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
           <p className="text-slate-400">This Folder is Empty</p>
         </div>

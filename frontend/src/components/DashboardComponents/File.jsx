@@ -57,7 +57,7 @@ const File = ({ id, originalFilename, size, filetype }) => {
             <span>{formatSize(size)}</span>
           </div>
         </div>
-      </Link>  
+      </Link>
       <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
         <MoreVertical size={16} />
       </button>

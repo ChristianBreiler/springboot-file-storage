@@ -4,7 +4,6 @@ import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
 import com.example.springbootfilestorage.repository.SettingsRepository;
-import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +19,7 @@ public class SettingsService {
     }
 
     public Settings getSettingsFromUser() {
-        User currentUser = userContext.getAuthenticatedUser();
-        return currentUser.getSettings();
+        return userContext.getAuthenticatedUser().getSettings();
     }
 
     public int fileDeletionWeeks() {

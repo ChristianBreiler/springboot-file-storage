@@ -3,6 +3,7 @@ package com.example.springbootfilestorage.service;
 import com.example.springbootfilestorage.dao.Filetype;
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.file.CreateFileDTO;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
@@ -59,8 +60,9 @@ public class FileService {
     }
 
     // TODO: Fix nulls here
-    public UploadedFileDTO saveFile(MultipartFile file, Long folderId) {
-        if (file.isEmpty() || fileExists(file.getOriginalFilename(), folderId)) return null;
+    public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, Long folderId) {
+        MultipartFile file = createFileDTO.file();
+        if (fileExists(file.getOriginalFilename(), folderId)) throw new IllegalArgumentException("File already exists");
 
         UploadedFile uploadedFile = new UploadedFile();
 

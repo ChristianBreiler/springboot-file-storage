@@ -9,8 +9,8 @@ const Sidebar = () => {
 
   const navLinkClass = (path) => `
     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
-    ${isActive(path) 
-      ? "bg-blue-600/10 text-blue-400" 
+    ${isActive(path)
+      ? "bg-blue-600/10 text-blue-400"
       : "hover:bg-slate-900 hover:text-slate-100 text-slate-400"}
   `;
 
@@ -35,19 +35,20 @@ const Sidebar = () => {
           <span className="text-sm font-medium">All Files</span>
         </Link>
         <Link to="/deleted_files" className={navLinkClass("/deleted_files")}>
-        <Trash 
-        size={18} 
-        className={isActive("/deleted_files") ? "text-blue-400" : "text-slate-500 group-hover:text-slate-100"} 
-        />
-      <span className="text-sm font-medium">Trash</span>
-      </Link>
+          <Trash
+            size={18}
+            className={isActive("/deleted_files") ? "text-blue-400" : "text-slate-500 group-hover:text-slate-100"}
+          />
+          <span className="text-sm font-medium">Trash</span>
+        </Link>
+        {/* TODO: Manage page for admins */}
       </nav>
       <div className="p-4 border-t border-slate-900">
         <Link to="/settings" className={navLinkClass("/settings") + " mb-4"}>
           <Settings size={18} className={isActive("/settings") ? "text-blue-400" : "text-slate-500 group-hover:text-slate-100"} />
           <span className="text-sm font-medium">Settings</span>
-        </Link>        
-          <StorageBar />
+        </Link>
+        <StorageBar />
       </div>
     </aside>
   );

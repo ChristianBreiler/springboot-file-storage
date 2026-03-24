@@ -34,4 +34,17 @@ public class Folder extends BaseDAO {
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadedFile> files = new ArrayList<>();
+
+    public List<Folder> allParents() {
+        List<Folder> parents = new ArrayList<>();
+        Folder currentFolder = this;
+        // Add max depth to prevent infinite loop
+        int MAX_DEPTH = 10;
+        int depth = 0;
+        while (currentFolder.getParent() != null && depth++ < MAX_DEPTH) {
+            parents.add(currentFolder.getParent());
+            currentFolder = currentFolder.getParent();
+        }
+        return parents;
+    }
 }

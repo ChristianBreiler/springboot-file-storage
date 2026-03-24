@@ -6,31 +6,31 @@ import File from "./File";
 
 const DeletedFiles = () => {
 
-    const [loading, setLoading] = useState(true);
-    const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
 
-    useEffect(() => {
-        const fetchFolderData = async () => {
-          setLoading(true); 
-          try {
-            const response = await api.get(`/deleted_files`);
-            setData(response.data);
-          } catch (err) {
-            // TODO: Render Erro page here?
-            console.error("Failed to fetch folders:", err);
-          } finally {
-            setLoading(false);
-          }
-        };
-    
-        fetchFolderData();
-      }, []); 
+  useEffect(() => {
+    const fetchFolderData = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get(`/deleted_files`);
+        setData(response.data);
+      } catch (err) {
+        // TODO: Render Erro page here?
+        console.error("Failed to fetch folders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFolderData();
+  }, []);
 
 
-    if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading storage...</div>;
-    if (!data) return <div className="p-8 text-red-500">Error while loading deleted Folders</div>;
+  if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading storage...</div>;
+  if (!data) return <div className="p-8 text-red-500">Error while loading deleted Folders</div>;
 
-    return (
+  return (
     <div className="p-6">
       <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
         <Link to="/folders/home" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
