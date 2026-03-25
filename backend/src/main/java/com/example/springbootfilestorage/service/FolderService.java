@@ -4,6 +4,7 @@ import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
+import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
@@ -52,13 +53,13 @@ public class FolderService {
         return folderDTOMapper.apply(folder);
     }
 
-    public Folder renameFolder(Long id, String newName) {
+    public FolderDTO renameFolder(Long id, RenameFolderDTO renameFolderDTO) {
         Folder folder = folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
 
-        folder.setName(newName);
+        folder.setName(renameFolderDTO.newFolderName());
         folderRepository.save(folder);
 
-        return folder;
+        return folderDTOMapper.apply(folder);
     }
 
     public void deleteFolder(Long id) {

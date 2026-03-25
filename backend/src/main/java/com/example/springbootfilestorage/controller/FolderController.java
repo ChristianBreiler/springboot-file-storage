@@ -48,9 +48,9 @@ public class FolderController {
     }
 
     @PostMapping("/rename/{id}")
-    public ResponseEntity<Folder> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable Long id) {
-        if (renameFolderDTO.folderName().trim().isEmpty()) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(folderService.renameFolder(id, renameFolderDTO.folderName()));
+    public ResponseEntity<FolderDTO> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable Long id) {
+        if (renameFolderDTO.newFolderName().trim().isEmpty()) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(folderService.renameFolder(id, renameFolderDTO));
     }
 
     @DeleteMapping("/delete/{id}")

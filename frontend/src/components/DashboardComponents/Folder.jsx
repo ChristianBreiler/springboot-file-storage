@@ -1,31 +1,87 @@
 import { Link } from "react-router-dom";
-import { Folder as FolderIcon, MoreVertical } from "lucide-react";
+import { Folder as FolderIcon, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import RenameFolderModal from "../modals/RenameFolderModal";
 
 const Folder = ({ id, name = "New Folder" }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    if (isMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
+
   return (
-    <Link
-      to={`/folders/${id}`}
-      className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-200 active:scale-[0.98]">
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
-          <FolderIcon size={24} fill="currentColor" fillOpacity={0.2} />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-700 truncate transition-colors">
-            {name}
-          </span>
+    <>
+      <div className="relative group/card">
+        <Link
+          to={`/folders/${id}`}
+          className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl 
+                     hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 
+                     transition-all duration-200 active:scale-[0.98]" >
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover/card:bg-blue-600 group-hover/card:text-white transition-colors duration-200">
+              <FolderIcon size={24} fill="currentColor" fillOpacity={0.2} />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-semibold text-slate-700 group-hover/card:text-blue-700 truncate transition-colors">
+                {name}
+              </span>
+            </div>
+          </div>
+          <div className="w-8" />
+        </Link>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2" ref={menuRef}>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className={`p-1.5 rounded-lg transition-all duration-200 ${isMenuOpen
+              ? "bg-slate-100 text-slate-600 opacity-100"
+              : "text-slate-400 hover:bg-slate-100 hover:text-slate-600 md:opacity-0 group-hover/card:opacity-100"
+              }`}
+          >
+            <MoreVertical size={18} />
+          </button>
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden z-50">
+              <button
+                className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  setIsRenameOpen(true);
+                }}
+              >
+                <Pencil size={14} /> Rename
+              </button>
+              <button
+                className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsMenuOpen(false); }}
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          console.log("Open options");
-        }}
-        className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <MoreVertical size={18} />
-      </button>
-    </Link>
+      <RenameFolderModal
+        isOpen={isRenameOpen}
+        onClose={() => setIsRenameOpen(false)}
+        currentFolderName={name}
+        folderId={id}
+      />
+    </>
   );
 };
 

@@ -9,7 +9,6 @@ const StorageBar = () => {
   useEffect(() => {
     const fetchStorage = async () => {
       try {
-        // Change "storage" to the exact endpoint your Spring Boot controller uses
         const response = await api.get(`storage`);
         setData(response.data);
       } catch (err) {
@@ -54,7 +53,7 @@ const StorageBar = () => {
       <div className="flex justify-between items-end mb-3">
         <div>
           <p className="text-xs font-bold text-slate-100">
-            {used.toFixed(1)} GB <span className="text-slate-500 font-normal">/ {total} GB</span>
+            {used.toFixed(1)} MB <span className="text-slate-500 font-normal">/ {total} MB</span>
           </p>
         </div>
         <Link
@@ -71,7 +70,6 @@ const StorageBar = () => {
           style={{ width: `${percentage}%` }}
         />
       </div>
-
       {percentage > 90 && (
         <p className="mt-2 text-[10px] text-red-400 font-medium leading-tight">
           Storage almost full!

@@ -40,7 +40,7 @@ const StorageDetails = () => {
             <div className="mb-10">
               <div className="flex justify-between items-end mb-3">
                 <span className="text-4xl font-light">{usedPercentage.toFixed(1)}<span className="text-xl">%</span></span>
-                <span className="text-slate-400 pb-1">{storage.usedSpace.toFixed(2)} GB / {storage.totalSpace} GB</span>
+                <span className="text-slate-400 pb-1">{storage.usedSpace.toFixed(2)} MB / {storage.totalSpace} MB</span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
                 <div

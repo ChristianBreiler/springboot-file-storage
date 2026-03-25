@@ -1,6 +1,10 @@
 package com.example.springbootfilestorage.security.service;
 
+import com.example.springbootfilestorage.dto.mappers.IsAdminDTOMapper;
+import com.example.springbootfilestorage.dto.mappers.ProfileDTOMapper;
+import com.example.springbootfilestorage.dto.mappers.UserInformationDTOMappers;
 import com.example.springbootfilestorage.dto.profile.ProfileDTO;
+import com.example.springbootfilestorage.dto.user.IsAdminDTO;
 import com.example.springbootfilestorage.dto.user.UserInformationDTO;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
@@ -14,46 +18,32 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserContext userContext;
+    private final IsAdminDTOMapper isAdminDTOMapper;
+    private final ProfileDTOMapper profileDTOMapper;
+    private final UserInformationDTOMappers userInformationDTOMappers;
 
-    public UserService(UserRepository userRepository, UserContext userContext) {
+    public UserService(UserRepository userRepository, UserContext userContext, IsAdminDTOMapper isAdminDTOMapper,
+                       ProfileDTOMapper profileDTOMapper, UserInformationDTOMappers userInformationDTOMappers) {
         this.userRepository = userRepository;
         this.userContext = userContext;
+        this.isAdminDTOMapper = isAdminDTOMapper;
+        this.profileDTOMapper = profileDTOMapper;
+        this.userInformationDTOMappers = userInformationDTOMappers;
     }
 
     public UserInformationDTO getUserInformation() {
-        return createUserInformationDTO(userContext.getAuthenticatedUser());
-    }
-
-    private UserInformationDTO createUserInformationDTO(User user) {
-        if (user == null) return null;
-        String profilePicName = null;
-        if (user.getProfilePic() != null) profilePicName = user.getProfilePic().getStoredName();
-        return new UserInformationDTO(
-                user.getFirstname(),
-                user.getLastname(),
-                user.getRole(),
-                profilePicName
-        );
+        return userInformationDTOMappers.apply(userContext.getAuthenticatedUser());
     }
 
     public ProfileDTO getProfile() {
-        return createProfileDTO(userContext.getAuthenticatedUser());
-    }
-
-    private ProfileDTO createProfileDTO(User user) {
-        String profilePicName = null;
-        if (user.getProfilePic() != null) profilePicName = user.getProfilePic().getStoredName();
-        return new ProfileDTO(
-                user.getFirstname(),
-                user.getLastname(),
-                user.getEmailaddress(),
-                user.getRole(),
-                user.getCreatedAt(),
-                profilePicName
-        );
+        return profileDTOMapper.apply(userContext.getAuthenticatedUser());
     }
 
     public List<User> allUsers() {
         return userRepository.findAll();
+    }
+
+    public IsAdminDTO isAdmin() {
+        return isAdminDTOMapper.apply(userContext.getAuthenticatedUser());
     }
 }

@@ -33,7 +33,6 @@ public class FileController {
         return ResponseEntity.ok(fileService.findAll());
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<UploadedFileDTO> show(@PathVariable Long id) {
         UploadedFileDTO file = fileService.findDTOById(id);

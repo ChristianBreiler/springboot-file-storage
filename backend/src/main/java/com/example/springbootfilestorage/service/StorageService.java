@@ -34,23 +34,16 @@ public class StorageService {
     }
 
     public StorageDTO getStorage() {
-        Long bytes = storageRepository.usedSpace(userContext.getAuthenticatedUser());
+        double usedSpace = usedSpaceInMB();
         double totalSpaceGB = 100.0;
 
-        if (bytes == null || bytes <= 0) return new StorageDTO(0.0, totalSpaceGB);
-
-        double usedSpaceGB = bytes / (1024.0 * 1024.0 * 1024.0);
-
-        return new StorageDTO(usedSpaceGB, totalSpaceGB);
+        return new StorageDTO(usedSpace, totalSpaceGB);
     }
 
     public StorageDetailDTO getStorageDetails() {
-        // TODO: This is very inefficient too many queries -> Fix later
-        Long usedSpaceVal = storageRepository.usedSpace(userContext.getAuthenticatedUser());
-        double totalSpace = 100;
-        double usedSpace;
-        if (usedSpaceVal == null) usedSpace = 0;
-        else usedSpace = usedSpaceVal.doubleValue();
+        double usedSpace = usedSpaceInMB();
+        // In MB
+        double totalSpace = 1000;
         int numberOfFiles = fileRepository.numberOfFiles();
         int numberOfFolders = folderRepository.numberOfFolders();
         List<UploadedFile> fiveBiggestFiles = fileRepository.fiveBiggestFiles();
@@ -64,6 +57,14 @@ public class StorageService {
     }
 
     private FileSizeDTO createFileSizeDTO(UploadedFile file) {
-        return new FileSizeDTO(file.getOriginalFilename(), file.getSize());
+        return new FileSizeDTO(file.getOriginalFilename(), convertToMB(file.getSize()));
+    }
+
+    private double usedSpaceInMB() {
+        return convertToMB(storageRepository.usedSpace(userContext.getAuthenticatedUser()));
+    }
+
+    private double convertToMB(Long bytes) {
+        return bytes == null ? 0 : bytes / (1024.0 * 1024.0);
     }
 }

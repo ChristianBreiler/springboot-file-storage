@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.security.controller;
 
+import com.example.springbootfilestorage.dto.user.IsAdminDTO;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +33,10 @@ public class UserController {
     public ResponseEntity<List<User>> allUsers() {
         List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/me/is_admin")
+    public ResponseEntity<IsAdminDTO> isAdmin() {
+        return ResponseEntity.ok(userService.isAdmin());
     }
 }

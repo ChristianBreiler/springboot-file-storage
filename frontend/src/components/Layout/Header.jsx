@@ -14,8 +14,8 @@ const Header = () => {
           <input
             type="text"
             placeholder="Search documents, people, or settings..."
-            className="w-full rounded-xl bg-slate-100/50 border-transparent py-2.5 pl-10 pr-12 text-sm outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-200 placeholder:text-slate-500"
-          />
+            className="w-full rounded-xl bg-slate-100/50 border-transparent py-2.5 pl-10 pr-12 text-sm outline-none transition-all 
+                    focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-200 placeholder:text-slate-500" />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1 px-1.5 py-1 rounded bg-white border border-slate-200 shadow-sm">
             <Command size={10} className="text-slate-400" />
             <span className="text-[10px] font-bold text-slate-400">K</span>
