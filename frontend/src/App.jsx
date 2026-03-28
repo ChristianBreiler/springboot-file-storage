@@ -23,12 +23,12 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/",
-    element: <Layout />,
+    element: <ProtectedRoute />,
     errorElement: <NotFound />,
     children: [
       {
-        element: <ProtectedRoute />, 
+        path: "/",
+        element: <Layout />,
         children: [
           { index: true, element: <Homepage /> },
           { path: "folders/:id", element: <SubFolder /> },

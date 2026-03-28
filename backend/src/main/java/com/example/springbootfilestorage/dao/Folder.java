@@ -47,4 +47,16 @@ public class Folder extends BaseDAO {
         }
         return parents;
     }
+
+    public int numberOfFiles() {
+        return files.size() + subfolders.stream()
+                .mapToInt(Folder::numberOfFiles)
+                .sum();
+    }
+
+    public int numberOfFolders() {
+        return subfolders.size() + subfolders.stream()
+                .mapToInt(Folder::numberOfFolders)
+                .sum();
+    }
 }

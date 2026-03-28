@@ -33,19 +33,9 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
-    @PostMapping("/change_username")
-    public ResponseEntity<?> changeUsername(@RequestParam String username) {
-        if (username.trim().isEmpty() || username.length() > 20) {
-            return ResponseEntity.badRequest().body("Invalid username: Must be 1-20 characters.");
-        }
-
-        // User user = userService.changeUserName(username);
-        return ResponseEntity.ok(new User());
-    }
-
     @PostMapping("/edit")
-    public ResponseEntity<?> editProfile(@RequestBody EditProfileDTO editedProfile) {
-        return null;
+    public ResponseEntity<ProfileDTO> editProfile(@RequestBody EditProfileDTO editedProfile) {
+        return ResponseEntity.ok(userService.editProfile(editedProfile));
     }
 
     @PostMapping("/uploadProfilePic")

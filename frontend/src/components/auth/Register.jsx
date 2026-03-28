@@ -19,10 +19,10 @@ const Register = () => {
     return regex.test(email);
   };
 
-   /**
-    * At least one lowercase letter, one uppercase letter,
-    * one digit, one special character, and must be at least 8 characters long.
-  */ 
+  /**
+   * At least one lowercase letter, one uppercase letter,
+   * one digit, one special character, and must be at least 8 characters long.
+ */
 
   const isPasswordValid = (password) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -45,7 +45,7 @@ const Register = () => {
       setError("Password must be 8+ chars with uppercase, lowercase, number, and special char");
       return;
     }
-    if (!isPasswordRepeated()){
+    if (!isPasswordRepeated()) {
       setError("Repeat Password");
       return;
     }
@@ -116,54 +116,52 @@ const Register = () => {
               className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             />
           </div>
-
-<div className="relative">
-  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-  <div className="relative">
-    <input
-      type={showPassword ? "text" : "password"}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      required
-      className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-    />
-    <button
-      type="button"
-      onClick={() => setShowPassword(!showPassword)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
-    >
-      {showPassword ? (
-        <span className="text-xs font-bold uppercase">Hide</span>
-      ) : (
-        <span className="text-xs font-bold uppercase">Show</span>
-      )}
-    </button>
-  </div>
-</div>
-
-<div className="relative">
-  <label className="block text-sm font-medium text-gray-700 mb-1">Repeat Password</label>
-  <div className="relative">
-    <input
-      type={showRepeatedPassword ? "text" : "password"}
-      value={repeatedPassword}
-      onChange={(e) => setRepeatedPassword(e.target.value)}
-      required
-      className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-    />
-    <button
-      type="button"
-      onClick={() => setShowRepeatedPassword(!showRepeatedPassword)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
-    >
-      {showRepeatedPassword ? (
-        <span className="text-xs font-bold uppercase">Hide</span>
-      ) : (
-        <span className="text-xs font-bold uppercase">Show</span>
-      )}
-    </button>
-  </div>
-</div>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
+              >
+                {showPassword ? (
+                  <span className="text-xs font-bold uppercase">Hide</span>
+                ) : (
+                  <span className="text-xs font-bold uppercase">Show</span>
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Repeat Password</label>
+            <div className="relative">
+              <input
+                type={showRepeatedPassword ? "text" : "password"}
+                value={repeatedPassword}
+                onChange={(e) => setRepeatedPassword(e.target.value)}
+                required
+                className="w-full p-3 pr-12 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowRepeatedPassword(!showRepeatedPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
+              >
+                {showRepeatedPassword ? (
+                  <span className="text-xs font-bold uppercase">Hide</span>
+                ) : (
+                  <span className="text-xs font-bold uppercase">Show</span>
+                )}
+              </button>
+            </div>
+          </div>
           <button
             type="submit"
             disabled={isLoading}

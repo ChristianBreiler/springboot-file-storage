@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+// Schedule that automatically deletes all files that are marked as "deleted" and their date is due
+
 @Service
 public class DeleteDeletedFiles {
 

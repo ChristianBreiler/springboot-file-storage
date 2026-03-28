@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { Folder as FolderIcon, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import RenameFolderModal from "../modals/RenameFolderModal";
+import DeleteFolderModal from "../modals/DeleteFolderModal";
 
 const Folder = ({ id, name = "New Folder" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -67,7 +69,12 @@ const Folder = ({ id, name = "New Folder" }) => {
               </button>
               <button
                 className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsMenuOpen(false); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  setIsDeleteOpen(true);
+                }}
               >
                 <Trash2 size={14} /> Delete
               </button>
@@ -75,12 +82,22 @@ const Folder = ({ id, name = "New Folder" }) => {
           )}
         </div>
       </div>
-      <RenameFolderModal
-        isOpen={isRenameOpen}
-        onClose={() => setIsRenameOpen(false)}
-        currentFolderName={name}
-        folderId={id}
-      />
+      {isRenameOpen && (
+        <RenameFolderModal
+          isOpen={isRenameOpen}
+          onClose={() => setIsRenameOpen(false)}
+          currentFolderName={name}
+          folderId={id}
+        />
+      )}
+      {isDeleteOpen && (
+        <DeleteFolderModal
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          currentFolderName={name}
+          folderId={id}
+        />
+      )}
     </>
   );
 };

@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
@@ -100,5 +101,11 @@ public class FolderService {
 
     public FolderDTO findByDTOId(Long id) {
         return folderDTOMapper.apply(folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found")));
+    }
+
+    public CanDeleteFolderDTO canFolderBeDeleted(Long id) {
+        Folder folder = folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
+        // TODO: Maybe make this more efficient?
+        return new CanDeleteFolderDTO((folder.numberOfFolders() + folder.numberOfFiles()) == 0);
     }
 }

@@ -1,13 +1,9 @@
 package com.example.springbootfilestorage.security.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class LoginResponse {
-    private String token;
-    private long expiresIn;
+public record LoginResponse(
+        String token,
+        long expiresIn,
+        // Do this to check if a verification email has to be send
+        boolean isEnabled
+) {
 }

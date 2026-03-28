@@ -3,6 +3,7 @@ package com.example.springbootfilestorage.security.service;
 import com.example.springbootfilestorage.dto.mappers.IsAdminDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.ProfileDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UserInformationDTOMappers;
+import com.example.springbootfilestorage.dto.profile.EditProfileDTO;
 import com.example.springbootfilestorage.dto.profile.ProfileDTO;
 import com.example.springbootfilestorage.dto.user.IsAdminDTO;
 import com.example.springbootfilestorage.dto.user.UserInformationDTO;
@@ -45,5 +46,16 @@ public class UserService {
 
     public IsAdminDTO isAdmin() {
         return isAdminDTOMapper.apply(userContext.getAuthenticatedUser());
+    }
+
+    public ProfileDTO editProfile(EditProfileDTO editedProfile) {
+        User user = userContext.getAuthenticatedUser();
+        user.setFirstname(editedProfile.firstname());
+        user.setLastname(editedProfile.lastname());
+        user.setEmailaddress(editedProfile.email());
+        // TODO: Obviously change this later on
+        user.setProfilePic(null);
+        userRepository.save(user);
+        return profileDTOMapper.apply(user);
     }
 }

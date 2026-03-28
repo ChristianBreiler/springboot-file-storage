@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
+import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.search.SearchResultDTO;
 import com.example.springbootfilestorage.dao.Folder;
@@ -63,5 +64,10 @@ public class FolderController {
     public ResponseEntity<FolderDTO> createFolder(@RequestBody CreateFolderDTO createFolderDTO,
                                                   @PathVariable(required = false) Long folderId) {
         return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderId));
+    }
+
+    @GetMapping("/delete_folder_info/{id}")
+    public ResponseEntity<CanDeleteFolderDTO> deleteFolderInfo(@PathVariable Long id) {
+        return ResponseEntity.ok(folderService.canFolderBeDeleted(id));
     }
 }

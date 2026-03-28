@@ -5,6 +5,7 @@ import api from "../../api/axiosConfig";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Login = () => {
       }
     } catch (err) {
       var message;
-      if (error.response){
+      if (error.response) {
         message = "Invalid email or password"
       } else {
         message = "Could not reach the server"
@@ -49,14 +50,12 @@ const Login = () => {
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
           <p className="text-gray-500 mt-2">Please enter your details</p>
         </div>
-
         <form onSubmit={handleLogin} className="space-y-4">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded text-sm">
               {error}
             </div>
           )}
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
@@ -67,18 +66,23 @@ const Login = () => {
               className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
             />
           </div>
-
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all pr-12"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9.5 text-gray-400 hover:text-indigo-600 transition-colors"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
           </div>
-
           <button
             type="submit"
             disabled={isLoading}
@@ -88,7 +92,6 @@ const Login = () => {
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{" "}
           <Link to="/register" className="text-indigo-600 font-medium hover:underline">

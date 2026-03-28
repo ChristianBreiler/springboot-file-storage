@@ -15,6 +15,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The FileCleanupJob class is a scheduled service responsible for maintaining file consistency
+ * between the application database and the physical file storage on disk.
+ * It performs cleanup operations to remove incorrect or orphaned file references.
+ * <p>
+ * This class works in the following main steps:
+ * 1. Deletes database file records with invalid or non-existent file paths.
+ * 2. Deletes physical files on disk that are not tracked in the database.
+ * 3. Stores details of cleanup operations as messages for administrator review.
+ * <p>
+ * Dependencies:
+ * - FileRepository: Provides access to file records in the database.
+ * - StoragePathBean: Supplies folder paths used for managing file storage locations.
+ * - MessageService: Sends cleanup operation summaries as messages.
+ * <p>
+ * Scheduled Execution:
+ * - This job executes daily at midnight (specified by the cron expression "0 0 0 * * ?").
+ */
+
 @Service
 public class FileCleanupJob {
 

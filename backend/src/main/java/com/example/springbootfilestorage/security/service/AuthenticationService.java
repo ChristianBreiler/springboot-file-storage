@@ -10,6 +10,7 @@ import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.dto.LoginUserDTO;
 import com.example.springbootfilestorage.security.dto.RegisterUserDTO;
 import com.example.springbootfilestorage.security.repository.UserRepository;
+import com.example.springbootfilestorage.security.response.LoginResponse;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,15 +29,17 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final SettingsService settingsService;
+    private final JwtService jwtService;
 
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                                  AuthenticationManager authenticationManager, EmailService emailService,
-                                 SettingsService settingsService) {
+                                 SettingsService settingsService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
         this.settingsService = settingsService;
+        this.jwtService = jwtService;
     }
 
     // Return true if successful since the user only has to be informed if it failed yes/no
@@ -68,15 +71,20 @@ public class AuthenticationService {
         }
     }
 
-    public User authenticate(LoginUserDTO input) {
+    public LoginResponse authenticate(LoginUserDTO input) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
+                        input.email(),
+                        input.password()
                 )
         );
 
-        return (User) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
+        // if (!user.isEnabled()) {
+        // TODO: Email here + return in login response
+        //}
+        String jwt = jwtService.generateToken(user);
+        return new LoginResponse(jwt, jwtService.getExpirationTime(), user.isEnabled());
     }
 
     // TODO: Verify email method
