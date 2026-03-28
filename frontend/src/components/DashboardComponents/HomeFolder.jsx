@@ -41,6 +41,7 @@ const HomeFolder = () => {
       {data?.files?.map((file) => (
         <File
           key={file.id}
+          id={file.id}
           originalFilename={file.originalFilename}
           size={file.size}
           filetype={file.filetype}

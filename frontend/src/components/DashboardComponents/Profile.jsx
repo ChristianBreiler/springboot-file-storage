@@ -61,7 +61,7 @@ const Profile = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <div className="h-48 w-full bg-gradient-to-r from-slate-800 to-slate-900" />
+      <div className="h-48 w-full bg-linear-to-r from-slate-800 to-slate-900" />
       <div className="max-w-5xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
           <div className="relative -top-16 md:-top-12 shrink-0">

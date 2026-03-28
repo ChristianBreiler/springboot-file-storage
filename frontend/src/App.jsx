@@ -7,6 +7,7 @@ import Settings from "./components/DashboardComponents/Settings";
 import StorageDetails from "./components/DashboardComponents/StorageDetails";
 import Profile from "./components/DashboardComponents/Profile";
 import AllFiles from "./components/DashboardComponents/AllFiles";
+import FileViewPage from "./components/DashboardComponents/FileViewPage";
 import NotFound from "./components/error/NotFound";
 import Login from "./components/auth/Login";
 import { AuthProvider } from "./components/auth/AuthContext";
@@ -30,9 +31,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <Layout />,
         children: [
-          { index: true, element: <Homepage /> },
+          { index: true, element: <SubFolder /> },
           { path: "folders/:id", element: <SubFolder /> },
           { path: "files", element: <AllFiles /> },
+          { path: "files/:id", element: <FileViewPage /> },
           { path: "settings", element: <Settings /> },
           { path: "deleted_files", element: <DeletedFiles /> },
           { path: "storage_details", element: <StorageDetails /> },

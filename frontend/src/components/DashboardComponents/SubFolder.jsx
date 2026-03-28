@@ -15,7 +15,8 @@ const SubFolder = () => {
     const fetchFolderData = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`folders/${id}`);
+        const path = id ? `folders/${id}` : "folders/home";
+        const response = await api.get(path);
         setData(response.data);
       } catch (err) {
         // TODO: Render Erro page here?
@@ -34,7 +35,7 @@ const SubFolder = () => {
   return (
     <div className="p-6">
       <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
-        <Link to="/folders/home" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+        <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
           <Home size={16} />
         </Link>
         {data.parentFolders?.map((folder) => (
@@ -74,6 +75,7 @@ const SubFolder = () => {
             {data.files.map((file) => (
               <File
                 key={file.id}
+                id={file.id}
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}

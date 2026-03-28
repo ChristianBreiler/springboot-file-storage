@@ -1,22 +1,8 @@
 import { FileText, FileImage, File as FileIcon, MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo, useState, useEffect } from "react";
-import api from "../../api/axiosConfig";
+import { useMemo } from "react";
 
 const File = ({ id, originalFilename, size, filetype }) => {
-  const [imgUrl, setImgUrl] = useState(null);
-
-  useEffect(() => {
-    if (filetype === "JPG") {
-      api.get(`/folders/open/${id}`, { responseType: 'blob' })
-        .then(res => {
-          const url = URL.createObjectURL(res.data);
-          setImgUrl(url);
-        })
-        .catch(err => console.error("Preview failed", err));
-    }
-    return () => { if (imgUrl) URL.revokeObjectURL(imgUrl); };
-  }, [id, filetype]);
 
   const formatSize = (bytes) => {
     if (!bytes) return "0 Bytes";
@@ -39,11 +25,9 @@ const File = ({ id, originalFilename, size, filetype }) => {
 
   return (
     <div className="group flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all mb-2">
-      <Link to={`/file/${id}`} className="flex items-center gap-4 flex-1 min-w-0">
+      <Link to={`/files/${id}`} className="flex items-center gap-4 flex-1 min-w-0">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden ${iconConfig.bg} ${iconConfig.color}`}>
-          {imgUrl ? (
-            <img src={imgUrl} alt="preview" className="h-full w-full object-cover" />
-          ) : (
+          {(
             iconConfig.icon
           )}
         </div>
