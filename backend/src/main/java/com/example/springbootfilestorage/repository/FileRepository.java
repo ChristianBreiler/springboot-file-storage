@@ -30,8 +30,8 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE f.fileShareCode = ?1 AND f.deleted = false")
     UploadedFile finaByFileShareCode(String fileShareCode);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.deleted = false")
-    List<UploadedFile> findAllDeletedFiles();
+    @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.owner = ?1")
+    List<UploadedFile> findAllDeletedFiles(User authenticatedUser);
 
     @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.finalDeletionDate <= ?1")
     List<UploadedFile> findAllFilesToBeDeletedToday(LocalDate now);

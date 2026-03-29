@@ -1,33 +1,75 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../../api/axiosConfig";
 import LoadingBar from "../loading/LoadingBar";
+import { X, FileText } from "lucide-react";
 
-const FileViewPage = () => {
-    const { id } = useParams();
+const FileViewPage = ({ fileId, onClose }) => {
     const [blobUrl, setBlobUrl] = useState(null);
     const [loading, setLoading] = useState(true);
+    const iframeRef = useRef(null);
 
     useEffect(() => {
-        if (id === null) return
+        if (!fileId) return;
 
         let url;
-        api.get(`/files/open/${id}`, { responseType: 'blob' })
+        setLoading(true);
+        api.get(`/files/open/${fileId}`, { responseType: 'blob' })
             .then(res => {
                 url = URL.createObjectURL(res.data);
                 setBlobUrl(url);
                 setLoading(false);
             })
-            .catch(err => console.error("Could not stream file", err));
+            .catch(err => {
+                console.error("Could not stream file", err);
+                setLoading(false);
+            });
 
         return () => { if (url) URL.revokeObjectURL(url); };
-    }, [id]);
+    }, [fileId]);
 
     if (loading) return <LoadingBar />
 
     return (
-        <div className="h-screen w-full p-4">
-            <iframe src={blobUrl} className="w-full h-full rounded-lg border shadow-lg" title="File Preview" />
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 md:p-8">
+            <div className="bg-white w-full max-w-6xl h-full max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                            <FileText size={20} />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-slate-800 leading-none">File Preview</h3>
+                            <p className="text-[11px] text-slate-400 mt-1 uppercase font-bold tracking-wider">Document Viewer</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 md:gap-2">
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" >
+                            <X size={24} />
+                        </button>
+                    </div>
+                </div>
+                <div className="flex-1 bg-slate-100/50 relative">
+                    {loading ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                            <LoadingBar />
+                            <span className="text-sm font-medium text-slate-500 animate-pulse">Preparing your document...</span>
+                        </div>
+                    ) : (
+                        <iframe
+                            ref={iframeRef}
+                            src={blobUrl}
+                            className="w-full h-full border-none"
+                            title="File Preview"
+                        />
+                    )}
+                </div>
+                {!loading && (
+                    <div className="px-6 py-2 bg-slate-50 border-t border-slate-100 text-right">
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

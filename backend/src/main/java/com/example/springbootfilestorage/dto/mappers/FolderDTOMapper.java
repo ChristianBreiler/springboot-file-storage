@@ -39,7 +39,8 @@ public class FolderDTOMapper implements Function<Folder, FolderDTO> {
                 folder.getSubfolders() != null ?
                         folder.getSubfolders().stream().map(this::createFolderSummaryDTO).toList() : List.of(),
                 folder.getFiles() != null ?
-                        folder.getFiles().stream().map(uploadFileDTOMapper).toList() : List.of()
+                        folder.getFiles().stream().filter(f -> !f.isDeleted())
+                                .map(uploadFileDTOMapper).toList() : List.of()
         );
     }
 

@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axiosConfig";
-import { Link } from "react-router-dom";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import File from "./File";
 
 const DeletedFiles = () => {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const fetchFolderData = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/deleted_files`);
+        const response = await api.get(`deleted_files`);
         setData(response.data);
       } catch (err) {
         // TODO: Render Erro page here?
@@ -30,38 +30,41 @@ const DeletedFiles = () => {
   if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading storage...</div>;
   if (!data) return <div className="p-8 text-red-500">Error while loading deleted Folders</div>;
 
+  const filesToRender = Array.isArray(data) ? data : (data?.files || []);
+
   return (
     <div className="p-6">
-      <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
-        <Link to="/folders/home" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-          <Home size={16} />
-        </Link>
-        {data.name && (
-          <div className="flex items-center">
-            <ChevronRight size={14} className="mx-1 text-slate-400 flex-shrink-0" />
-            <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-[200px]">
-              Deleted Files
-            </span>
-          </div>
-        )}
+      <nav className="flex items-center ...">
+        <div className="flex items-center">
+          <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
+          <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
+            Deleted Files
+          </span>
+        </div>
       </nav>
-      {data.files?.length > 0 && (
+      {filesToRender.length > 0 ? (
         <>
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
           <div className="grid grid-cols-1 gap-2">
-            {data.files.map((file) => (
+            {filesToRender.map((file) => (
               <File
                 key={file.id}
+                id={file.id}
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}
+                isDeleted={file.isDeleted}
+                onClick={(id) => setSelectedId(id)}
               />
             ))}
           </div>
         </>
+      ) : (
+        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+          <p className="text-slate-400 font-medium">No deleted files found</p>
+        </div>
       )}
     </div>
   );
-}
-
+};
 export default DeletedFiles;

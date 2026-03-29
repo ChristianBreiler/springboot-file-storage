@@ -133,8 +133,8 @@ public class FileService {
     }
 
     public List<UploadedFileDTO> findAllDeletedFiles() {
-        // User user = userContextService.getCurrentUser();
-        return fileRepository.findAllDeletedFiles().stream()
+        return fileRepository.findAllDeletedFiles(userContext.getAuthenticatedUser())
+                .stream()
                 .map(uploadFileDTOMapper)
                 .toList();
     }
@@ -146,7 +146,11 @@ public class FileService {
         file.setDeleted(true);
         // TODO: Handle deleting folders with deleted files
         file.setFinalDeletionDate(LocalDate.now().plusWeeks(3));
-        fileRepository.save(file);
+        try {
+            fileRepository.save(file);
+        } catch (Exception e) {
+            return false;
+        }
         return true;
     }
 

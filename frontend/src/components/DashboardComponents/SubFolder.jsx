@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Folder from "./Folder";
 import File from "./File";
+import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
 
 const SubFolder = () => {
   const { id } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     const fetchFolderData = async () => {
@@ -19,7 +21,6 @@ const SubFolder = () => {
         const response = await api.get(path);
         setData(response.data);
       } catch (err) {
-        // TODO: Render Erro page here?
         console.error("Failed to fetch folders:", err);
       } finally {
         setLoading(false);
@@ -29,7 +30,7 @@ const SubFolder = () => {
     fetchFolderData();
   }, [id]);
 
-  if (loading) return <LoadingBar />
+  if (loading) return <LoadingBar />;
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;
 
   return (
@@ -40,10 +41,10 @@ const SubFolder = () => {
         </Link>
         {data.parentFolders?.map((folder) => (
           <div key={folder.id} className="flex items-center">
-            <ChevronRight size={14} className="mx-1 text-slate-400 flex-shrink-0" />
+            <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
             <Link
               to={`/folders/${folder.id}`}
-              className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-[120px] truncate"
+              className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate"
             >
               {folder.name}
             </Link>
@@ -51,8 +52,8 @@ const SubFolder = () => {
         ))}
         {data.name && (
           <div className="flex items-center">
-            <ChevronRight size={14} className="mx-1 text-slate-400 flex-shrink-0" />
-            <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-[200px]">
+            <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
+            <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
               {data.name}
             </span>
           </div>
@@ -79,6 +80,8 @@ const SubFolder = () => {
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}
+                isDeleted={file.isDeleted}
+                onClick={(id) => setSelectedId(id)}
               />
             ))}
           </div>
@@ -88,6 +91,12 @@ const SubFolder = () => {
         <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
           <p className="text-slate-400 font-medium">This Folder is Empty</p>
         </div>
+      )}
+      {selectedId && (
+        <FileViewPage
+          fileId={selectedId}
+          onClose={() => setSelectedId(null)}
+        />
       )}
     </div>
   );

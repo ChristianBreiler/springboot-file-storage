@@ -49,7 +49,7 @@ public class Folder extends BaseDAO {
     }
 
     public int numberOfFiles() {
-        return files.size() + subfolders.stream()
+        return files.stream().filter(f -> !f.isDeleted()).toList().size() + subfolders.stream()
                 .mapToInt(Folder::numberOfFiles)
                 .sum();
     }

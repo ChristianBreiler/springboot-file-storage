@@ -7,7 +7,6 @@ import com.example.springbootfilestorage.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -82,13 +81,13 @@ public class FileController {
     @GetMapping("/open/{id}")
     public ResponseEntity<Resource> openFile(@PathVariable Long id) throws MalformedURLException {
         UploadedFile file = fileService.findById(id);
-        Path path = Paths.get(file.getStoragePath());
-        Resource resource = new UrlResource(path.toUri());
+        if (file == null) return ResponseEntity.notFound().build();
+
+        Resource resource = new UrlResource(Paths.get(file.getStoragePath()).toUri());
         if (!resource.exists()) return ResponseEntity.notFound().build();
 
-        String contentType = file.probeContentType();
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
+                .contentType(MediaType.parseMediaType(file.probeContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
@@ -105,9 +104,8 @@ public class FileController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        fileService.deleteFile(id);
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        return fileService.deleteFile(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/rename/{id}")

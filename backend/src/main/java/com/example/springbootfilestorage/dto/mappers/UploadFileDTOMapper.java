@@ -16,6 +16,8 @@ public class UploadFileDTOMapper implements Function<UploadedFile, UploadedFileD
                 file.getFolder() != null ? file.getFolder().getId() : null,
                 file.getOriginalFilename(),
                 file.getSize(),
-                file.getFiletype());
+                file.getFiletype(),
+                file.isDeleted()
+        );
     }
 }

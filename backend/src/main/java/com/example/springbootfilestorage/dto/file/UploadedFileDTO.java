@@ -7,6 +7,7 @@ public record UploadedFileDTO(
         Long folderId,
         String originalFilename,
         Long size,
-        Filetype filetype
+        Filetype filetype,
+        boolean isDeleted
 ) {
 }
