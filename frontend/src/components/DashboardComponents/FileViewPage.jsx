@@ -3,17 +3,17 @@ import api from "../../api/axiosConfig";
 import LoadingBar from "../loading/LoadingBar";
 import { X, FileText } from "lucide-react";
 
-const FileViewPage = ({ fileId, onClose }) => {
+const FileViewPage = ({ uuid, onClose }) => {
     const [blobUrl, setBlobUrl] = useState(null);
     const [loading, setLoading] = useState(true);
     const iframeRef = useRef(null);
 
     useEffect(() => {
-        if (!fileId) return;
+        if (!uuid) return;
 
         let url;
         setLoading(true);
-        api.get(`/files/open/${fileId}`, { responseType: 'blob' })
+        api.get(`/files/open/${uuid}`, { responseType: 'blob' })
             .then(res => {
                 url = URL.createObjectURL(res.data);
                 setBlobUrl(url);
@@ -25,7 +25,7 @@ const FileViewPage = ({ fileId, onClose }) => {
             });
 
         return () => { if (url) URL.revokeObjectURL(url); };
-    }, [fileId]);
+    }, [uuid]);
 
     if (loading) return <LoadingBar />
 

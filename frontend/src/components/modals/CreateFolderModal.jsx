@@ -5,7 +5,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 const CreateFolderModal = ({ isOpen, onClose }) => {
-    const { id } = useParams();
+    const { uuid } = useParams();
     const [folderName, setFolderName] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,7 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const endpoint = id ? `folders/create/${id}` : "folders/create";
+            const endpoint = uuid ? `folders/create/${uuid}` : "folders/create";
             await api.post(endpoint, { folderName: folderName });
             setFolderName("");
             onClose();

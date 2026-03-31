@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/files")
@@ -32,16 +33,27 @@ public class FileController {
         return ResponseEntity.ok(fileService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UploadedFileDTO> show(@PathVariable Long id) {
-        UploadedFileDTO file = fileService.findDTOById(id);
+    @GetMapping("/{uuid}")
+    public ResponseEntity<UploadedFileDTO> show(@PathVariable UUID uuid) {
+        UploadedFileDTO file = fileService.findDTOByUuid(uuid);
         if (file == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(file);
     }
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
-        UploadedFile file = fileService.findById(id);
+    @PostMapping(value = {"/upload", "/upload/{folderUuid}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UploadedFileDTO> upload(@ModelAttribute CreateFileDTO createFileDTO,
+                                                  @PathVariable(required = false) UUID folderUuid) {
+        if (createFileDTO == null || createFileDTO.file().isEmpty()) return ResponseEntity.badRequest().build();
+
+        UploadedFileDTO file = fileService.saveFile(createFileDTO, folderUuid);
+        if (file == null) return ResponseEntity.badRequest().build();
+
+        return ResponseEntity.ok(file);
+    }
+
+    @GetMapping("/download/{uuid}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable UUID uuid) {
+        UploadedFile file = fileService.findByUuid(uuid);
         if (file == null) return ResponseEntity.notFound().build();
         try {
             Path path = Paths.get(file.getStoragePath());
@@ -58,9 +70,9 @@ public class FileController {
     }
 
     // Show a file image for pngs in the browser
-    @GetMapping("/show_image/{id}")
-    public ResponseEntity<Resource> showFileImage(@PathVariable Long id) {
-        UploadedFile file = fileService.findById(id);
+    @GetMapping("/show_image/{uuid}")
+    public ResponseEntity<Resource> showFileImage(@PathVariable UUID uuid) {
+        UploadedFile file = fileService.findByUuid(uuid);
         try {
             Path path = Paths.get(file.getStoragePath());
             UrlResource resource = new UrlResource(path.toUri());
@@ -78,9 +90,9 @@ public class FileController {
         }
     }
 
-    @GetMapping("/open/{id}")
-    public ResponseEntity<Resource> openFile(@PathVariable Long id) throws MalformedURLException {
-        UploadedFile file = fileService.findById(id);
+    @GetMapping("/open/{uuid}")
+    public ResponseEntity<Resource> openFile(@PathVariable UUID uuid) throws MalformedURLException {
+        UploadedFile file = fileService.findByUuid(uuid);
         if (file == null) return ResponseEntity.notFound().build();
 
         Resource resource = new UrlResource(Paths.get(file.getStoragePath()).toUri());
@@ -92,25 +104,14 @@ public class FileController {
                 .body(resource);
     }
 
-    @PostMapping(value = {"/upload", "/upload/{folderId}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UploadedFileDTO> upload(@ModelAttribute CreateFileDTO createFileDTO,
-                                                  @PathVariable(required = false) Long folderId) {
-        if (createFileDTO == null || createFileDTO.file().isEmpty()) return ResponseEntity.badRequest().build();
-
-        UploadedFileDTO updatedFile = fileService.saveFile(createFileDTO, folderId);
-        if (updatedFile == null) return ResponseEntity.badRequest().build();
-
-        return ResponseEntity.ok(updatedFile);
+    @DeleteMapping("/delete/{uuid}")
+    public ResponseEntity<?> delete(@PathVariable UUID uuid) {
+        return fileService.deleteFile(uuid) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        return fileService.deleteFile(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
-    }
-
-    @PostMapping("/rename/{id}")
-    public ResponseEntity<UploadedFile> rename(@PathVariable Long id, @RequestParam String newName) {
-        UploadedFile updatedFile = fileService.renameFile(id, newName);
+    @PostMapping("/rename/{uuid}")
+    public ResponseEntity<UploadedFile> rename(@PathVariable UUID uuid, @RequestParam String newName) {
+        UploadedFile updatedFile = fileService.renameFile(uuid, newName);
         return ResponseEntity.ok(updatedFile);
     }
 }

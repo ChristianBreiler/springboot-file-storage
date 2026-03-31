@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/deleted_files")
@@ -24,17 +25,17 @@ public class DeletedFileController {
         return ResponseEntity.ok(fileService.findAllDeletedFiles());
     }
 
-    @PostMapping("/restore/{id}")
-    public ResponseEntity<UploadedFileDTO> restore(@PathVariable Long id) {
-        UploadedFileDTO restoredFile = fileService.restoreFile(id);
+    @PostMapping("/restore/{uuid}")
+    public ResponseEntity<UploadedFileDTO> restore(@PathVariable UUID uuid) {
+        UploadedFileDTO restoredFile = fileService.restoreFile(uuid);
         if (restoredFile == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(restoredFile);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        fileService.deleteFilePermanently(id);
+    public void delete(@PathVariable UUID uuid) {
+        fileService.deleteFilePermanently(uuid);
     }
 }

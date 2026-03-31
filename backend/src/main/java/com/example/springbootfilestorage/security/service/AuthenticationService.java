@@ -53,8 +53,8 @@ public class AuthenticationService {
         // TODO: Change this
         user.setUsername(input.getEmail());
         user.setEmailaddress(input.getEmail());
-        user.setCreatedAt(LocalDate.now());
-        user.setUpdatedAt(LocalDate.now());
+        // user.setCreatedAt(LocalDate.now());
+        // user.setUpdatedAt(LocalDate.now());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
@@ -115,8 +115,8 @@ public class AuthenticationService {
         settings.setPageLayout(PageLayout.CARDS);
         settings.setLanguage(Language.EN);
         settings.setDeleteFilesAfterXWeeks(2);
-        settings.setCreatedAt(LocalDate.now());
-        settings.setUpdatedAt(LocalDate.now());
+        // settings.setCreatedAt(LocalDate.now());
+        // settings.setUpdatedAt(LocalDate.now());
         settingsService.saveSettings(settings);
         return settings;
     }

@@ -10,14 +10,12 @@ import java.util.List;
 @Setter
 public class FolderNode {
 
-    private Long id;
     private String name;
     private boolean directory = true;
     private List<FolderNode> subfolders = new ArrayList<>();
     private List<FileNode> files = new ArrayList<>();
 
-    public FolderNode(Long id, String name) {
-        this.id = id;
+    public FolderNode(String name) {
         this.name = name;
     }
 }

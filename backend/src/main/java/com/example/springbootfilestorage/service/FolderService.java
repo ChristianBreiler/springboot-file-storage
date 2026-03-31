@@ -10,11 +10,13 @@ import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
+import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class FolderService {
@@ -35,27 +37,26 @@ public class FolderService {
         this.folderDTOMapper = folderDTOMapper;
     }
 
-    public FolderDTO saveFolder(CreateFolderDTO createFolderDTO, Long parentId) {
+    public FolderDTO saveFolder(CreateFolderDTO createFolderDTO, UUID parentUuid) {
         Folder folder = new Folder();
         folder.setName(createFolderDTO.folderName());
         folder.setOwner(userContext.getAuthenticatedUser());
         folder.setCreatedAt(LocalDate.now());
         folder.setUpdatedAt(LocalDate.now());
-        if (parentId != null) {
-            Folder parent = folderRepository.findById(parentId).orElse(null);
+        if (parentUuid != null) {
+            Folder parent = folderRepository.findByUuid(parentUuid).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
             folder.setParent(parent);
             if (parent.getSubfolders().size() >= MAX_PARENT_FOLDERS)
                 throw new IllegalArgumentException("Maximum number of subfolders reached");
-        } else {
-            folder.setParent(null);
-        }
+        } else folder.setParent(null);
+
         folderRepository.save(folder);
         return folderDTOMapper.apply(folder);
     }
 
-    public FolderDTO renameFolder(Long id, RenameFolderDTO renameFolderDTO) {
-        Folder folder = folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
+    public FolderDTO renameFolder(UUID uuid, RenameFolderDTO renameFolderDTO) {
+        Folder folder = folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
 
         folder.setName(renameFolderDTO.newFolderName());
         folderRepository.save(folder);
@@ -63,8 +64,8 @@ public class FolderService {
         return folderDTOMapper.apply(folder);
     }
 
-    public void deleteFolder(Long id) {
-        Folder folder = folderRepository.findById(id).orElse(null);
+    public void deleteFolder(UUID uuid) {
+        Folder folder = folderRepository.findByUuid(uuid).orElse(null);
         if (folder == null) throw new RuntimeException("Folder to be deleted not found");
         folderRepository.delete(folder);
     }
@@ -73,17 +74,18 @@ public class FolderService {
         return folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
     }
 
-    public List<Folder> searchFoldersByName(Long parentFolderId, String name) {
-        return parentFolderId != null ?
-                folderRepository.searchFoldersByName(parentFolderId, name) :
+    public List<Folder> searchFoldersByName(UUID uuid, String name) {
+        return uuid != null ?
+                folderRepository.searchFoldersByName(uuid, name) :
                 folderRepository.findFoldersByNameOnHomePage(name);
     }
 
     public FolderDTO findHomeDTO() {
-        List<Folder> folders = folderRepository.findAllFoldersWithNoParents(userContext.getAuthenticatedUser());
-        List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder();
+        User currentUser = userContext.getAuthenticatedUser();
+        List<Folder> folders = folderRepository.findAllFoldersWithNoParents(currentUser);
+        List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder(currentUser);
         Folder homeFolder = new Folder();
-        homeFolder.setOwner(userContext.getAuthenticatedUser());
+        homeFolder.setOwner(currentUser);
         homeFolder.setParent(null);
         homeFolder.setSubfolders(folders);
         homeFolder.setFiles(subfolderIds);
@@ -99,13 +101,18 @@ public class FolderService {
         folderRepository.save(folder);
     }
 
-    public FolderDTO findByDTOId(Long id) {
-        return folderDTOMapper.apply(folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found")));
-    }
-
-    public CanDeleteFolderDTO canFolderBeDeleted(Long id) {
-        Folder folder = folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
+    public CanDeleteFolderDTO canFolderBeDeleted(UUID uuid) {
+        Folder folder = folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
         // TODO: Maybe make this more efficient?
         return new CanDeleteFolderDTO((folder.numberOfFolders() + folder.numberOfFiles()) == 0);
+    }
+
+    public Folder findByUuid(UUID uuid) {
+        return folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
+    }
+
+    public FolderDTO findByDTOUuid(UUID uuid) {
+        return folderDTOMapper.apply(folderRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("Folder not found")));
     }
 }

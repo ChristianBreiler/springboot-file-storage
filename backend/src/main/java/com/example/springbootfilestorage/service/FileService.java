@@ -55,14 +55,9 @@ public class FileService {
         return fileRepository.finaByFileShareCode(fileShareCode);
     }
 
-    public UploadedFileDTO findDTOById(Long id) {
-        return uploadFileDTOMapper.apply(fileRepository.findById(id).orElse(null));
-    }
-
-    // TODO: Fix nulls here
-    public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, Long folderId) {
+    public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
         MultipartFile file = createFileDTO.file();
-        if (fileExists(file.getOriginalFilename(), folderId)) throw new IllegalArgumentException("File already exists");
+        if (fileExists(file.getOriginalFilename(), folderUuid)) throw new IllegalArgumentException("File already exists");
 
         UploadedFile uploadedFile = new UploadedFile();
 
@@ -90,13 +85,13 @@ public class FileService {
         if (filetype == null) return null;
         uploadedFile.setFiletype(filetype);
 
-        if (folderId != null) {
-            Folder folder = folderService.findById(folderId);
+        if (folderUuid != null) {
+            Folder folder = folderService.findByUuid(folderUuid);
             if (folder == null) return null;
             uploadedFile.setFolder(folder);
         }
 
-        uploadedFile.setCreatedAt(LocalDate.now());
+        // uploadedFile.setCreatedAt(LocalDate.now());
         uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setDeleted(false);
         fileRepository.save(uploadedFile);
@@ -109,11 +104,6 @@ public class FileService {
         if (dotIndex > 0) extension = originalFilename.substring(dotIndex);
 
         return UUID.randomUUID().toString() + extension;
-    }
-
-    public List<UploadedFile> findAllFilesWithNoFolder() {
-        // Long ownerId = userContextService.getCurrentUserId();
-        return fileRepository.findAllFilesWithNoFolder();
     }
 
     private Filetype getFileType(MultipartFile file) {
@@ -139,8 +129,8 @@ public class FileService {
                 .toList();
     }
 
-    public boolean deleteFile(Long fileId) {
-        UploadedFile file = fileRepository.findById(fileId).orElse(null);
+    public boolean deleteFile(UUID uuid) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
         if (file == null) return false;
 
         file.setDeleted(true);
@@ -154,23 +144,24 @@ public class FileService {
         return true;
     }
 
-    public UploadedFileDTO restoreFile(Long fileId) {
-        UploadedFile file = fileRepository.findById(fileId).orElse(null);
+    public UploadedFileDTO restoreFile(UUID uuid) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
         if (file == null) return null;
 
         file.setDeleted(false);
         file.setFinalDeletionDate(null);
         // TODO: Handle deleting folders with deleted files
-        if (file.getFolder() != null && folderRepository.existsById(file.getFolder().getId()))
+        if (file.getFolder() != null && folderRepository.existsByUuid(file.getFolder().getUuid()))
             file.setFolder(null);
         fileRepository.save(file);
         return uploadFileDTOMapper.apply(file);
     }
 
-    public void deleteFilePermanently(Long fileId) {
-        UploadedFile file = fileRepository.findById(fileId).orElse(null);
-        if (file == null) throw new IllegalArgumentException("File not found: " + fileId);
-        if (!deleteFileOnMachine(file.getStoragePath())) return;
+    public void deleteFilePermanently(UUID uuid) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
+        if (file == null) throw new IllegalArgumentException("File not found: " + uuid);
+        if (!deleteFileOnMachine(file.getStoragePath()))
+            throw new RuntimeException("Failed to delete file from machine");
         fileRepository.delete(file);
     }
 
@@ -190,16 +181,16 @@ public class FileService {
         }
     }
 
-    public List<UploadedFile> searchFilesByName(Long folderid, String name) {
+    public List<UploadedFile> searchFilesByName(UUID uuid, String name) {
         // Special case since on the homepage file.folder == null and doesn't have an id
-        if (folderid == null)
+        if (uuid == null)
             return fileRepository.findFilesByNameOnHomePage(name);
-        return fileRepository.findByNameAndId(folderid, name);
+        return fileRepository.findByNameAndId(uuid, name);
     }
 
     // File with same name in folder already exists
-    public boolean fileExists(String name, Long folderId) {
-        return fileRepository.findByNameAndFolderId(name, folderId) != null;
+    public boolean fileExists(String name, UUID folderUuid) {
+        return fileRepository.findByNameAndFolderUuid(name, folderUuid) != null;
     }
 
     public void saveProfilePic(MultipartFile file) {
@@ -220,7 +211,7 @@ public class FileService {
         UploadedFile oldProfilePic = user.getProfilePic();
         uploadedFile.setProfilePic(true);
 
-        deleteFilePermanently(oldProfilePic.getId());
+        deleteFilePermanently(oldProfilePic.getUuid());
 
         Path filePath = PROFILE_PIC_DIR.resolve(storedName);
         try {
@@ -236,7 +227,7 @@ public class FileService {
         if (filetype == null) return;
         uploadedFile.setFiletype(filetype);
 
-        uploadedFile.setCreatedAt(LocalDate.now());
+        // uploadedFile.setCreatedAt(LocalDate.now());
         fileRepository.save(uploadedFile);
         // To update the user in the database with the new profile pic
         // userRepository.save(user);
@@ -251,20 +242,12 @@ public class FileService {
         fileRepository.save(file);
     }
 
-    public UploadedFile renameFile(Long id, String newName) {
-        UploadedFile file = fileRepository.findById(id).orElse(null);
+    public UploadedFile renameFile(UUID uuid, String newName) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
         if (file == null) return null;
         file.setOriginalFilename(newName);
         fileRepository.save(file);
         return file;
-    }
-
-    public String findStoragePath(Long id) {
-        return fileRepository.findStoragePath(id);
-    }
-
-    public UploadedFile findById(Long id) {
-        return fileRepository.findById(id).orElse(null);
     }
 
     public List<UploadedFileDTO> findAll() {
@@ -273,5 +256,13 @@ public class FileService {
                 .stream()
                 .map(uploadFileDTOMapper)
                 .toList();
+    }
+
+    public UploadedFileDTO findDTOByUuid(UUID uuid) {
+        return uploadFileDTOMapper.apply(findByUuid(uuid));
+    }
+
+    public UploadedFile findByUuid(UUID uuid) {
+        return fileRepository.findByUuid(uuid).orElse(null);
     }
 }

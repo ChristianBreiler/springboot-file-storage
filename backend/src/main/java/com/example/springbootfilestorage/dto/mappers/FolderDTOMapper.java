@@ -27,9 +27,9 @@ public class FolderDTOMapper implements Function<Folder, FolderDTO> {
     public FolderDTO apply(Folder folder) {
         if (folder == null) return null;
         return new FolderDTO(
-                folder.getId(),
+                folder.getUuid(),
                 folder.getName(),
-                userContext.getAuthenticatedUser().getId(),
+                userContext.getAuthenticatedUser().getUuid(),
                 // Do this so the breadcrumb order is correct and not reversed
                 folder.allParents().stream().map(this::createParentFolderDTO).collect(Collector.of(LinkedList::new,
                         LinkedList::addFirst, (a, b) -> {
@@ -46,10 +46,10 @@ public class FolderDTOMapper implements Function<Folder, FolderDTO> {
 
     private ParentFolderDTO createParentFolderDTO(Folder folder) {
         if (folder == null) return null;
-        return new ParentFolderDTO(folder.getId(), folder.getName());
+        return new ParentFolderDTO(folder.getUuid(), folder.getName());
     }
 
     private FolderSummaryDTO createFolderSummaryDTO(Folder folder) {
-        return new FolderSummaryDTO(folder.getId(), folder.getName());
+        return new FolderSummaryDTO(folder.getUuid(), folder.getName());
     }
 }

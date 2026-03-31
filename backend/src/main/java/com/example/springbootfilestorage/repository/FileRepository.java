@@ -8,18 +8,17 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface FileRepository extends JpaRepository<UploadedFile, Long> {
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.isProfilePic = false AND f.deleted = false")
-    List<UploadedFile> findAllFilesWithNoFolder();
+    @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.isProfilePic = false AND f.deleted = false AND f.owner = ?1")
+    List<UploadedFile> findAllFilesWithNoFolder(User currentUser);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.originalFilename = ?1 AND f.folder.id = ?2 AND  f.isProfilePic = false AND f.deleted = false")
-    UploadedFile findByNameAndFolderId(String name, Long folderId);
-
-    @Query("SELECT f FROM UploadedFile f WHERE f.folder.id = ?1 AND f.originalFilename LIKE %?2% AND f.isProfilePic = false AND f.deleted = false")
-    List<UploadedFile> findByNameAndId(Long folderId, String name);
+    @Query("SELECT f FROM UploadedFile f WHERE f.folder.uuid = ?1 AND f.originalFilename LIKE %?2% AND f.isProfilePic = false AND f.deleted = false")
+    List<UploadedFile> findByNameAndId(UUID folderUuid, String name);
 
     @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.originalFilename LIKE %?1% AND f.isProfilePic = false AND f.deleted = false")
     List<UploadedFile> findFilesByNameOnHomePage(String name);
@@ -42,9 +41,15 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT COUNT(f) FROM UploadedFile f WHERE f.deleted = false")
     int numberOfFiles();
 
-    @Query("SELECT f FROM UploadedFile f ORDER BY f.size DESC LIMIT 5")
-    List<UploadedFile> fiveBiggestFiles();
+    @Query("SELECT f FROM UploadedFile f WHERE f.owner = ?1 ORDER BY f.size DESC LIMIT 5")
+    List<UploadedFile> fiveBiggestFiles(User authenticatedUser);
 
     @Query("SELECT f FROM UploadedFile f WHERE f.owner = ?1 AND f.deleted = false")
     List<UploadedFile> findAllFiles(User authenticatedUser);
+
+    @Query("SELECT f FROM UploadedFile f WHERE f.uuid = ?1")
+    Optional<UploadedFile> findByUuid(UUID uuid);
+
+    @Query("SELECT f FROM UploadedFile f WHERE  f.originalFilename LIKE %?1% AND f.folder.uuid = ?2 AND f.isProfilePic = false AND f.deleted = false")
+    UploadedFile findByNameAndFolderUuid(String name, UUID folderUuid);
 }

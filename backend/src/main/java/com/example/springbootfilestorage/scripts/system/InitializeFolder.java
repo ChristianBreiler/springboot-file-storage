@@ -37,13 +37,6 @@ public class InitializeFolder implements CommandLineRunner {
         if (!storageFolder.toFile().exists()) {
             Files.createDirectories(storageFolder);
             System.out.println("file_storage_folder created at: " + storageFolder.toAbsolutePath());
-            /*
-            Path readmeFilePath = Paths.get("README.txt");
-            if (!Files.exists(readmeFilePath)) Files.createFile(readmeFilePath);
-
-            String content = "Hello, this is a text file!";
-            Files.writeString(readmeFilePath, content);
-             */
         } else System.out.println("file_storage_folder exists at: " + storageFolder.toAbsolutePath());
     }
 

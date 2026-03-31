@@ -48,13 +48,13 @@ const DeletedFiles = () => {
           <div className="grid grid-cols-1 gap-2">
             {filesToRender.map((file) => (
               <File
-                key={file.id}
-                id={file.id}
+                key={file.uuid}
+                id={file.uuid}
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}
                 isDeleted={file.isDeleted}
-                onClick={(id) => setSelectedId(id)}
+                onClick={(uuid) => setSelectedId(uuid)}
               />
             ))}
           </div>

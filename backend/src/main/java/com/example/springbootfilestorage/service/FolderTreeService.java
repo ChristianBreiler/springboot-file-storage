@@ -24,14 +24,14 @@ public class FolderTreeService {
     }
 
     private FolderNode buildNode(Folder folder) {
-        FolderNode node = new FolderNode(folder.getId(), folder.getName());
+        FolderNode node = new FolderNode(folder.getName());
 
         for (Folder sub : folder.getSubfolders()) {
             node.getSubfolders().add(buildNode(sub));
         }
 
         for (UploadedFile file : folder.getFiles()) {
-            node.getFiles().add(new FileNode(file.getId(), file.getOriginalFilename()));
+            node.getFiles().add(new FileNode(file.getOriginalFilename()));
         }
 
         return node;

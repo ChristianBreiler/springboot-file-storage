@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import api from "../../api/axiosConfig";
 import { X, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 
-const DeleteFileModal = ({ isOpen, onClose, originalFilename, fileId, isDeleted }) => {
+const DeleteFileModal = ({ isOpen, onClose, originalFilename, fileUuid, isDeleted }) => {
     const [loading, setLoading] = useState(false);
 
     if (!isOpen) return null;
@@ -12,7 +12,7 @@ const DeleteFileModal = ({ isOpen, onClose, originalFilename, fileId, isDeleted 
         e.preventDefault();
         setLoading(true);
         try {
-            const path = isDeleted ? `deleted_files/delete/${fileId}` : `files/delete/${fileId}`;
+            const path = isDeleted ? `deleted_files/delete/${fileUuid}` : `files/delete/${fileUuid}`;
             await api.delete(path);
             onClose();
             window.location.reload();

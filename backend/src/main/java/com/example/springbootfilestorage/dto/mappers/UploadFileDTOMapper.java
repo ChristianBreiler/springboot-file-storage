@@ -12,8 +12,8 @@ public class UploadFileDTOMapper implements Function<UploadedFile, UploadedFileD
     public UploadedFileDTO apply(UploadedFile file) {
         if (file == null) return null;
         return new UploadedFileDTO(
-                file.getId(),
-                file.getFolder() != null ? file.getFolder().getId() : null,
+                file.getUuid(),
+                file.getFolder() != null ? file.getFolder().getUuid() : null,
                 file.getOriginalFilename(),
                 file.getSize(),
                 file.getFiletype(),

@@ -67,7 +67,7 @@ public class CreateAdminRunner {
             admin.setEmailaddress("admin@example.com");
             admin.setPassword("Admin123");
             admin.setRole(Role.ADMIN);
-            admin.setCreatedAt(LocalDate.now());
+            // admin.setCreatedAt(LocalDate.now());
 
             Settings settings = new Settings();
             settings.setPageLayout(PageLayout.CARDS);

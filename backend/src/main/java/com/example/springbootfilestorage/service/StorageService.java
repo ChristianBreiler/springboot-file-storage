@@ -46,7 +46,7 @@ public class StorageService {
         double totalSpace = 1000;
         int numberOfFiles = fileRepository.numberOfFiles();
         int numberOfFolders = folderRepository.numberOfFolders();
-        List<UploadedFile> fiveBiggestFiles = fileRepository.fiveBiggestFiles();
+        List<UploadedFile> fiveBiggestFiles = fileRepository.fiveBiggestFiles(userContext.getAuthenticatedUser());
         return new StorageDetailDTO(
                 usedSpace,
                 totalSpace,

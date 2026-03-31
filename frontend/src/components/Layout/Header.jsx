@@ -1,4 +1,4 @@
-import { Bell, Search, User, Sun, Plus, Command } from "lucide-react";
+import { Bell, Search, Sun, Command } from "lucide-react";
 import CreateDropdown from "../DashboardComponents/CreateDropdown";
 import ProfileDropdown from "../DashboardComponents/ProfileDropdown";
 

@@ -1,8 +1,10 @@
 package com.example.springbootfilestorage.dto.summary;
 
+import java.util.UUID;
+
 // Used in the frontend for the clickable folders
 public record FolderSummaryDTO(
-        Long id,
+        UUID uuid,
         String name
 ) {
 }

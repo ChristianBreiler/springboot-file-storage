@@ -2,7 +2,7 @@ import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2 } from "luc
 import { useState, useMemo, useRef, useEffect } from "react";
 import DeleteFileModal from "../modals/DeleteFileModal";
 
-const File = ({ id, originalFilename, size, filetype, isDeleted, onClick }) => {
+const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -39,7 +39,7 @@ const File = ({ id, originalFilename, size, filetype, isDeleted, onClick }) => {
     <>
       <div
         className="group flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all mb-2 cursor-pointer relative"
-        onClick={() => onClick(id)}
+        onClick={() => onClick(uuid)}
       >
         <div className="flex items-center gap-4 flex-1 min-w-0">
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden ${iconConfig.bg} ${iconConfig.color}`}>
@@ -83,7 +83,7 @@ const File = ({ id, originalFilename, size, filetype, isDeleted, onClick }) => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         originalFilename={originalFilename}
-        fileId={id}
+        fileUuid={uuid}
         isDeleted={isDeleted}
       />
     </>

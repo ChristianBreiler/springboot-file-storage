@@ -3,7 +3,7 @@ import api from "../../api/axiosConfig";
 import { useState } from "react";
 import { X } from "lucide-react";
 
-const RenameFolderModal = ({ isOpen, onClose, currentFolderName, folderId }) => {
+const RenameFolderModal = ({ isOpen, onClose, currentFolderName, folderUuid }) => {
     const [newFolderName, setNewFolderName] = useState(currentFolderName);
     const [loading, setLoading] = useState(false);
 
@@ -13,7 +13,7 @@ const RenameFolderModal = ({ isOpen, onClose, currentFolderName, folderId }) => 
         e.preventDefault();
         setLoading(true);
         try {
-            const endpoint = folderId ? `folders/rename/${folderId}` : "folders/rename";
+            const endpoint = folderUuid ? `folders/rename/${folderUuid}` : "folders/rename";
             await api.post(endpoint, { newFolderName: newFolderName });
             setNewFolderName("")
             onClose();

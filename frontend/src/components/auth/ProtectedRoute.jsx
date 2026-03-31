@@ -1,15 +1,13 @@
+// ProtectedRoute.jsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 const ProtectedRoute = () => {
-  const auth = useAuth();
+  const { token, loading } = useAuth();
 
-  if (!auth) {
-    console.error("Auth context is not available!");
-    return null; 
+  if (loading) {
+    return <div>Loading...</div>;
   }
-
-  const { token } = auth;
 
   if (!token) {
     return <Navigate to="/login" replace />;

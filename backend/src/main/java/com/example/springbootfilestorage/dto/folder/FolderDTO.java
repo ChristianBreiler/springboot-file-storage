@@ -4,11 +4,12 @@ import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 
 import java.util.List;
+import java.util.UUID;
 
 public record FolderDTO(
-        Long id,
+        UUID uuid,
         String name,
-        Long ownerId,
+        UUID ownerUuid,
         List<ParentFolderDTO> parentFolders,
         List<FolderSummaryDTO> folders,
         List<UploadedFileDTO> files

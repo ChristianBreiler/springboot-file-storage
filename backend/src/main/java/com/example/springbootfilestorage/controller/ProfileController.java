@@ -2,7 +2,6 @@ package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dto.profile.EditProfileDTO;
 import com.example.springbootfilestorage.dto.profile.ProfileDTO;
-import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.service.UserService;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.MessageService;

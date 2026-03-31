@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import RenameFolderModal from "../modals/RenameFolderModal";
 import DeleteFolderModal from "../modals/DeleteFolderModal";
 
-const Folder = ({ id, name = "New Folder" }) => {
+const Folder = ({ uuid, name = "New Folder" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -24,7 +24,7 @@ const Folder = ({ id, name = "New Folder" }) => {
     <>
       <div className="relative group/card">
         <Link
-          to={`/folders/${id}`}
+          to={`/folders/${uuid}`}
           className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl 
                      hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 
                      transition-all duration-200 active:scale-[0.98]" >
@@ -87,7 +87,7 @@ const Folder = ({ id, name = "New Folder" }) => {
           isOpen={isRenameOpen}
           onClose={() => setIsRenameOpen(false)}
           currentFolderName={name}
-          folderId={id}
+          folderUuid={uuid}
         />
       )}
       {isDeleteOpen && (
@@ -95,7 +95,7 @@ const Folder = ({ id, name = "New Folder" }) => {
           isOpen={isDeleteOpen}
           onClose={() => setIsDeleteOpen(false)}
           currentFolderName={name}
-          folderId={id}
+          folderUuid={uuid}
         />
       )}
     </>

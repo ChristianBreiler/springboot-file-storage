@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 
 const UploadFileModal = ({ isOpen, onClose }) => {
     // Id of the current folder from the url
-    const { id } = useParams();
+    const { uuid } = useParams();
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const UploadFileModal = ({ isOpen, onClose }) => {
         formData.append("file", file);
 
         try {
-            const endpoint = id ? `files/upload/${id}` : "files/upload";
+            const endpoint = uuid ? `files/upload/${uuid}` : "files/upload";
             await api.post(endpoint, formData);
 
             setFile(null);

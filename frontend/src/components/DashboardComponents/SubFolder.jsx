@@ -8,7 +8,7 @@ import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
 
 const SubFolder = () => {
-  const { id } = useParams();
+  const { uuid } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
@@ -17,7 +17,7 @@ const SubFolder = () => {
     const fetchFolderData = async () => {
       setLoading(true);
       try {
-        const path = id ? `folders/${id}` : "folders/home";
+        const path = uuid ? `folders/${uuid}` : "folders/home";
         const response = await api.get(path);
         setData(response.data);
       } catch (err) {
@@ -28,7 +28,7 @@ const SubFolder = () => {
     };
 
     fetchFolderData();
-  }, [id]);
+  }, [uuid]);
 
   if (loading) return <LoadingBar />;
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;
@@ -40,10 +40,10 @@ const SubFolder = () => {
           <Home size={16} />
         </Link>
         {data.parentFolders?.map((folder) => (
-          <div key={folder.id} className="flex items-center">
+          <div key={folder.uuid} className="flex items-center">
             <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
             <Link
-              to={`/folders/${folder.id}`}
+              to={`/folders/${folder.uuid}`}
               className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate"
             >
               {folder.name}
@@ -64,7 +64,11 @@ const SubFolder = () => {
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Folders</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {data.folders.map((folder) => (
-              <Folder key={folder.id} id={folder.id} name={folder.name} />
+              <Folder
+                key={folder.uuid}
+                uuid={folder.uuid}
+                name={folder.name}
+              />
             ))}
           </div>
         </>
@@ -75,13 +79,13 @@ const SubFolder = () => {
           <div className="grid grid-cols-1 gap-2">
             {data.files.map((file) => (
               <File
-                key={file.id}
-                id={file.id}
+                key={file.uuid}
+                uuid={file.uuid}
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}
                 isDeleted={file.isDeleted}
-                onClick={(id) => setSelectedId(id)}
+                onClick={(uuid) => setSelectedId(uuid)}
               />
             ))}
           </div>
@@ -94,7 +98,7 @@ const SubFolder = () => {
       )}
       {selectedId && (
         <FileViewPage
-          fileId={selectedId}
+          uuid={selectedId}
           onClose={() => setSelectedId(null)}
         />
       )}

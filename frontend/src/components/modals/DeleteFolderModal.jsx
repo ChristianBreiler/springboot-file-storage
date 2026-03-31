@@ -3,20 +3,20 @@ import { createPortal } from "react-dom";
 import api from "../../api/axiosConfig";
 import { X, AlertTriangle, Trash2 } from "lucide-react";
 
-const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderId }) => {
+const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderUuid }) => {
     const [folderDeletionInfo, setFolderDeletionInfo] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Do this to prevent 403 erros since request with folder_id = undefined cause issues
-        if (!isOpen || !folderId || folderId === "undefined") {
+        // Do this to prevent 403 erros since request with folderUuid = undefined cause issues
+        if (!isOpen || !folderUuid || folderUuid === "undefined") {
             return;
         }
 
         const fetchFolderInfo = async () => {
             setLoading(true);
             try {
-                const response = await api.get(`folders/delete_folder_info/${folderId}`);
+                const response = await api.get(`folders/delete_folder_info/${folderUuid}`);
                 setFolderDeletionInfo(response.data);
             } catch (err) {
                 console.error("Error fetching folder info:", err);
@@ -26,7 +26,7 @@ const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderId }) => 
         };
 
         fetchFolderInfo();
-    }, [isOpen, folderId]);
+    }, [isOpen, folderUuid]);
 
     if (!isOpen) return null;
 
@@ -37,7 +37,7 @@ const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderId }) => 
 
         setLoading(true);
         try {
-            await api.delete(`folders/delete/${folderId}`);
+            await api.delete(`folders/delete/${folderUuid}`);
             onClose();
             window.location.reload();
         } catch (err) {

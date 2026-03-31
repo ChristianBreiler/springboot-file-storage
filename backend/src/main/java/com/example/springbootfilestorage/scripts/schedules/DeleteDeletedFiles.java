@@ -25,6 +25,6 @@ public class DeleteDeletedFiles {
     @Scheduled(cron = "0 0 5 * * ?")
     public void deleteDeletedFiles() {
         List<UploadedFile> files = fileRepository.findAllFilesToBeDeletedToday(LocalDate.now());
-        files.forEach(f -> fileService.deleteFilePermanently(f.getId()));
+        files.forEach(f -> fileService.deleteFilePermanently(f.getUuid()));
     }
 }

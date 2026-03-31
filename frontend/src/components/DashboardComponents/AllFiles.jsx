@@ -2,6 +2,7 @@ import api from "../../api/axiosConfig";
 import { useState, useEffect } from "react";
 import File from "./File";
 import FileViewPage from "./FileViewPage";
+import LoadingBar from "../loading/LoadingBar";
 
 const AllFiles = () => {
   const [data, setData] = useState([]);
@@ -23,7 +24,7 @@ const AllFiles = () => {
     fetchFolderData();
   }, []);
 
-  if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading files...</div>;
+  if (loading) return <LoadingBar />
 
   return (
     <div className="p-6">
@@ -31,13 +32,13 @@ const AllFiles = () => {
         <div className="grid grid-cols-1 gap-2">
           {data.map((file) => (
             <File
-              key={file.id}
-              id={file.id}
+              key={file.uuid}
+              uuid={file.uuid}
               originalFilename={file.originalFilename}
               size={file.size}
               filetype={file.filetype}
               isDeleted={file.isDeleted}
-              onClick={(id) => setSelectedId(id)}
+              onClick={(uuid) => setSelectedId(uuid)}
             />
           ))}
         </div>
@@ -48,7 +49,7 @@ const AllFiles = () => {
       )}
       {selectedId && (
         <FileViewPage
-          fileId={selectedId}
+          uuid={selectedId}
           onClose={() => setSelectedId(null)}
         />
       )}

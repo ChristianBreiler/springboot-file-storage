@@ -32,9 +32,9 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { index: true, element: <SubFolder /> },
-          { path: "folders/:id", element: <SubFolder /> },
+          { path: "folders/:uuid", element: <SubFolder /> },
           { path: "files", element: <AllFiles /> },
-          { path: "files/:id", element: <FileViewPage /> },
+          { path: "files/:uuid", element: <FileViewPage /> },
           { path: "settings", element: <Settings /> },
           { path: "deleted_files", element: <DeletedFiles /> },
           { path: "storage_details", element: <StorageDetails /> },

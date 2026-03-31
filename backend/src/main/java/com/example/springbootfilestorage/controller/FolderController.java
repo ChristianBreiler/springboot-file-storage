@@ -1,12 +1,10 @@
 package com.example.springbootfilestorage.controller;
 
+import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
-import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.search.SearchResultDTO;
-import com.example.springbootfilestorage.dao.Folder;
-import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.scripts.view_beans.SettingsViewBean;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.FolderService;
@@ -14,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/folders")
@@ -35,39 +33,40 @@ public class FolderController {
         return ResponseEntity.ok(folderService.findHomeDTO());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<FolderDTO> show(@PathVariable Long id) {
-        return ResponseEntity.ok(folderService.findByDTOId(id));
+    @GetMapping("/{uuid}")
+    public ResponseEntity<FolderDTO> show(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(folderService.findByDTOUuid(uuid));
     }
 
-    @GetMapping("/{id}/search")
-    public ResponseEntity<SearchResultDTO> searchByName(@RequestParam(required = true) String name, @PathVariable Long id) {
-        List<Folder> filteredSubfolders = folderService.searchFoldersByName(id, name);
-        List<UploadedFile> filteredSubfiles = fileService.searchFilesByName(id, name);
-        return new ResponseEntity<SearchResultDTO>(new SearchResultDTO(filteredSubfolders, filteredSubfiles),
-                HttpStatus.OK);
+    @GetMapping("/{uuid}/search")
+    public ResponseEntity<SearchResultDTO> searchByName(@RequestParam(required = true) String name, @PathVariable UUID uuid) {
+        return ResponseEntity.ok(new SearchResultDTO(
+                        folderService.searchFoldersByName(uuid, name),
+                        fileService.searchFilesByName(uuid, name)
+                )
+        );
     }
 
-    @PostMapping("/rename/{id}")
-    public ResponseEntity<FolderDTO> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable Long id) {
+    @PostMapping("/rename/{uuid}")
+    public ResponseEntity<FolderDTO> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable UUID uuid) {
         if (renameFolderDTO.newFolderName().trim().isEmpty()) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(folderService.renameFolder(id, renameFolderDTO));
+        return ResponseEntity.ok(folderService.renameFolder(uuid, renameFolderDTO));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204 No Content
-    public void deleteFolderHome(@PathVariable Long id) {
-        folderService.deleteFolder(id);
+    public void deleteFolderHome(@PathVariable UUID uuid) {
+        folderService.deleteFolder(uuid);
     }
 
-    @PostMapping({"/create", "/create/{folderId}"})
+    @PostMapping({"/create", "/create/{folderUuid}"})
     public ResponseEntity<FolderDTO> createFolder(@RequestBody CreateFolderDTO createFolderDTO,
-                                                  @PathVariable(required = false) Long folderId) {
-        return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderId));
+                                                  @PathVariable(required = false) UUID folderUuid) {
+        return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderUuid));
     }
 
-    @GetMapping("/delete_folder_info/{id}")
-    public ResponseEntity<CanDeleteFolderDTO> deleteFolderInfo(@PathVariable Long id) {
-        return ResponseEntity.ok(folderService.canFolderBeDeleted(id));
+    @GetMapping("/delete_folder_info/{uuid}")
+    public ResponseEntity<CanDeleteFolderDTO> deleteFolderInfo(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(folderService.canFolderBeDeleted(uuid));
     }
 }
