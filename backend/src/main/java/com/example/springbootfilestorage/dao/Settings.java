@@ -13,13 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "settings")
 public class Settings extends BaseDAO {
-
     @Column(nullable = false)
     private PageLayout pageLayout;
 
     @Column(nullable = false)
     private Language language;
-
-    @Column(nullable = false)
-    private int deleteFilesAfterXWeeks;
 }

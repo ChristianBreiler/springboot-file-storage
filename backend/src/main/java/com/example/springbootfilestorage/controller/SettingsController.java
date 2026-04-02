@@ -1,13 +1,11 @@
 package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dao.Settings;
+import com.example.springbootfilestorage.dto.settings.SettingsDTO;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/settings")
@@ -20,12 +18,12 @@ public class SettingsController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Settings> show() {
+    public ResponseEntity<SettingsDTO> show() {
         return ResponseEntity.ok(settingsService.getSettingsFromUser());
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Settings> update(@RequestParam String pageLayout, @RequestParam String language) {
-        return ResponseEntity.ok(settingsService.updateSettings(pageLayout, language));
+    public ResponseEntity<SettingsDTO> update(@RequestBody SettingsDTO settingsDTO) {
+        return ResponseEntity.ok(settingsService.updateSettings(settingsDTO));
     }
 }

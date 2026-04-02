@@ -2,5 +2,9 @@ package com.example.springbootfilestorage.dao;
 
 public enum Language {
     DE,
-    EN
+    EN;
+
+    public String toString() {
+        return super.toString().toLowerCase();
+    }
 }

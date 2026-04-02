@@ -5,13 +5,14 @@ import api from "../../api/axiosConfig";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
       navigate("/", { replace: true });
     }
@@ -23,19 +24,28 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post("auth/login", { email, password });
+      const response = await api.post("auth/login", {
+        email,
+        password,
+        rememberMe,
+      });
+
       const accessToken = response.data.token;
 
       if (accessToken) {
-        localStorage.setItem("token", accessToken);
+        if (rememberMe) {
+          localStorage.setItem("token", accessToken);
+        } else {
+          sessionStorage.setItem("token", accessToken);
+        }
         window.location.href = "/";
       }
     } catch (err) {
-      var message;
-      if (error.response) {
-        message = "Invalid email or password"
+      let message;
+      if (err.response) {
+        message = "Invalid email or password";
       } else {
-        message = "Could not reach the server"
+        message = "Could not reach the server";
       }
       setError(message);
     } finally {
@@ -57,7 +67,9 @@ const Login = () => {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -67,7 +79,9 @@ const Login = () => {
             />
           </div>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <input
               type={showPassword ? "text" : "password"}
               value={password}
@@ -83,18 +97,39 @@ const Login = () => {
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label
+              htmlFor="rememberMe"
+              className="ml-2 block text-sm text-gray-700"
+            >
+              Remember me
+            </label>
+          </div>
           <button
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 rounded-lg font-semibold text-white transition-all shadow-md 
-              ${isLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]'}`}
+              ${isLoading
+                ? "bg-indigo-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+              }`}
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{" "}
-          <Link to="/register" className="text-indigo-600 font-medium hover:underline">
+          <Link
+            to="/register"
+            className="text-indigo-600 font-medium hover:underline"
+          >
             Create one
           </Link>
         </p>

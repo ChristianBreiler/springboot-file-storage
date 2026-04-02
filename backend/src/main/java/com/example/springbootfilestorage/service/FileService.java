@@ -57,7 +57,8 @@ public class FileService {
 
     public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
         MultipartFile file = createFileDTO.file();
-        if (fileExists(file.getOriginalFilename(), folderUuid)) throw new IllegalArgumentException("File already exists");
+        if (fileExists(file.getOriginalFilename(), folderUuid))
+            throw new IllegalArgumentException("File already exists");
 
         UploadedFile uploadedFile = new UploadedFile();
 
@@ -98,30 +99,6 @@ public class FileService {
         return uploadFileDTOMapper.apply(uploadedFile);
     }
 
-    private String generateUniqueFileName(String originalFilename) {
-        String extension = "";
-        int dotIndex = originalFilename.lastIndexOf('.');
-        if (dotIndex > 0) extension = originalFilename.substring(dotIndex);
-
-        return UUID.randomUUID().toString() + extension;
-    }
-
-    private Filetype getFileType(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        if (fileName == null) return null;
-        String[] split = fileName.split("\\.");
-        if (split.length < 2) return null;
-        String extension = split[split.length - 1];
-        return switch (extension.toLowerCase()) {
-            case "pdf" -> Filetype.PDF;
-            case "png" -> Filetype.PNG;
-            case "jpg" -> Filetype.PNG;
-            case "jpeg" -> Filetype.PNG;
-            case "mp3" -> Filetype.MP3;
-            default -> null;
-        };
-    }
-
     public List<UploadedFileDTO> findAllDeletedFiles() {
         return fileRepository.findAllDeletedFiles(userContext.getAuthenticatedUser())
                 .stream()
@@ -145,14 +122,10 @@ public class FileService {
     }
 
     public UploadedFileDTO restoreFile(UUID uuid) {
-        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
-        if (file == null) return null;
+        UploadedFile file = fileRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("File not found"));
 
         file.setDeleted(false);
         file.setFinalDeletionDate(null);
-        // TODO: Handle deleting folders with deleted files
-        if (file.getFolder() != null && folderRepository.existsByUuid(file.getFolder().getUuid()))
-            file.setFolder(null);
         fileRepository.save(file);
         return uploadFileDTOMapper.apply(file);
     }
@@ -165,30 +138,14 @@ public class FileService {
         fileRepository.delete(file);
     }
 
-    // Delete the physical file on the machine in the given directory
-    private boolean deleteFileOnMachine(String filepath) {
-        try {
-            Path path = Paths.get(filepath);
-            if (Files.exists(path)) {
-                Files.delete(path);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public List<UploadedFile> searchFilesByName(UUID uuid, String name) {
         // Special case since on the homepage file.folder == null and doesn't have an id
-        if (uuid == null)
-            return fileRepository.findFilesByNameOnHomePage(name);
-        return fileRepository.findByNameAndId(uuid, name);
+        return uuid == null ?
+                fileRepository.findFilesByNameOnHomePage(name) :
+                fileRepository.findByNameAndId(uuid, name);
     }
 
-    // File with same name in folder already exists
+    // File with the same name in the folder already exists
     public boolean fileExists(String name, UUID folderUuid) {
         return fileRepository.findByNameAndFolderUuid(name, folderUuid) != null;
     }
@@ -227,7 +184,6 @@ public class FileService {
         if (filetype == null) return;
         uploadedFile.setFiletype(filetype);
 
-        // uploadedFile.setCreatedAt(LocalDate.now());
         fileRepository.save(uploadedFile);
         // To update the user in the database with the new profile pic
         // userRepository.save(user);
@@ -264,5 +220,45 @@ public class FileService {
 
     public UploadedFile findByUuid(UUID uuid) {
         return fileRepository.findByUuid(uuid).orElse(null);
+    }
+
+    // Delete the physical file on the machine in the given directory
+    private boolean deleteFileOnMachine(String filepath) {
+        try {
+            Path path = Paths.get(filepath);
+            if (Files.exists(path)) {
+                Files.delete(path);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String generateUniqueFileName(String originalFilename) {
+        // Rename the file when storing it on the server to avoid name conflicts
+        String extension = "";
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex > 0) extension = originalFilename.substring(dotIndex);
+
+        return UUID.randomUUID().toString() + extension;
+    }
+
+    private Filetype getFileType(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        if (fileName == null) return null;
+        String[] split = fileName.split("\\.");
+        if (split.length < 2) return null;
+        String extension = split[split.length - 1];
+        return switch (extension.toLowerCase()) {
+            case "pdf" -> Filetype.PDF;
+            case "png" -> Filetype.PNG;
+            case "jpg" -> Filetype.PNG;
+            case "jpeg" -> Filetype.PNG;
+            case "mp3" -> Filetype.MP3;
+            default -> null;
+        };
     }
 }

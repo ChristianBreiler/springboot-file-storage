@@ -7,6 +7,7 @@ import File from "./File";
 import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
 
+// Represents the view of a specific Folder with all its Files and other subfolders
 const SubFolder = () => {
   const { uuid } = useParams();
   const [data, setData] = useState(null);
@@ -64,11 +65,13 @@ const SubFolder = () => {
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Folders</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {data.folders.map((folder) => (
-              <Folder
-                key={folder.uuid}
-                uuid={folder.uuid}
-                name={folder.name}
-              />
+              <div draggable>
+                <Folder
+                  key={folder.uuid}
+                  uuid={folder.uuid}
+                  name={folder.name}
+                />
+              </div>
             ))}
           </div>
         </>
@@ -78,15 +81,17 @@ const SubFolder = () => {
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
           <div className="grid grid-cols-1 gap-2">
             {data.files.map((file) => (
-              <File
-                key={file.uuid}
-                uuid={file.uuid}
-                originalFilename={file.originalFilename}
-                size={file.size}
-                filetype={file.filetype}
-                isDeleted={file.isDeleted}
-                onClick={(uuid) => setSelectedId(uuid)}
-              />
+              <div draggable>
+                <File
+                  key={file.uuid}
+                  uuid={file.uuid}
+                  originalFilename={file.originalFilename}
+                  size={file.size}
+                  filetype={file.filetype}
+                  isDeleted={file.isDeleted}
+                  onClick={(uuid) => setSelectedId(uuid)}
+                />
+              </div>
             ))}
           </div>
         </>

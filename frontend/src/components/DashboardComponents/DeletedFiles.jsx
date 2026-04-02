@@ -49,7 +49,7 @@ const DeletedFiles = () => {
             {filesToRender.map((file) => (
               <File
                 key={file.uuid}
-                id={file.uuid}
+                uuid={file.uuid}
                 originalFilename={file.originalFilename}
                 size={file.size}
                 filetype={file.filetype}

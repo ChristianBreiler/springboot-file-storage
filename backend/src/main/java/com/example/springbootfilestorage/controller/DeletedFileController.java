@@ -28,6 +28,7 @@ public class DeletedFileController {
     @PostMapping("/restore/{uuid}")
     public ResponseEntity<UploadedFileDTO> restore(@PathVariable UUID uuid) {
         UploadedFileDTO restoredFile = fileService.restoreFile(uuid);
+        System.out.println("No error");
         if (restoredFile == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(restoredFile);

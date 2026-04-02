@@ -1,10 +1,12 @@
-import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2 } from "lucide-react";
+import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2, Undo2 } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DeleteFileModal from "../modals/DeleteFileModal";
+import RestoreFileModal from "../modals/RestoreFileModal";
 
 const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -59,7 +61,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
         <div className="relative" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg group-hover:opacity-100 transition-opacity"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
           >
             <MoreVertical size={16} />
           </button>
@@ -73,8 +75,21 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
                 <Trash2 size={14} />
-                Delete File
+                {isDeleted ? "Delete Forever" : "Delete File"}
               </button>
+
+              {isDeleted && (
+                <button
+                  onClick={() => {
+                    setIsRestoreModalOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  <Undo2 size={14} />
+                  Restore File
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -86,6 +101,14 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
         fileUuid={uuid}
         isDeleted={isDeleted}
       />
+      {isDeleted && (
+        <RestoreFileModal
+          isOpen={isRestoreModalOpen}
+          onClose={() => setIsRestoreModalOpen(false)}
+          originalFilename={originalFilename}
+          uuid={uuid}
+        />
+      )}
     </>
   );
 };

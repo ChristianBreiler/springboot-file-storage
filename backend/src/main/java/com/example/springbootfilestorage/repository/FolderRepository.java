@@ -26,8 +26,5 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     int numberOfFolders();
 
     @Query("SELECT f FROM Folder f WHERE f.uuid = ?1")
-    boolean existsByUuid(UUID uuid);
-
-    @Query("SELECT f FROM Folder f WHERE f.uuid = ?1")
     Optional<Folder> findByUuid(UUID uuid);
 }

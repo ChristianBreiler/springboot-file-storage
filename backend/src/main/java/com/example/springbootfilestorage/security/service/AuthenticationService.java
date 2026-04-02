@@ -83,7 +83,7 @@ public class AuthenticationService {
         // if (!user.isEnabled()) {
         // TODO: Email here + return in login response
         //}
-        String jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(user, input.rememberMe());
         return new LoginResponse(jwt, jwtService.getExpirationTime(), user.isEnabled());
     }
 
@@ -114,7 +114,7 @@ public class AuthenticationService {
         Settings settings = new Settings();
         settings.setPageLayout(PageLayout.CARDS);
         settings.setLanguage(Language.EN);
-        settings.setDeleteFilesAfterXWeeks(2);
+        // settings.setDeleteFilesAfterXWeeks(2);
         // settings.setCreatedAt(LocalDate.now());
         // settings.setUpdatedAt(LocalDate.now());
         settingsService.saveSettings(settings);

@@ -3,6 +3,7 @@ package com.example.springbootfilestorage.scripts.schedules;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.service.FileService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ public class DeleteDeletedFiles {
     private final FileService fileService;
     private final FileRepository fileRepository;
 
+    @Value("${spring.files.delete.after.weeks}")
+    private int deleteAfterWeeks;
+
     public DeleteDeletedFiles(FileService fileService, FileRepository fileRepository) {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
@@ -24,6 +28,7 @@ public class DeleteDeletedFiles {
 
     @Scheduled(cron = "0 0 5 * * ?")
     public void deleteDeletedFiles() {
+        // TODO: Fix this
         List<UploadedFile> files = fileRepository.findAllFilesToBeDeletedToday(LocalDate.now());
         files.forEach(f -> fileService.deleteFilePermanently(f.getUuid()));
     }

@@ -85,7 +85,7 @@ public class FileCleanupJob {
         }
     }
 
-    // Delete files with incorrect filepaths (e.g., deleted by the user)
+    // Delete files with incorrect file paths (e.g., deleted by the user)
     private void cleanUpIncorrectFilepaths() {
         List<UploadedFile> files = fileRepository.findAll();
         files.forEach(file -> {

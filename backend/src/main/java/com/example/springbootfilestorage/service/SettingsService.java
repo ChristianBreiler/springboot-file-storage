@@ -3,6 +3,8 @@ package com.example.springbootfilestorage.service;
 import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
+import com.example.springbootfilestorage.dto.mappers.SettingsDTOMapper;
+import com.example.springbootfilestorage.dto.settings.SettingsDTO;
 import com.example.springbootfilestorage.repository.SettingsRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
@@ -12,29 +14,44 @@ public class SettingsService {
 
     private final SettingsRepository settingsRepository;
     private final UserContext userContext;
+    private final SettingsDTOMapper settingsDTOMapper;
 
-    public SettingsService(SettingsRepository settingsRepository, UserContext userContext) {
+    public SettingsService(SettingsRepository settingsRepository, UserContext userContext,
+                           SettingsDTOMapper settingsDTOMapper) {
         this.settingsRepository = settingsRepository;
         this.userContext = userContext;
+        this.settingsDTOMapper = settingsDTOMapper;
     }
 
-    public Settings getSettingsFromUser() {
-        return userContext.getAuthenticatedUser().getSettings();
-    }
-
-    public int fileDeletionWeeks() {
-        return getSettingsFromUser().getDeleteFilesAfterXWeeks();
+    public SettingsDTO getSettingsFromUser() {
+        return settingsDTOMapper.apply(userContext.getAuthenticatedUser().getSettings());
     }
 
     public void saveSettings(Settings settings) {
         settingsRepository.save(settings);
     }
 
-    public Settings updateSettings(String pageLayout, String language) {
-        Settings userSettings = getSettingsFromUser();
-        userSettings.setPageLayout(pageLayout.equals("cards") ? PageLayout.CARDS : PageLayout.LIST);
-        userSettings.setLanguage(language.equals("en") ? Language.EN : Language.DE);
+    public SettingsDTO updateSettings(SettingsDTO settingsDTO) {
+        Settings userSettings = userContext.getAuthenticatedUser().getSettings();
+        userSettings.setPageLayout(getPageLayout(settingsDTO.pageLayout()));
+        userSettings.setLanguage(getLanguage(settingsDTO.language()));
         saveSettings(userSettings);
-        return userSettings;
+        return settingsDTOMapper.apply(userSettings);
+    }
+
+    private Language getLanguage(String language) {
+        return switch (language.toLowerCase()) {
+            case "en" -> Language.EN;
+            case "de" -> Language.DE;
+            default -> throw new IllegalArgumentException("Invalid language");
+        };
+    }
+
+    private PageLayout getPageLayout(String pageLayout) {
+        return switch (pageLayout.toLowerCase()) {
+            case "cards" -> PageLayout.CARDS;
+            case "list" -> PageLayout.LIST;
+            default -> throw new IllegalArgumentException("Invalid page layout");
+        };
     }
 }

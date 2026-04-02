@@ -13,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
@@ -33,12 +34,12 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserDetails userDetails, boolean rememberMe) {
+        return generateToken(new HashMap<>(), userDetails, rememberMe);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, boolean rememberMe) {
+        return buildToken(extraClaims, userDetails, jwtExpiration, rememberMe);
     }
 
     public long getExpirationTime() {
@@ -50,12 +51,16 @@ public class JwtService {
         return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long jwtExpiration) {
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long jwtExpiration,
+                              boolean rememberMe) {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(
+                        rememberMe ? getRememberMeDate()
+                                : new Date(System.currentTimeMillis() + jwtExpiration * 1000)
+                )
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -75,5 +80,10 @@ public class JwtService {
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Date getRememberMeDate() {
+        // The Token is valid for 1 day
+        return new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1));
     }
 }

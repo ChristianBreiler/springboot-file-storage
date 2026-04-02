@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout";
-import Homepage from "./components/DashboardComponents/HomeFolder";
 import SubFolder from "./components/DashboardComponents/SubFolder";
 import DeletedFiles from "./components/DashboardComponents/DeletedFiles";
 import Settings from "./components/DashboardComponents/Settings";

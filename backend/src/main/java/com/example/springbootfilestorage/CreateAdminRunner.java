@@ -72,7 +72,7 @@ public class CreateAdminRunner {
             Settings settings = new Settings();
             settings.setPageLayout(PageLayout.CARDS);
             settings.setLanguage(Language.EN);
-            settings.setDeleteFilesAfterXWeeks(2);
+            // settings.setDeleteFilesAfterXWeeks(2);
             settingsRepository.save(settings);
 
             admin.setSettings(settings);
