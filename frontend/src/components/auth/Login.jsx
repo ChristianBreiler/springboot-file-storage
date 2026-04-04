@@ -36,7 +36,7 @@ const Login = () => {
         if (rememberMe) {
           localStorage.setItem("token", accessToken);
         } else {
-          sessionStorage.setItem("token", accessToken);
+          localStorage.setItem("token", accessToken);
         }
         window.location.href = "/";
       }
@@ -54,7 +54,6 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
@@ -133,8 +132,17 @@ const Login = () => {
             Create one
           </Link>
         </p>
+        <div className="text-center">
+          <p>
+          <Link
+            to="/register"
+            className="text-indigo-600 font-medium hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </p>
+        </div>
       </div>
-    </div>
   );
 };
 

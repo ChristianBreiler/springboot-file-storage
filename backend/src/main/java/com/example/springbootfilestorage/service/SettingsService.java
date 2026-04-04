@@ -32,12 +32,19 @@ public class SettingsService {
     }
 
     public SettingsDTO updateSettings(SettingsDTO settingsDTO) {
-        Settings userSettings = userContext.getAuthenticatedUser().getSettings();
-        userSettings.setPageLayout(getPageLayout(settingsDTO.pageLayout()));
-        userSettings.setLanguage(getLanguage(settingsDTO.language()));
-        saveSettings(userSettings);
-        return settingsDTOMapper.apply(userSettings);
+        try {
+            Settings userSettings = userContext.getAuthenticatedUser().getSettings();
+            userSettings.setPageLayout(getPageLayout(settingsDTO.pageLayout()));
+            userSettings.setLanguage(getLanguage(settingsDTO.language()));
+            saveSettings(userSettings);
+            return settingsDTOMapper.apply(userSettings);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
+    // Do both of the following since the frontend sends the settings a strings
 
     private Language getLanguage(String language) {
         return switch (language.toLowerCase()) {

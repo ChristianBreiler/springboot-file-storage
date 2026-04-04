@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axiosConfig";
-import { ChevronRight } from "lucide-react";
 import File from "./File";
 
 const DeletedFiles = () => {
@@ -36,7 +35,6 @@ const DeletedFiles = () => {
     <div className="p-6">
       <nav className="flex items-center ...">
         <div className="flex items-center">
-          <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
           <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
             Deleted Files
           </span>

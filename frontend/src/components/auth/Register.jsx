@@ -72,11 +72,10 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="text-gray-500 mt-2">Join us to start managing your files</p>
+          <p className="text-gray-500 mt-2">Create a new Account</p>
         </div>
         <form onSubmit={handleRegister} className="space-y-4">
           {error && (
@@ -178,7 +177,6 @@ const Register = () => {
           </Link>
         </p>
       </div>
-    </div>
   );
 };
 

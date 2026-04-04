@@ -52,7 +52,7 @@ public class FileController {
     }
 
     @GetMapping("/download/{uuid}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable UUID uuid) {
+    public ResponseEntity<Resource> download(@PathVariable UUID uuid) {
         UploadedFile file = fileService.findByUuid(uuid);
         if (file == null) return ResponseEntity.notFound().build();
         try {
@@ -91,7 +91,7 @@ public class FileController {
     }
 
     @GetMapping("/open/{uuid}")
-    public ResponseEntity<Resource> openFile(@PathVariable UUID uuid) throws MalformedURLException {
+    public ResponseEntity<Resource> open(@PathVariable UUID uuid) throws MalformedURLException {
         UploadedFile file = fileService.findByUuid(uuid);
         if (file == null) return ResponseEntity.notFound().build();
 

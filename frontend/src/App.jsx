@@ -12,15 +12,21 @@ import Login from "./components/auth/Login";
 import { AuthProvider } from "./components/auth/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Register from "./components/auth/Register";
+import AuthLayout from "./components/auth/AuthLayout"; 
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+    ],
   },
   {
     element: <ProtectedRoute />,

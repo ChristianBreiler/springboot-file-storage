@@ -48,7 +48,7 @@ public class FolderController {
     }
 
     @PostMapping("/rename/{uuid}")
-    public ResponseEntity<FolderDTO> renameFolder(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable UUID uuid) {
+    public ResponseEntity<FolderDTO> rename(@RequestBody RenameFolderDTO renameFolderDTO, @PathVariable UUID uuid) {
         if (renameFolderDTO.newFolderName().trim().isEmpty()) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(folderService.renameFolder(uuid, renameFolderDTO));
     }
@@ -60,13 +60,14 @@ public class FolderController {
     }
 
     @PostMapping({"/create", "/create/{folderUuid}"})
-    public ResponseEntity<FolderDTO> createFolder(@RequestBody CreateFolderDTO createFolderDTO,
+    public ResponseEntity<FolderDTO> create(@RequestBody CreateFolderDTO createFolderDTO,
                                                   @PathVariable(required = false) UUID folderUuid) {
         return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderUuid));
     }
 
     @GetMapping("/delete_folder_info/{uuid}")
     public ResponseEntity<CanDeleteFolderDTO> deleteFolderInfo(@PathVariable UUID uuid) {
+        // Shows the user if the folder is empty and if it can therefore be deleted
         return ResponseEntity.ok(folderService.canFolderBeDeleted(uuid));
     }
 }

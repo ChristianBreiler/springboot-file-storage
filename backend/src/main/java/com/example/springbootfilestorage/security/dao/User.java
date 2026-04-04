@@ -56,7 +56,7 @@ public class User extends BaseDAO implements UserDetails {
     @Enumerated
     private Role role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "settings_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Settings settings;

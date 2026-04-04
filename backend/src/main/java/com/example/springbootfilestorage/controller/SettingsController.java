@@ -1,11 +1,13 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.dao.Settings;
 import com.example.springbootfilestorage.dto.settings.SettingsDTO;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/settings")
