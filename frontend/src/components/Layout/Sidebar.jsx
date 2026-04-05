@@ -18,10 +18,12 @@ const Sidebar = () => {
   return (
     <aside className={`h-screen bg-slate-950 flex flex-col border-r border-slate-800 transition-all duration-300 ${isExpanded ? "w-64" : "w-20"}`}>
       <div className={`h-16 flex items-center px-6 gap-3 ${!isExpanded && "justify-center px-0"}`}>
+        <Link to="/" className={navLinkClass("/")}>
         <div className="w-8 h-8 bg-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center text-white">
           <FolderOpen size={20} />
         </div>
         {isExpanded && <span className="text-white font-semibold tracking-tight truncate">File Storage</span>}
+        </Link>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-1">
         {isExpanded && (
