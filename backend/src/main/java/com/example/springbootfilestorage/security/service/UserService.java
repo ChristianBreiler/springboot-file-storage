@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.security.service;
 
+import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.mappers.IsAdminDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.ProfileDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UserInformationDTOMappers;
@@ -11,6 +12,7 @@ import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -53,9 +55,18 @@ public class UserService {
         user.setFirstname(editedProfile.firstname());
         user.setLastname(editedProfile.lastname());
         user.setEmailaddress(editedProfile.email());
-        // TODO: Obviously change this later on
-        user.setProfilePic(null);
+        user.setProfilePic(initializeUploadedProfilePic(editedProfile.profilePic()));
         userRepository.save(user);
         return profileDTOMapper.apply(user);
+    }
+
+    private UploadedFile initializeUploadedProfilePic(MultipartFile file) {
+        UploadedFile uploadedFile = new UploadedFile();
+        uploadedFile.setOriginalFilename(file.getOriginalFilename());
+        uploadedFile.setStoredName(file.getOriginalFilename());
+        uploadedFile.setSize(file.getSize());
+        uploadedFile.setOwner(userContext.getAuthenticatedUser());
+        uploadedFile.setProfilePic(true);
+        return uploadedFile;
     }
 }

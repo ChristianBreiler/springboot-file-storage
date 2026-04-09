@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const [data, setData] = useState(null);
@@ -20,6 +21,10 @@ const Profile = () => {
       }
     };
     fetchProfileData();
+  }, []);
+
+  useEffect(() => {
+    document.title = "File Storage App - Profile"
   }, []);
 
   const formatDate = (dateString) => {
@@ -99,12 +104,11 @@ const Profile = () => {
           </div>
         </div>
         <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4 pb-12">
-          <button className="px-8 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 hover:shadow-lg transition-all active:scale-95">
-            Edit Profile
-          </button>
-          <button className="px-8 py-2.5 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-white hover:border-gray-400 transition-all active:scale-95">
-            Security Settings
-          </button>
+          <Link to="/profile/edit">
+            <button className="px-8 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 hover:shadow-lg transition-all active:scale-95">
+              Edit Profile
+            </button>
+          </Link>
         </div>
       </div>
     </div>

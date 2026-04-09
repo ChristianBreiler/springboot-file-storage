@@ -6,13 +6,23 @@ import Folder from "./Folder";
 import File from "./File";
 import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
+import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 
-// Represents the view of a specific Folder with all its Files and other subfolders
+// Represents the view of a specific Folder with all its Files and other subfolders (Including the Homefolder)
 const SubFolder = () => {
   const { uuid } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
+
+  // Do this so that the btton inside File is stil clik
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
 
   useEffect(() => {
     const fetchFolderData = async () => {
@@ -31,57 +41,85 @@ const SubFolder = () => {
     fetchFolderData();
   }, [uuid]);
 
+  useEffect(() => {
+    if (data && uuid) {
+      document.title = "File Storage App - " + data.name;
+    } else {
+      document.title = "File Storage App";
+    }
+  }, [data, uuid]);
+
+  async function handleDragEnd(event) {
+    const { active, over } = event;
+
+    // Not over something that is droppable
+    if (!over) return
+
+    const fileUuid = active.id
+    const folderUuid = over.id
+
+    setLoading(true);
+
+    try {
+      // Change the file stuff in the backend here when done dragging
+      const response = await api.post("drag/move-file", { fileUuid: fileUuid, folderUuid: folderUuid })
+      setData(response.data)
+    } catch (err) {
+      console.error("Failed to fetch folders:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (loading) return <LoadingBar />;
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;
 
   return (
-    <div className="p-6">
-      <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
-        <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-          <Home size={16} />
-        </Link>
-        {data.parentFolders?.map((folder) => (
-          <div key={folder.uuid} className="flex items-center">
-            <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
-            <Link
-              to={`/folders/${folder.uuid}`}
-              className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate"
-            >
-              {folder.name}
-            </Link>
-          </div>
-        ))}
-        {data.name && (
-          <div className="flex items-center">
-            <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
-            <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
-              {data.name}
-            </span>
-          </div>
-        )}
-      </nav>
-      {data.folders?.length > 0 && (
-        <>
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Folders</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {data.folders.map((folder) => (
-              <div draggable>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="p-6">
+        <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
+          <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <Home size={16} />
+          </Link>
+          {data.parentFolders?.map((folder) => (
+            <div key={folder.uuid} className="flex items-center">
+              <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
+              <Link
+                to={`/folders/${folder.uuid}`}
+                className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate"
+              >
+                {folder.name}
+              </Link>
+            </div>
+          ))}
+          {data.name && (
+            <div className="flex items-center">
+              <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
+              <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
+                {data.name}
+              </span>
+            </div>
+          )}
+        </nav>
+        {data.folders?.length > 0 && (
+          <>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Folders</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              {data.folders.map((folder) => (
                 <Folder
                   key={folder.uuid}
                   uuid={folder.uuid}
                   name={folder.name}
                 />
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-      {data.files?.length > 0 && (
-        <>
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
-          <div className="grid grid-cols-1 gap-2">
-            {data.files.map((file) => (
-              <div draggable>
+              ))}
+            </div>
+          </>
+        )}
+        {data.files?.length > 0 && (
+          <>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
+            <div className="grid grid-cols-1 gap-2">
+              {data.files.map((file) => (
                 <File
                   key={file.uuid}
                   uuid={file.uuid}
@@ -91,23 +129,23 @@ const SubFolder = () => {
                   isDeleted={file.isDeleted}
                   onClick={(uuid) => setSelectedId(uuid)}
                 />
-              </div>
-            ))}
+              ))}
+            </div>
+          </>
+        )}
+        {data.folders?.length === 0 && data.files?.length === 0 && (
+          <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+            <p className="text-slate-400 font-medium">This Folder is Empty</p>
           </div>
-        </>
-      )}
-      {data.folders?.length === 0 && data.files?.length === 0 && (
-        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-          <p className="text-slate-400 font-medium">This Folder is Empty</p>
-        </div>
-      )}
-      {selectedId && (
-        <FileViewPage
-          uuid={selectedId}
-          onClose={() => setSelectedId(null)}
-        />
-      )}
-    </div>
+        )}
+        {selectedId && (
+          <FileViewPage
+            uuid={selectedId}
+            onClose={() => setSelectedId(null)}
+          />
+        )}
+      </div>
+    </DndContext>
   );
 };
 

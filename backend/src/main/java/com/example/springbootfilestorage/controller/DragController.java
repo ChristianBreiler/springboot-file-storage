@@ -2,13 +2,16 @@ package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dto.MoveFileDto;
 import com.example.springbootfilestorage.dto.MoveFolderDto;
+import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.FolderService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // Controller for the drag and drop functionality on the server side.
+@RequestMapping("/drag")
 @RestController
 public class DragController {
 
@@ -21,18 +24,12 @@ public class DragController {
     }
 
     @PostMapping("/move-file")
-    public void moveFileIntoFolder(@RequestBody MoveFileDto moveFileDto) {
-        Long fileId = moveFileDto.getFileId();
-        Long folderId = moveFileDto.getContainerId();
-        fileService.moveFileToFolder(fileId, folderId);
+    public FolderDTO moveFileIntoFolder(@RequestBody MoveFileDto moveFileDto) {
+        return fileService.moveFileToFolder(moveFileDto);
     }
 
-    // TODO: Implement this
     @PostMapping("/move-folder")
-    public void moveFolderIntoFolder(@RequestBody MoveFolderDto moveFolderDto) {
-        Long folderId = moveFolderDto.getContainerId();
-        long folderTargetId = moveFolderDto.getContainerTargetId();
-        folderService.moveFolderToFolder(folderId, folderTargetId);
-
+    public FolderDTO moveFolderIntoFolder(@RequestBody MoveFolderDto moveFolderDto) {
+        return folderService.moveFolderToFolder(moveFolderDto);
     }
 }

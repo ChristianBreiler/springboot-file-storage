@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.MoveFolderDto;
 import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
@@ -92,18 +93,16 @@ public class FolderService {
         return folderDTOMapper.apply(homeFolder);
     }
 
-    public void moveFolderToFolder(Long folderId, long folderTargetId) {
-        Folder folder = folderRepository.findById(folderId).orElse(null);
-        if (folder == null) throw new IllegalArgumentException("Folder not found");
-        Folder targetFolder = folderRepository.findById(folderTargetId).orElse(null);
-        if (targetFolder == null) throw new IllegalArgumentException("Target folder not found");
+    public FolderDTO moveFolderToFolder(MoveFolderDto moveFolderDto) {
+        Folder folder = folderRepository.findByUuid(moveFolderDto.folderUuid()).orElseThrow(() -> new RuntimeException("Folder not found"));
+        Folder targetFolder = folderRepository.findByUuid(moveFolderDto.targetFolderUuid()).orElseThrow(() -> new RuntimeException("Folder not found"));
         folder.setParent(targetFolder);
         folderRepository.save(folder);
+        return folderDTOMapper.apply(folder);
     }
 
     public CanDeleteFolderDTO canFolderBeDeleted(UUID uuid) {
         Folder folder = folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
-        // TODO: Maybe make this more efficient?
         return new CanDeleteFolderDTO((folder.numberOfFolders() + folder.numberOfFiles()) == 0);
     }
 

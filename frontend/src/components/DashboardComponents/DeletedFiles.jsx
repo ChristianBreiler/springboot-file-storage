@@ -33,13 +33,6 @@ const DeletedFiles = () => {
 
   return (
     <div className="p-6">
-      <nav className="flex items-center ...">
-        <div className="flex items-center">
-          <span className="text-slate-900 font-semibold px-2 py-1 truncate max-w-50">
-            Deleted Files
-          </span>
-        </div>
-      </nav>
       {filesToRender.length > 0 ? (
         <>
           <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>

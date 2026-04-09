@@ -1,8 +1,19 @@
-import { Bell, Search, Sun, Command } from "lucide-react";
+import { Search, Sun, Command, Settings } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import CreateDropdown from "../DashboardComponents/CreateDropdown";
 import ProfileDropdown from "../DashboardComponents/ProfileDropdown";
 
 const Header = () => {
+  const location = useLocation();
+
+  const navLinkClass = (path) => {
+    const isActive = location.pathname === path;
+    return `group flex h-10 w-10 items-center justify-center rounded-xl transition-all ${isActive
+        ? "bg-blue-50 text-blue-600 shadow-sm"
+        : "text-slate-500 hover:bg-white hover:shadow-sm hover:text-blue-600"
+      }`;
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-100 bg-white/70 px-8 backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-6">
@@ -29,10 +40,9 @@ const Header = () => {
           <button className="group flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-orange-500 transition-all">
             <Sun size={20} />
           </button>
-          <button className="group relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-blue-600 transition-all">
-            <Bell size={20} />
-            <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border-2 border-white bg-red-500"></span>
-          </button>
+          <Link to="/settings" className={navLinkClass("/settings")}>
+            <Settings size={20} />
+          </Link>
         </div>
         <ProfileDropdown />
       </div>

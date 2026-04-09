@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import api from "../../api/axiosConfig";
 import { CheckCircle, Layout, List, Globe, Save } from "lucide-react";
 import LoadingBar from "../loading/LoadingBar";
+import i18n from "../../utils/i18n";
+import { data } from "react-router-dom";
 
 const Settings = () => {
     const [settings, setSettings] = useState({
@@ -9,7 +11,7 @@ const Settings = () => {
         language: "en"
     });
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState(null); 
+    const [status, setStatus] = useState(null);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -34,6 +36,8 @@ const Settings = () => {
             await api.post("/settings/update", settings);
             setStatus("success");
             setTimeout(() => setStatus(null), 3000);
+            // TODO: Maybe Change this
+            i18n.changeLanguage(data.language)
         } catch (err) {
             setStatus("error");
         } finally {
@@ -68,7 +72,7 @@ const Settings = () => {
                     <div className="flex items-center gap-3 mb-6">
                         <Layout className="text-indigo-600 w-5 h-5" />
                         <h3 className="text-lg font-bold text-slate-800">Page Layout</h3>
-                    </div>      
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
                             { id: "cards", label: "Card Grid", icon: <Layout />, desc: "Visual blocks for high-detail items." },
@@ -78,8 +82,8 @@ const Settings = () => {
                                 key={option.id}
                                 onClick={() => setSettings({ ...settings, pageLayout: option.id })}
                                 className={`relative cursor-pointer p-5 rounded-xl border-2 transition-all flex items-start gap-4 
-                                    ${settings.pageLayout === option.id 
-                                        ? "border-indigo-600 bg-indigo-50/30" 
+                                    ${settings.pageLayout === option.id
+                                        ? "border-indigo-600 bg-indigo-50/30"
                                         : "border-slate-100 hover:border-slate-300 bg-white"}`}
                             >
                                 <div className={`p-2 rounded-lg ${settings.pageLayout === option.id ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500"}`}>

@@ -18,8 +18,7 @@ public class ProfileController {
     private final MessageService messageService;
     private final UserService userService;
 
-    public ProfileController(FileService fileService,
-                             MessageService messageService, UserService userService) {
+    public ProfileController(FileService fileService, MessageService messageService, UserService userService) {
         this.fileService = fileService;
         this.messageService = messageService;
         this.userService = userService;

@@ -2,12 +2,24 @@ import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2, Undo2 } fr
 import { useState, useMemo, useRef, useEffect } from "react";
 import DeleteFileModal from "../modals/DeleteFileModal";
 import RestoreFileModal from "../modals/RestoreFileModal";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // dnd-kit logic
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: uuid,
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    zIndex: isDragging ? 100 : undefined,
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,20 +39,22 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
 
   const iconConfig = useMemo(() => {
     switch (filetype) {
-      case "PDF":
-        return { icon: <FileText size={20} />, color: "text-red-500", bg: "bg-red-50" };
+      case "PDF": return { icon: <FileText size={20} />, color: "text-red-500", bg: "bg-red-50" };
       case "JPG":
-      case "PNG":
-        return { icon: <FileImage size={20} />, color: "text-blue-500", bg: "bg-blue-50" };
-      default:
-        return { icon: <FileIcon size={20} />, color: "text-slate-500", bg: "bg-slate-50" };
+      case "PNG": return { icon: <FileImage size={20} />, color: "text-blue-500", bg: "bg-blue-50" };
+      default: return { icon: <FileIcon size={20} />, color: "text-slate-500", bg: "bg-slate-50" };
     }
   }, [filetype]);
 
   return (
     <>
       <div
-        className="group flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all mb-2 cursor-pointer relative"
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+        className={`group flex items-center justify-between p-3 bg-white border rounded-xl transition-all mb-2 relative touch-none ${isDragging ? "opacity-50 border-blue-500 shadow-2xl scale-105 cursor-grabbing" : "border-slate-100 hover:border-blue-200 hover:shadow-sm cursor-grab"
+          }`}
         onClick={() => onClick(uuid)}
       >
         <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -60,55 +74,36 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
         </div>
         <div className="relative" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDropdownOpen(!isDropdownOpen);
+            }}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
           >
             <MoreVertical size={16} />
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl z-50 py-1">
               <button
-                onClick={() => {
-                  setIsDeleteModalOpen(true);
-                  setIsDropdownOpen(false);
-                }}
+                onClick={() => { setIsDeleteModalOpen(true); setIsDropdownOpen(false); }}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <Trash2 size={14} />
-                {isDeleted ? "Delete Forever" : "Delete File"}
+                <Trash2 size={14} /> {isDeleted ? "Delete Forever" : "Delete File"}
               </button>
-
               {isDeleted && (
                 <button
-                  onClick={() => {
-                    setIsRestoreModalOpen(true);
-                    setIsDropdownOpen(false);
-                  }}
+                  onClick={() => { setIsRestoreModalOpen(true); setIsDropdownOpen(false); }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
                 >
-                  <Undo2 size={14} />
-                  Restore File
+                  <Undo2 size={14} /> Restore File
                 </button>
               )}
             </div>
           )}
         </div>
       </div>
-      <DeleteFileModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        originalFilename={originalFilename}
-        fileUuid={uuid}
-        isDeleted={isDeleted}
-      />
-      {isDeleted && (
-        <RestoreFileModal
-          isOpen={isRestoreModalOpen}
-          onClose={() => setIsRestoreModalOpen(false)}
-          originalFilename={originalFilename}
-          uuid={uuid}
-        />
-      )}
+      <DeleteFileModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} originalFilename={originalFilename} fileUuid={uuid} isDeleted={isDeleted} />
+      {isDeleted && <RestoreFileModal isOpen={isRestoreModalOpen} onClose={() => setIsRestoreModalOpen(false)} originalFilename={originalFilename} uuid={uuid} />}
     </>
   );
 };

@@ -1,14 +1,9 @@
 package com.example.springbootfilestorage.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.UUID;
 
-@Setter
-@Getter
-public class MoveFolderDto {
-    @JsonProperty("containerId")
-    private Long containerId;
-    @JsonProperty("containerTargetId")
-    private Long containerTargetId;
+public record MoveFolderDto(
+        UUID folderUuid,
+        UUID targetFolderUuid
+) {
 }

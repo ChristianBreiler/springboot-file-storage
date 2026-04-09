@@ -5,6 +5,7 @@ import DeletedFiles from "./components/DashboardComponents/DeletedFiles";
 import Settings from "./components/DashboardComponents/Settings";
 import StorageDetails from "./components/DashboardComponents/StorageDetails";
 import Profile from "./components/DashboardComponents/Profile";
+import EditProfile from "./components/DashboardComponents/EditProfile";
 import AllFiles from "./components/DashboardComponents/AllFiles";
 import FileViewPage from "./components/DashboardComponents/FileViewPage";
 import NotFound from "./components/error/NotFound";
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
           { path: "deleted_files", element: <DeletedFiles /> },
           { path: "storage_details", element: <StorageDetails /> },
           { path: "profile", element: <Profile /> },
+          { path: "profile/edit", element: <EditProfile /> },
         ],
       },
     ],
