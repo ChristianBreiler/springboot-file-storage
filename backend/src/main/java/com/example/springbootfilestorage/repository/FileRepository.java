@@ -17,8 +17,8 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.isProfilePic = false AND f.deleted = false AND f.owner = ?1")
     List<UploadedFile> findAllFilesWithNoFolder(User currentUser);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.folder.uuid = ?1 AND f.originalFilename LIKE %?2% AND f.isProfilePic = false AND f.deleted = false")
-    List<UploadedFile> findByNameAndId(UUID folderUuid, String name);
+    @Query("SELECT f FROM UploadedFile f WHERE f.originalFilename LIKE %?1% AND f.isProfilePic = false AND f.deleted = false")
+    List<UploadedFile> findByNameAndId(String name);
 
     @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.originalFilename LIKE %?1% AND f.isProfilePic = false AND f.deleted = false")
     List<UploadedFile> findFilesByNameOnHomePage(String name);

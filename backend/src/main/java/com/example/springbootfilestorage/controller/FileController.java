@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.controller;
 
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.file.CreateFileDTO;
+import com.example.springbootfilestorage.dto.file.RenameFileDTO;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.service.FileService;
 import org.springframework.core.io.Resource;
@@ -55,13 +56,15 @@ public class FileController {
     public ResponseEntity<Resource> download(@PathVariable UUID uuid) {
         UploadedFile file = fileService.findByUuid(uuid);
         if (file == null) return ResponseEntity.notFound().build();
+
         try {
             Path path = Paths.get(file.getStoragePath());
             UrlResource resource = new UrlResource(path.toUri());
-            if (!resource.exists() || !resource.isReadable()) return ResponseEntity.notFound().build();
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getOriginalFilename() + "\"")
+                    .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                    .contentType(MediaType.APPLICATION_PDF)
                     .body(resource);
 
         } catch (Exception e) {
@@ -100,7 +103,8 @@ public class FileController {
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(file.probeContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getOriginalFilename() + "\"")
+                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
                 .body(resource);
     }
 
@@ -110,8 +114,7 @@ public class FileController {
     }
 
     @PostMapping("/rename/{uuid}")
-    public ResponseEntity<UploadedFile> rename(@PathVariable UUID uuid, @RequestParam String newName) {
-        UploadedFile updatedFile = fileService.renameFile(uuid, newName);
-        return ResponseEntity.ok(updatedFile);
+    public ResponseEntity<UploadedFileDTO> rename(@PathVariable UUID uuid, @RequestBody RenameFileDTO renameFileDTO) {
+        return ResponseEntity.ok(fileService.renameFile(uuid, renameFileDTO));
     }
 }

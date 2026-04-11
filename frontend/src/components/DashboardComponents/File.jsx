@@ -1,7 +1,8 @@
-import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2, Undo2 } from "lucide-react";
+import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2, Undo2, Pencil } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DeleteFileModal from "../modals/DeleteFileModal";
 import RestoreFileModal from "../modals/RestoreFileModal";
+import RenameFileModal from "../modals/RenameFileModal"
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -9,9 +10,9 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // dnd-kit logic
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: uuid,
   });
@@ -36,6 +37,11 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
+
+  const trimFileName = (name) => {
+    // Slice off the file extension here so users cant accidentally change the filetype or break the file entirely
+    return name.split('.').slice(0, -1).join('.');
+  }
 
   const iconConfig = useMemo(() => {
     switch (filetype) {
@@ -90,6 +96,18 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
               >
                 <Trash2 size={14} /> {isDeleted ? "Delete Forever" : "Delete File"}
               </button>
+              {!isDeleted && (
+                <button
+                  className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
+                  onClick={(e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    setIsDropdownOpen(false); setIsRenameOpen(true);
+                  }}
+                >
+                  <Pencil size={14} /> Rename
+                </button>
+              )
+              }
               {isDeleted && (
                 <button
                   onClick={() => { setIsRestoreModalOpen(true); setIsDropdownOpen(false); }}
@@ -104,6 +122,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
       </div>
       <DeleteFileModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} originalFilename={originalFilename} fileUuid={uuid} isDeleted={isDeleted} />
       {isDeleted && <RestoreFileModal isOpen={isRestoreModalOpen} onClose={() => setIsRestoreModalOpen(false)} originalFilename={originalFilename} uuid={uuid} />}
+      {isRenameOpen && <RenameFileModal isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentFileName={trimFileName(originalFilename)} fileUuid={uuid} filetype={filetype} />}
     </>
   );
 };

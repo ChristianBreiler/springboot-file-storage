@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axiosConfig";
 import File from "./File";
+import { useTranslation } from "react-i18next";
 
 const DeletedFiles = () => {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchFolderData = async () => {
@@ -35,7 +37,7 @@ const DeletedFiles = () => {
     <div className="p-6">
       {filesToRender.length > 0 ? (
         <>
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('deletedFiles')}</h2>
           <div className="grid grid-cols-1 gap-2">
             {filesToRender.map((file) => (
               <File

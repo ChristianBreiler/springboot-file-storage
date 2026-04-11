@@ -132,16 +132,6 @@ const Login = () => {
             Create one
           </Link>
         </p>
-        <div className="text-center">
-          <p>
-          <Link
-            to="/register"
-            className="text-indigo-600 font-medium hover:underline"
-          >
-            Forgot Password?
-          </Link>
-        </p>
-        </div>
       </div>
   );
 };

@@ -5,10 +5,12 @@ import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.MoveFileDto;
 import com.example.springbootfilestorage.dto.file.CreateFileDTO;
+import com.example.springbootfilestorage.dto.file.RenameFileDTO;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
+import com.example.springbootfilestorage.dto.search.SearchTermDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
@@ -95,7 +97,6 @@ public class FileService {
             uploadedFile.setFolder(folder);
         }
 
-        // uploadedFile.setCreatedAt(LocalDate.now());
         uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setDeleted(false);
         fileRepository.save(uploadedFile);
@@ -141,11 +142,11 @@ public class FileService {
         fileRepository.delete(file);
     }
 
-    public List<UploadedFile> searchFilesByName(UUID uuid, String name) {
-        // Special case since on the homepage file.folder == null and doesn't have an id
-        return uuid == null ?
-                fileRepository.findFilesByNameOnHomePage(name) :
-                fileRepository.findByNameAndId(uuid, name);
+    public List<UploadedFileDTO> searchFilesByName(SearchTermDTO searchTermDTO) {
+        return fileRepository.findByNameAndId(searchTermDTO.searchTerm())
+                .stream()
+                .map(uploadFileDTOMapper)
+                .toList();
     }
 
     // File with the same name in the folder already exists
@@ -177,8 +178,6 @@ public class FileService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            // TODO: Notify the user about the error (e.g., via log or message)
-            e.printStackTrace();
             return;
         }
 
@@ -216,12 +215,11 @@ public class FileService {
             return folderDTOMapper.apply(originalFolder);
     }
 
-    public UploadedFile renameFile(UUID uuid, String newName) {
-        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
-        if (file == null) return null;
-        file.setOriginalFilename(newName);
+    public UploadedFileDTO renameFile(UUID uuid, RenameFileDTO renameFileDTO) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("File not found:"));
+        file.setOriginalFilename(renameFileDTO.newFileName() + '.' + renameFileDTO.fileType().toLowerCase());
         fileRepository.save(file);
-        return file;
+        return uploadFileDTOMapper.apply(file);
     }
 
     public List<UploadedFileDTO> findAll() {

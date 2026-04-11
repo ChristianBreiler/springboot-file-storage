@@ -1,12 +1,12 @@
 package com.example.springbootfilestorage.dto.search;
 
-import com.example.springbootfilestorage.dao.Folder;
-import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
+import com.example.springbootfilestorage.dto.folder.FolderDTO;
 
 import java.util.List;
 
 public record SearchResultDTO(
-        List<Folder> folders,
-        List<UploadedFile> files
+        List<FolderDTO> folders,
+        List<UploadedFileDTO> files
 ) {
 }

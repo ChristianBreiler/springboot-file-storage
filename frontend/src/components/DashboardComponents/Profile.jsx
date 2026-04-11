@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Profile = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileImgUrl, setProfileImgUrl] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -27,13 +30,43 @@ const Profile = () => {
     document.title = "File Storage App - Profile"
   }, []);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: 'numeric',
+  useEffect(() => {
+    console.log("fmkakfamf")
+    let objectUrl = null;
+
+    const fetchImage = async () => {
+      if (data?.profilePictureUuid) {
+        try {
+          const response = await api.get(`/files/show_image/${data.profilePictureUuid}`, {
+            responseType: 'blob'
+          });
+
+          objectUrl = URL.createObjectURL(response.data);
+          console.log(objectUrl)
+          setProfileImgUrl(objectUrl);
+        } catch (err) {
+          console.error("Could not load protected image", err);
+        }
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [data?.profilePictureUuid]);
+
+  const formatDate = (dateString, locale = 'en-US') => {
+    if (!dateString) return "";
+
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
       month: 'long',
-      day: 'numeric'
-    });
+      year: 'numeric',
+    }).format(new Date(dateString));
   };
 
   if (loading) {
@@ -71,9 +104,8 @@ const Profile = () => {
         <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
           <div className="relative -top-16 md:-top-12 shrink-0">
             <img
-              src={`https://ui-avatars.com/api/?name=${data?.firstname}+${data?.lastname}&background=random&size=256`}
+              src={profileImgUrl || `https://ui-avatars.com/api/?name=${data?.firstname}...`}
               alt="Profile"
-              className="w-32 h-32 rounded-2xl border-4 border-white shadow-2xl object-cover bg-gray-200"
             />
           </div>
           <div className="text-center md:text-left pb-4">
@@ -90,23 +122,23 @@ const Profile = () => {
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Email Address
+              {t('emailAddress')}
             </label>
             <p className="text-gray-800 font-semibold text-lg">{data?.email}</p>
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Member Since
+              {t('profileCreatedAt')}
             </label>
             <p className="text-gray-800 font-semibold text-lg">
-              {formatDate(data?.createdAt)}
+              {formatDate(data?.createdAt, t.language)}
             </p>
           </div>
         </div>
         <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4 pb-12">
           <Link to="/profile/edit">
             <button className="px-8 py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 hover:shadow-lg transition-all active:scale-95">
-              Edit Profile
+              {t('editProfile')}
             </button>
           </Link>
         </div>

@@ -2,10 +2,12 @@ import { LogOut, User, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 function ProfileDropdown() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const { t } = useTranslation();
 
   const logOut = () => {
     localStorage.removeItem("token");
@@ -49,7 +51,7 @@ function ProfileDropdown() {
           <Link to="/profile">
             <button className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">
               <User size={18} className="text-slate-400" />
-              View Profile
+              {t('viewProfile')}
             </button>
           </Link>
           <div className="my-1 border-t border-slate-100" />
@@ -58,7 +60,7 @@ function ProfileDropdown() {
             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
           >
             <LogOut size={18} />
-            Sign Out
+            {t('signOut')}
           </button>
         </div>
       </div>

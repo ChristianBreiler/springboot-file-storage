@@ -2,9 +2,11 @@ import { Search, Sun, Command, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import CreateDropdown from "../DashboardComponents/CreateDropdown";
 import ProfileDropdown from "../DashboardComponents/ProfileDropdown";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
   const location = useLocation();
+  const { t } = useTranslation()
 
   const navLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -24,7 +26,7 @@ const Header = () => {
           />
           <input
             type="text"
-            placeholder="Search documents, people, or settings..."
+            placeholder={t('search')}
             className="w-full rounded-xl bg-slate-100/50 border-transparent py-2.5 pl-10 pr-12 text-sm outline-none transition-all 
                     focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-200 placeholder:text-slate-500" />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1 px-1.5 py-1 rounded bg-white border border-slate-200 shadow-sm">

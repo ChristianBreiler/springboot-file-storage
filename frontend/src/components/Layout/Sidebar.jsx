@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Settings, Trash, FolderOpen, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { Trash, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import StorageBar from "../DashboardComponents/StorageBar";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocation();
+  const { t } = useTranslation();
 
   const isActive = (path) => location.pathname === path;
 
@@ -19,7 +21,7 @@ const Sidebar = () => {
     <aside className={`h-screen bg-slate-950 flex flex-col border-r border-slate-800 transition-all duration-300 ${isExpanded ? "w-64" : "w-20"}`}>
       <div className={`h-16 flex items-center px-6 gap-3 ${!isExpanded && "justify-center px-0"}`}>
         <Link to="/" className={navLinkClass("/")}>
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center text-white">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg shrink-0 flex items-center justify-center text-white">
             <FolderOpen size={20} />
           </div>
           {isExpanded && <span className="text-white font-semibold tracking-tight truncate">File Storage</span>}
@@ -28,16 +30,16 @@ const Sidebar = () => {
       <nav className="flex-1 px-4 py-6 space-y-1">
         {isExpanded && (
           <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">
-            Main Menu
+            {t('mainMenu')}
           </p>
         )}
         <Link to="/files" className={navLinkClass("/files")}>
           <FolderOpen size={18} className="shrink-0" />
-          {isExpanded && <span className="text-sm font-medium">All Files</span>}
+          {isExpanded && <span className="text-sm font-medium">{t('allFiles')}</span>}
         </Link>
         <Link to="/deleted_files" className={navLinkClass("/deleted_files")}>
           <Trash size={18} className="shrink-0" />
-          {isExpanded && <span className="text-sm font-medium">Trash</span>}
+          {isExpanded && <span className="text-sm font-medium">{t('trash')}</span>}
         </Link>
       </nav>
       <div className="p-4 border-t border-slate-900 space-y-4">

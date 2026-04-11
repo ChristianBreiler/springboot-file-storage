@@ -34,10 +34,12 @@ const Settings = () => {
         setStatus(null);
         try {
             await api.post("/settings/update", settings);
+            localStorage.setItem("pageLayout", settings.pageLayout);
+            localStorage.setItem("language", settings.language);
+            i18n.changeLanguage(settings.language);
             setStatus("success");
             setTimeout(() => setStatus(null), 3000);
-            // TODO: Maybe Change this
-            i18n.changeLanguage(data.language)
+
         } catch (err) {
             setStatus("error");
         } finally {

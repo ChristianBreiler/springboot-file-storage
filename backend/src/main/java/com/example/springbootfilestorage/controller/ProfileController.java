@@ -32,7 +32,7 @@ public class ProfileController {
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<ProfileDTO> edit(@RequestBody EditProfileDTO editedProfile) {
+    public ResponseEntity<ProfileDTO> edit(@ModelAttribute EditProfileDTO editedProfile) {
         return ResponseEntity.ok(userService.editProfile(editedProfile));
     }
 

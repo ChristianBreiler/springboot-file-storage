@@ -10,15 +10,13 @@ import java.util.function.Function;
 public class ProfileDTOMapper implements Function<User, ProfileDTO> {
     @Override
     public ProfileDTO apply(User user) {
-        String profilePicName = null;
-        if (user.getProfilePic() != null) profilePicName = user.getProfilePic().getStoredName();
         return new ProfileDTO(
                 user.getFirstname(),
                 user.getLastname(),
                 user.getEmailaddress(),
                 user.getRole(),
                 user.getCreatedAt(),
-                profilePicName
+                user.getProfilePic() != null ? user.getProfilePic().getUuid() : null
         );
     }
 }

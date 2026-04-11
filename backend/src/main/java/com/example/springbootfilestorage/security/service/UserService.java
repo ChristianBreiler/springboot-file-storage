@@ -11,10 +11,12 @@ import com.example.springbootfilestorage.dto.user.UserInformationDTO;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
+import com.example.springbootfilestorage.service.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -24,14 +26,17 @@ public class UserService {
     private final IsAdminDTOMapper isAdminDTOMapper;
     private final ProfileDTOMapper profileDTOMapper;
     private final UserInformationDTOMappers userInformationDTOMappers;
+    private final FileService fileService;
 
     public UserService(UserRepository userRepository, UserContext userContext, IsAdminDTOMapper isAdminDTOMapper,
-                       ProfileDTOMapper profileDTOMapper, UserInformationDTOMappers userInformationDTOMappers) {
+                       ProfileDTOMapper profileDTOMapper, UserInformationDTOMappers userInformationDTOMappers,
+                       FileService fileService) {
         this.userRepository = userRepository;
         this.userContext = userContext;
         this.isAdminDTOMapper = isAdminDTOMapper;
         this.profileDTOMapper = profileDTOMapper;
         this.userInformationDTOMappers = userInformationDTOMappers;
+        this.fileService = fileService;
     }
 
     public UserInformationDTO getUserInformation() {
@@ -51,21 +56,33 @@ public class UserService {
     }
 
     public ProfileDTO editProfile(EditProfileDTO editedProfile) {
-        User user = userContext.getAuthenticatedUser();
-        user.setFirstname(editedProfile.firstname());
-        user.setLastname(editedProfile.lastname());
-        user.setEmailaddress(editedProfile.email());
-        user.setProfilePic(initializeUploadedProfilePic(editedProfile.profilePic()));
-        userRepository.save(user);
-        return profileDTOMapper.apply(user);
+        try {
+            User user = userContext.getAuthenticatedUser();
+            user.setFirstname(editedProfile.getFirstname());
+            user.setLastname(editedProfile.getLastname());
+            user.setEmailaddress(editedProfile.getEmail());
+            if (editedProfile.getProfilePic() != null) {
+                // Delete the old picture
+                if (user.getProfilePic() != null)
+                    fileService.deleteFilePermanently(user.getProfilePic().getUuid());
+                user.setProfilePic(initializeUploadedProfilePic(editedProfile.getProfilePic()));
+            }
+            userRepository.save(user);
+            return profileDTOMapper.apply(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
 
     private UploadedFile initializeUploadedProfilePic(MultipartFile file) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setOriginalFilename(file.getOriginalFilename());
         uploadedFile.setStoredName(file.getOriginalFilename());
         uploadedFile.setSize(file.getSize());
-        uploadedFile.setOwner(userContext.getAuthenticatedUser());
+        // uploadedFile.setOwner(userContext.getAuthenticatedUser());
+        uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setProfilePic(true);
         return uploadedFile;
     }

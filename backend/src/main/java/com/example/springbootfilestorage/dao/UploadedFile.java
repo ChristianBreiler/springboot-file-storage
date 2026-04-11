@@ -37,7 +37,7 @@ public class UploadedFile extends BaseDAO {
     private String fileImage;
 
     // Used to share files with other users
-    @Column(name = "file_share_code", unique = true, nullable = false)
+    @Column(name = "file_share_code", unique = true, nullable = true)
     private String fileShareCode;
 
     @Column(name = "deleted", nullable = false)

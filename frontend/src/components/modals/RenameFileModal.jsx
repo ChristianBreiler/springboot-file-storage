@@ -1,13 +1,11 @@
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const CreateFolderModal = ({ isOpen, onClose }) => {
-    const { uuid } = useParams();
-    const [folderName, setFolderName] = useState("");
+const RenameFileModal = ({ isOpen, onClose, currentFileName, fileUuid, filetype }) => {
+    const [newFileName, setNewFileName] = useState(currentFileName);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
 
@@ -17,9 +15,9 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const endpoint = uuid ? `folders/create/${uuid}` : "folders/create";
-            await api.post(endpoint, { folderName: folderName });
-            setFolderName("");
+            const endpoint = `files/rename/${fileUuid}`;
+            await api.post(endpoint, { newFileName: newFileName, fileType: filetype });
+            setNewFileName("")
             onClose();
             window.location.reload();
         } catch (err) {
@@ -38,8 +36,7 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
             <div className="relative w-full max-w-md transform rounded-3xl bg-slate-900 p-8 shadow-2xl ring-1 ring-slate-800 animate-in fade-in zoom-in duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-white">{t('newFolder')}</h2>
-                        <p className="text-sm text-slate-400 mt-1">{t('createFolderInfo')}</p>
+                        <h2 className="text-xl font-bold text-white">{t('renameFile')}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -54,8 +51,8 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
                             autoFocus
                             placeholder="Folder Name"
                             className="w-full rounded-2xl border-none bg-slate-800 px-5 py-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            value={folderName}
-                            onChange={(e) => setFolderName(e.target.value)}
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
                             required
                         />
                     </div>
@@ -68,9 +65,9 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || !folderName.trim()}
+                            disabled={loading || !newFileName.trim()}
                             className="rounded-2xl bg-blue-600 px-8 py-3 text-sm font-bold text-white hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50">
-                            {t('createFolder')}
+                            {t('renameFile')}
                         </button>
                     </div>
                 </form>
@@ -78,6 +75,6 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
         </div>,
         document.body
     );
-};
+}
 
-export default CreateFolderModal;
+export default RenameFileModal;

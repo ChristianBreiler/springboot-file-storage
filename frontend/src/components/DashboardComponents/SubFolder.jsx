@@ -7,6 +7,7 @@ import File from "./File";
 import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 // Represents the view of a specific Folder with all its Files and other subfolders (Including the Homefolder)
 const SubFolder = () => {
@@ -14,6 +15,7 @@ const SubFolder = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
+  const { t } = useTranslation()
 
   // Do this so that the btton inside File is stil clik
   const sensors = useSensors(
@@ -103,7 +105,7 @@ const SubFolder = () => {
         </nav>
         {data.folders?.length > 0 && (
           <>
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Folders</h2>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('folders')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               {data.folders.map((folder) => (
                 <Folder
@@ -117,7 +119,7 @@ const SubFolder = () => {
         )}
         {data.files?.length > 0 && (
           <>
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Files</h2>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('files')}</h2>
             <div className="grid grid-cols-1 gap-2">
               {data.files.map((file) => (
                 <File
@@ -135,7 +137,7 @@ const SubFolder = () => {
         )}
         {data.folders?.length === 0 && data.files?.length === 0 && (
           <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-medium">This Folder is Empty</p>
+            <p className="text-slate-400 font-medium">{t('folderEmpty')}</p>
           </div>
         )}
         {selectedId && (

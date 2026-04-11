@@ -51,23 +51,23 @@ const EditProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        setStatus(null);
 
         const data = new FormData();
         data.append("firstname", formData.firstname);
         data.append("lastname", formData.lastname);
         data.append("email", formData.email);
+
         if (selectedFile) {
             data.append("profilePic", selectedFile);
         }
 
         try {
-            await api.post("/profile/edit", data, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
+            await api.post("/profile/edit", data);
+
             setStatus("success");
             setTimeout(() => navigate("/profile"), 1500);
         } catch (err) {
+            console.log(err)
             setStatus("error");
         } finally {
             setSubmitting(false);

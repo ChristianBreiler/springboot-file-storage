@@ -1,10 +1,12 @@
 import api from "../../api/axiosConfig";
 import { useState, useEffect } from "react";
 import LoadingBar from "../loading/LoadingBar";
+import { useTranslation } from "react-i18next";
 
 const StorageDetails = () => {
   const [storage, setStorage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStorage = async () => {
@@ -21,7 +23,7 @@ const StorageDetails = () => {
   }, []);
 
   if (loading) return <LoadingBar />;
-  if (!storage) return <div className="p-10 text-slate-600">No data available.</div>;
+  if (!storage) return <div className="p-10 text-slate-600">{t('noData')}</div>;
 
   const usedPercentage = storage.totalSpace > 0
     ? (storage.usedSpace / storage.totalSpace) * 100
@@ -30,13 +32,13 @@ const StorageDetails = () => {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900">
       <header className="w-full border-b border-slate-200 px-8 py-6 bg-slate-50">
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">Storage Management</h2>
-        <p className="text-slate-500">Real-time overview of your drive usage and file distribution.</p>
+        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">{t('storageManagement')}</h2>
+        <p className="text-slate-500">{t('storageManagementInfo')}</p>
       </header>
       <div className="flex flex-col lg:flex-row w-full h-full">
         <aside className="w-full lg:w-1/3 p-8 border-r border-slate-200 bg-slate-50/50">
           <div className="sticky top-8">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Usage Summary</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">{t('usageSummary')}</h3>
             <div className="mb-10">
               <div className="flex justify-between items-end mb-3">
                 <span className="text-4xl font-light">{usedPercentage.toFixed(1)}<span className="text-xl">%</span></span>
@@ -52,24 +54,24 @@ const StorageDetails = () => {
             </div>
             <div className="space-y-4">
               <div className="flex justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <span className="text-slate-500">Total Folders</span>
+                <span className="text-slate-500">{t('totalFolders')}</span>
                 <span className="font-bold text-xl">{storage.numberOfFolders}</span>
               </div>
               <div className="flex justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <span className="text-slate-500">Total Files</span>
+                <span className="text-slate-500">{t('totalFiles')}</span>
                 <span className="font-bold text-xl">{storage.numberOfFiles}</span>
               </div>
             </div>
           </div>
         </aside>
         <main className="flex-1 p-8 bg-white">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Largest Files in Storage</h3>
+          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">{t('largestFiles')}</h3>
           <div className="overflow-hidden border border-slate-200 rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">File Name</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Size</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">{t('fileName')}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">{t('size')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

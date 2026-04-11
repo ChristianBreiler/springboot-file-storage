@@ -13,7 +13,8 @@ import Login from "./components/auth/Login";
 import { AuthProvider } from "./components/auth/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Register from "./components/auth/Register";
-import AuthLayout from "./components/auth/AuthLayout"; 
+import AuthLayout from "./components/auth/AuthLayout";
+import { useTranslation } from "react-i18next";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+
   return (
     <AuthProvider>
       <RouterProvider router={router} />

@@ -4,7 +4,6 @@ import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
-import com.example.springbootfilestorage.dto.search.SearchResultDTO;
 import com.example.springbootfilestorage.scripts.view_beans.SettingsViewBean;
 import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.FolderService;
@@ -36,15 +35,6 @@ public class FolderController {
     @GetMapping("/{uuid}")
     public ResponseEntity<FolderDTO> show(@PathVariable UUID uuid) {
         return ResponseEntity.ok(folderService.findByDTOUuid(uuid));
-    }
-
-    @GetMapping("/{uuid}/search")
-    public ResponseEntity<SearchResultDTO> searchByName(@RequestParam(required = true) String name, @PathVariable UUID uuid) {
-        return ResponseEntity.ok(new SearchResultDTO(
-                        folderService.searchFoldersByName(uuid, name),
-                        fileService.searchFilesByName(uuid, name)
-                )
-        );
     }
 
     @PostMapping("/rename/{uuid}")
