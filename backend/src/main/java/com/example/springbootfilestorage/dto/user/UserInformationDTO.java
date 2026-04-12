@@ -5,7 +5,6 @@ import com.example.springbootfilestorage.security.dao.Role;
 public record UserInformationDTO(
         String firstname,
         String lastname,
-        Role role,
-        String profilePictureUrl
+        Role role
 ) {
 }

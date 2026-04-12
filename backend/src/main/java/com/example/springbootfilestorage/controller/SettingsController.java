@@ -1,6 +1,5 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.dto.settings.LanguageDTO;
 import com.example.springbootfilestorage.dto.settings.SettingsDTO;
 import com.example.springbootfilestorage.service.SettingsService;
 import org.springframework.http.ResponseEntity;

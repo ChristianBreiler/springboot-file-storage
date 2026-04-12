@@ -17,12 +17,10 @@ public class SharedFilesController {
         this.fileService = fileService;
     }
 
-    // TODO: Can stil ldelete files this way
     @GetMapping("/shared_file/{file_share_code}")
     public String showSharedFile(@PathVariable String file_share_code, Model model) {
         UploadedFile sharedFile = fileService.getFileByFileShareCode(file_share_code);
         if (sharedFile == null) {
-            // TODO: Message
             return "redirect:/home";
         }
         // TODO: Add access privileges

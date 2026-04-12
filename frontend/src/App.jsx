@@ -8,6 +8,7 @@ import Profile from "./components/DashboardComponents/Profile";
 import EditProfile from "./components/DashboardComponents/EditProfile";
 import AllFiles from "./components/DashboardComponents/AllFiles";
 import FileViewPage from "./components/DashboardComponents/FileViewPage";
+import SearchResults from "./components/DashboardComponents/SearchResults"; // Added import
 import NotFound from "./components/error/NotFound";
 import Login from "./components/auth/Login";
 import { AuthProvider } from "./components/auth/AuthContext";
@@ -15,6 +16,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Register from "./components/auth/Register";
 import AuthLayout from "./components/auth/AuthLayout";
 import { useTranslation } from "react-i18next";
+import i18n from "./utils/i18n";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
           { path: "storage_details", element: <StorageDetails /> },
           { path: "profile", element: <Profile /> },
           { path: "profile/edit", element: <EditProfile /> },
+          { path: "search", element: <SearchResults /> }, // Added Search Route
         ],
       },
     ],
@@ -54,6 +57,8 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const language = localStorage.getItem("language") || "en"
+  i18n.changeLanguage(language)
 
   return (
     <AuthProvider>

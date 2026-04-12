@@ -10,7 +10,6 @@ public record ProfileDTO(
         String lastname,
         String email,
         Role role,
-        LocalDate createdAt,
-        UUID profilePictureUuid
+        LocalDate createdAt
 ) {
 }

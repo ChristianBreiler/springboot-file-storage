@@ -15,8 +15,7 @@ public class ProfileDTOMapper implements Function<User, ProfileDTO> {
                 user.getLastname(),
                 user.getEmailaddress(),
                 user.getRole(),
-                user.getCreatedAt(),
-                user.getProfilePic() != null ? user.getProfilePic().getUuid() : null
+                user.getCreatedAt()
         );
     }
 }

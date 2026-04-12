@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
         // Set settings for a user in the localstorage to simplify things for this project
         localStorage.setItem("pageLayout", response.data.pageLayout);
         localStorage.setItem("language", response.data.language);
-        i18n.changeLanguage(response.data.language)
       } catch (err) {
         console.error("Failed to fetch settings:", err);
       }

@@ -5,6 +5,7 @@ import RestoreFileModal from "../modals/RestoreFileModal";
 import RenameFileModal from "../modals/RenameFileModal"
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useTranslation } from "react-i18next";
 
 const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -12,6 +13,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { t } = useTranslation();
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: uuid,
@@ -94,7 +96,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
                 onClick={() => { setIsDeleteModalOpen(true); setIsDropdownOpen(false); }}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <Trash2 size={14} /> {isDeleted ? "Delete Forever" : "Delete File"}
+                <Trash2 size={14} /> {isDeleted ? t('deleteFileForever') : t('restoreFile') }
               </button>
               {!isDeleted && (
                 <button

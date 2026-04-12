@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../api/axiosConfig";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -54,85 +56,85 @@ const Login = () => {
   };
 
   return (
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="text-gray-500 mt-2">Please enter your details</p>
-        </div>
-        <form onSubmit={handleLogin} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded text-sm">
-              {error}
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-            />
-          </div>
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all pr-12"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9.5 text-gray-400 hover:text-indigo-600 transition-colors"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-            />
-            <label
-              htmlFor="rememberMe"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Remember me
-            </label>
-          </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition-all shadow-md 
-              ${isLoading
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
-              }`}
-          >
-            {isLoading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-600 mt-6">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-indigo-600 font-medium hover:underline"
-          >
-            Create one
-          </Link>
-        </p>
+    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-bold text-gray-900">{t('welcomeBack')}</h2>
+        <p className="text-gray-500 mt-2">{t('enterDetails')}</p>
       </div>
+      <form onSubmit={handleLogin} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded text-sm">
+            {error}
+          </div>
+        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('emailAddress')}
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+          />
+        </div>
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('password')}
+          </label>
+          <input
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all pr-12"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9.5 text-gray-400 hover:text-indigo-600 transition-colors"
+          >
+            {showPassword ? t('hide') : t('show')}
+          </button>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          />
+          <label
+            htmlFor="rememberMe"
+            className="ml-2 block text-sm text-gray-700"
+          >
+            {t('rememberMe')}
+          </label>
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-3 rounded-lg font-semibold text-white transition-all shadow-md 
+              ${isLoading
+              ? "bg-indigo-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+            }`}
+        >
+          {isLoading ? "Signing in..." : t('signIn')}
+        </button>
+      </form>
+      <p className="text-center text-sm text-gray-600 mt-6">
+        {t('dontHaveAccount')}{" "}
+        <Link
+          to="/register"
+          className="text-indigo-600 font-medium hover:underline"
+        >
+          {t('createAccount')}
+        </Link>
+      </p>
+    </div>
   );
 };
 

@@ -18,4 +18,7 @@ public class Settings extends BaseDAO {
 
     @Column(nullable = false)
     private Language language;
+
+    @Column(nullable = false)
+    public int deleteFilesAfterXWeeks;
 }

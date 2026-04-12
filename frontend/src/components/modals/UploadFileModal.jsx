@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const UploadFileModal = ({ isOpen, onClose }) => {
     // Id of the current folder from the url
     const { uuid } = useParams();
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation()
 
     if (!isOpen) return null;
 
@@ -46,8 +48,8 @@ const UploadFileModal = ({ isOpen, onClose }) => {
             <div className="relative w-full max-w-md transform rounded-3xl bg-slate-900 p-8 shadow-2xl ring-1 ring-slate-800 animate-in fade-in zoom-in duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-white">New File</h2>
-                        <p className="text-sm text-slate-400 mt-1">Upload a new File to the current directory</p>
+                        <h2 className="text-xl font-bold text-white">{t('newFile')}</h2>
+                        <p className="text-sm text-slate-400 mt-1">{t('newFileInfo')}</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -66,7 +68,7 @@ const UploadFileModal = ({ isOpen, onClose }) => {
                         />
                         {file && (
                             <p className="mt-2 text-xs text-blue-400 italic">
-                                Selected: {file.name}
+                                {t('selected')} {file.name}
                             </p>
                         )}
                     </div>
@@ -75,13 +77,13 @@ const UploadFileModal = ({ isOpen, onClose }) => {
                             type="button"
                             onClick={onClose}
                             className="px-6 py-3 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
-                            Cancel
+                            {t('cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={loading || file === null}
                             className="rounded-2xl bg-blue-600 px-8 py-3 text-sm font-bold text-white hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50">
-                            {loading ? "Creating..." : "Create Folder"}
+                            {loading ? "Creating..." : t('uploadFile')}
                         </button>
                     </div>
                 </form>

@@ -16,5 +16,4 @@ public class EditProfileDTO {
     private String firstname;
     private String lastname;
     private String email;
-    private MultipartFile profilePic;
 }

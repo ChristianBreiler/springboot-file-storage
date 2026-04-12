@@ -10,7 +10,6 @@ import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
-import com.example.springbootfilestorage.dto.search.SearchTermDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
@@ -142,8 +141,8 @@ public class FileService {
         fileRepository.delete(file);
     }
 
-    public List<UploadedFileDTO> searchFilesByName(SearchTermDTO searchTermDTO) {
-        return fileRepository.findByNameAndId(searchTermDTO.searchTerm())
+    public List<UploadedFileDTO> searchFilesByName(String searchTerm) {
+        return fileRepository.findByNameAndId(searchTerm)
                 .stream()
                 .map(uploadFileDTOMapper)
                 .toList();
@@ -168,11 +167,7 @@ public class FileService {
 
         User user = userContext.getAuthenticatedUser();
         uploadedFile.setOwner(user);
-        user.setProfilePic(uploadedFile);
-        UploadedFile oldProfilePic = user.getProfilePic();
         uploadedFile.setProfilePic(true);
-
-        deleteFilePermanently(oldProfilePic.getUuid());
 
         Path filePath = PROFILE_PIC_DIR.resolve(storedName);
         try {
@@ -192,27 +187,34 @@ public class FileService {
     }
 
     public FolderDTO moveFileToFolder(MoveFileDto moveFileDto) {
-        UploadedFile file = fileRepository.findByUuid(moveFileDto.fileUuid()).orElseThrow(()
-                -> new RuntimeException("File not found"));
-        if (file == null) throw new IllegalArgumentException("File not found");
-        Folder folder = folderService.findByUuid(moveFileDto.folderUuid());
-        Folder originalFolder = file.getFolder();
-        file.setFolder(folder);
-        fileRepository.save(file);
-        // Return the original folder to update the UI
-        if (originalFolder == null) {
-            // In case the file was originally in the home folder, update the home folder
-            User currentUser = userContext.getAuthenticatedUser();
-            List<Folder> folders = folderRepository.findAllFoldersWithNoParents(currentUser);
-            List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder(currentUser);
-            Folder homeFolder = new Folder();
-            homeFolder.setOwner(currentUser);
-            homeFolder.setParent(null);
-            homeFolder.setSubfolders(folders);
-            homeFolder.setFiles(subfolderIds);
-            return folderDTOMapper.apply(homeFolder);
-        } else
-            return folderDTOMapper.apply(originalFolder);
+        try {
+            System.out.println("Debug");
+            System.out.println(moveFileDto);
+            UploadedFile file = fileRepository.findByUuid(moveFileDto.fileUuid()).orElseThrow(()
+                    -> new RuntimeException("File not found"));
+            if (file == null) throw new IllegalArgumentException("File not found");
+            Folder folder = moveFileDto.folderUuid() != null ? folderService.findByUuid(moveFileDto.folderUuid()) : null;
+            Folder originalFolder = file.getFolder();
+            file.setFolder(folder);
+            fileRepository.save(file);
+            // Return the original folder to update the UI
+            if (originalFolder == null) {
+                // In case the file was originally in the home folder, update the home folder
+                User currentUser = userContext.getAuthenticatedUser();
+                List<Folder> folders = folderRepository.findAllFoldersWithNoParents(currentUser);
+                List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder(currentUser);
+                Folder homeFolder = new Folder();
+                homeFolder.setOwner(currentUser);
+                homeFolder.setParent(null);
+                homeFolder.setSubfolders(folders);
+                homeFolder.setFiles(subfolderIds);
+                return folderDTOMapper.apply(homeFolder);
+            } else
+                return folderDTOMapper.apply(originalFolder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public UploadedFileDTO renameFile(UUID uuid, RenameFileDTO renameFileDTO) {

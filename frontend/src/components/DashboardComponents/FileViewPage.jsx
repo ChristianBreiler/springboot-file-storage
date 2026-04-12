@@ -103,11 +103,6 @@ const FileViewPage = ({ uuid, onClose }) => {
                         />
                     )}
                 </div>
-                {!loading && (
-                    <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-right">
-                        <span className="text-[10px] text-slate-400 font-medium">Securely streamed via encrypted tunnel</span>
-                    </div>
-                )}
             </div>
         </div>
     );

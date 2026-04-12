@@ -1,47 +1,29 @@
-import { Search, Sun, Command, Settings } from "lucide-react";
+import { Sun, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import CreateDropdown from "../DashboardComponents/CreateDropdown";
 import ProfileDropdown from "../DashboardComponents/ProfileDropdown";
-import { useTranslation } from "react-i18next";
+import SearchBar from "../DashboardComponents/SearchBar";
 
 const Header = () => {
   const location = useLocation();
-  const { t } = useTranslation()
 
   const navLinkClass = (path) => {
     const isActive = location.pathname === path;
     return `group flex h-10 w-10 items-center justify-center rounded-xl transition-all ${isActive
-        ? "bg-blue-50 text-blue-600 shadow-sm"
-        : "text-slate-500 hover:bg-white hover:shadow-sm hover:text-blue-600"
+      ? "bg-blue-50 text-blue-600 shadow-sm"
+      : "text-slate-500 hover:bg-white hover:shadow-sm hover:text-blue-600"
       }`;
   };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-100 bg-white/70 px-8 backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-6">
-        <div className="relative group w-full max-w-md">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-          />
-          <input
-            type="text"
-            placeholder={t('search')}
-            className="w-full rounded-xl bg-slate-100/50 border-transparent py-2.5 pl-10 pr-12 text-sm outline-none transition-all 
-                    focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-200 placeholder:text-slate-500" />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1 px-1.5 py-1 rounded bg-white border border-slate-200 shadow-sm">
-            <Command size={10} className="text-slate-400" />
-            <span className="text-[10px] font-bold text-slate-400">K</span>
-          </div>
-        </div>
+        <SearchBar />
       </div>
       <div className="flex items-center gap-3">
         <CreateDropdown />
         <div className="h-6 w-px bg-slate-200 mx-2 hidden md:block" />
         <div className="flex items-center gap-1">
-          <button className="group flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:shadow-sm hover:text-orange-500 transition-all">
-            <Sun size={20} />
-          </button>
           <Link to="/settings" className={navLinkClass("/settings")}>
             <Settings size={20} />
           </Link>

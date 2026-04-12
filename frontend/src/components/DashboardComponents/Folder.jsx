@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import RenameFolderModal from "../modals/RenameFolderModal";
 import DeleteFolderModal from "../modals/DeleteFolderModal";
 import { useDroppable } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 const Folder = ({ uuid, name = "New Folder" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const menuRef = useRef(null);
+  const { t } = useTranslation()
 
   const { setNodeRef, isOver } = useDroppable({
     id: uuid,
@@ -75,7 +77,7 @@ const Folder = ({ uuid, name = "New Folder" }) => {
                   setIsMenuOpen(false); setIsRenameOpen(true);
                 }}
               >
-                <Pencil size={14} /> Rename
+                <Pencil size={14} />{t('rename')}
               </button>
               <button
                 className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
@@ -84,7 +86,7 @@ const Folder = ({ uuid, name = "New Folder" }) => {
                   setIsMenuOpen(false); setIsDeleteOpen(true);
                 }}
               >
-                <Trash2 size={14} /> Delete
+                <Trash2 size={14} />{t('delete')}
               </button>
             </div>
           )}

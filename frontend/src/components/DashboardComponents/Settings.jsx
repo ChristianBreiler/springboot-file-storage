@@ -4,6 +4,7 @@ import { CheckCircle, Layout, List, Globe, Save } from "lucide-react";
 import LoadingBar from "../loading/LoadingBar";
 import i18n from "../../utils/i18n";
 import { data } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Settings = () => {
     const [settings, setSettings] = useState({
@@ -12,6 +13,7 @@ const Settings = () => {
     });
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -52,14 +54,14 @@ const Settings = () => {
     return (
         <div className="max-w-4xl mx-auto p-8 animate-in fade-in duration-500">
             <header className="mb-10">
-                <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Settings</h2>
-                <p className="text-slate-500 mt-2">Change your settings here</p>
+                <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t('settings')}</h2>
+                <p className="text-slate-500 mt-2">{t('changeSettings')}</p>
             </header>
             <form onSubmit={handleSubmit} className="space-y-8">
                 <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                         <Globe className="text-indigo-600 w-5 h-5" />
-                        <h3 className="text-lg font-bold text-slate-800">Language</h3>
+                        <h3 className="text-lg font-bold text-slate-800">{t('language')}</h3>
                     </div>
                     <select
                         className="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer hover:bg-slate-100"
@@ -73,12 +75,12 @@ const Settings = () => {
                 <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                         <Layout className="text-indigo-600 w-5 h-5" />
-                        <h3 className="text-lg font-bold text-slate-800">Page Layout</h3>
+                        <h3 className="text-lg font-bold text-slate-800">{t('pageLayout')}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                            { id: "cards", label: "Card Grid", icon: <Layout />, desc: "Visual blocks for high-detail items." },
-                            { id: "list", label: "Compact List", icon: <List />, desc: "Dense data view for fast scanning." }
+                            { id: "cards", label: t('cardGrid'), icon: <Layout />, desc: t('cardDesc') },
+                            { id: "list", label: t('compactList'), icon: <List />, desc: t('listDesc') }
                         ].map((option) => (
                             <div
                                 key={option.id}
@@ -104,15 +106,15 @@ const Settings = () => {
                 </section>
                 <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                     <div>
-                        {status === "success" && <span className="text-emerald-600 font-medium flex items-center gap-2">✓ Changes saved successfully!</span>}
-                        {status === "error" && <span className="text-red-500 font-medium text-sm">Failed to update. Try again.</span>}
+                        {status === "success" && <span className="text-emerald-600 font-medium flex items-center gap-2">{t('settingsChangesSavedSuccessfully')}</span>}
+                        {status === "error" && <span className="text-red-500 font-medium text-sm">{t('settingsChangesNotSaved')}</span>}
                     </div>
                     <button
                         type="submit"
                         disabled={loading}
                         className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 disabled:opacity-50"
                     >
-                        {loading ? "Saving..." : <><Save size={18} /> Save Changes</>}
+                        {loading ? "Saving..." : <><Save size={18} />{t('saveChanges')}</>}
                     </button>
                 </div>
             </form>

@@ -104,8 +104,9 @@ const Profile = () => {
         <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
           <div className="relative -top-16 md:-top-12 shrink-0">
             <img
-              src={profileImgUrl || `https://ui-avatars.com/api/?name=${data?.firstname}...`}
+              src={`https://ui-avatars.com/api/?name=${data?.firstname}+${data?.lastname}&background=random&size=128`}
               alt="Profile"
+              className="w-full h-full rounded-xl border-2 border-white shadow-xl object-cover bg-gray-200"
             />
           </div>
           <div className="text-center md:text-left pb-4">

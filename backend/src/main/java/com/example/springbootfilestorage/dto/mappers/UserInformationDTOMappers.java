@@ -11,13 +11,10 @@ public class UserInformationDTOMappers implements Function<User, UserInformation
     @Override
     public UserInformationDTO apply(User user) {
         if (user == null) return null;
-        String profilePicName = null;
-        if (user.getProfilePic() != null) profilePicName = user.getProfilePic().getStoredName();
         return new UserInformationDTO(
                 user.getFirstname(),
                 user.getLastname(),
-                user.getRole(),
-                profilePicName
+                user.getRole()
         );
     }
 }

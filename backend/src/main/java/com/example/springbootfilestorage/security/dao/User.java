@@ -49,10 +49,6 @@ public class User extends BaseDAO implements UserDetails {
     @Column(name = "verification_code_expiry")
     private LocalDateTime verificationCodeExpiry;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profile_pic_id")
-    private UploadedFile profilePic;
-
     @Enumerated
     private Role role;
 

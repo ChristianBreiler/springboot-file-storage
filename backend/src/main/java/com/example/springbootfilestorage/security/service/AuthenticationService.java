@@ -114,7 +114,7 @@ public class AuthenticationService {
         Settings settings = new Settings();
         settings.setPageLayout(PageLayout.CARDS);
         settings.setLanguage(Language.EN);
-        // settings.setDeleteFilesAfterXWeeks(2);
+        settings.setDeleteFilesAfterXWeeks(2);
         // settings.setCreatedAt(LocalDate.now());
         // settings.setUpdatedAt(LocalDate.now());
         settingsService.saveSettings(settings);

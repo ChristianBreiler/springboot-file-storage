@@ -9,7 +9,6 @@ import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
-import com.example.springbootfilestorage.dto.search.SearchTermDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.security.dao.User;
@@ -76,8 +75,8 @@ public class FolderService {
         return folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
     }
 
-    public List<FolderDTO> searchFoldersByName(SearchTermDTO searchTermDTO) {
-        return folderRepository.searchFoldersByName(searchTermDTO.searchTerm())
+    public List<FolderDTO> searchFoldersByName(String searchTerm) {
+        return folderRepository.searchFoldersByName(searchTerm)
                 .stream()
                 .map(folderDTOMapper)
                 .toList();

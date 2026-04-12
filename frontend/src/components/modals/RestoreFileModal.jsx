@@ -2,10 +2,12 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import api from "../../api/axiosConfig";
 import { X, RotateCcw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Modal to restore deleted file
 const RestoreFileModal = ({ isOpen, onClose, uuid, originalFilename }) => {
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     if (!isOpen) return null;
 
@@ -37,7 +39,7 @@ const RestoreFileModal = ({ isOpen, onClose, uuid, originalFilename }) => {
                             <RotateCcw className="text-green-500" size={24} />
                         </div>
                         <h2 className="text-xl font-bold text-white">
-                            Restore File
+                            {t('restoreFile')}
                         </h2>
                     </div>
                     <button
@@ -49,11 +51,7 @@ const RestoreFileModal = ({ isOpen, onClose, uuid, originalFilename }) => {
                 </div>
                 <div className="mb-8">
                     <p className="text-slate-300">
-                        Do you want to restore{" "}
-                        <span className="font-bold text-white">
-                            "{originalFilename}"
-                        </span>
-                        ?
+                        {t('restoreFileInfo', {originalFilename: originalFilename})}
                     </p>
                 </div>
                 <div className="flex justify-end gap-3">
@@ -62,14 +60,14 @@ const RestoreFileModal = ({ isOpen, onClose, uuid, originalFilename }) => {
                         onClick={onClose}
                         className="px-6 py-3 text-sm font-semibold text-slate-400 hover:text-white transition-colors"
                     >
-                        Cancel
+                        {t('cancel')}
                     </button>
                     <button
                         onClick={handleRestore}
                         disabled={loading}
                         className="rounded-2xl bg-green-600 px-8 py-3 text-sm font-bold text-white hover:bg-green-500 active:scale-95 transition-all shadow-lg shadow-green-600/20 disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                        {loading ? "Restoring..." : "Restore"}
+                        {loading ? "Restoring..." : t('restore')}
                     </button>
                 </div>
             </div>

@@ -61,12 +61,6 @@ public class UserService {
             user.setFirstname(editedProfile.getFirstname());
             user.setLastname(editedProfile.getLastname());
             user.setEmailaddress(editedProfile.getEmail());
-            if (editedProfile.getProfilePic() != null) {
-                // Delete the old picture
-                if (user.getProfilePic() != null)
-                    fileService.deleteFilePermanently(user.getProfilePic().getUuid());
-                user.setProfilePic(initializeUploadedProfilePic(editedProfile.getProfilePic()));
-            }
             userRepository.save(user);
             return profileDTOMapper.apply(user);
         } catch (Exception e) {

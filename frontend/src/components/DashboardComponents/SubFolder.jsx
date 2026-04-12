@@ -6,23 +6,35 @@ import Folder from "./Folder";
 import File from "./File";
 import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, PointerSensor, useSensor, useSensors, useDroppable } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
-// Represents the view of a specific Folder with all its Files and other subfolders (Including the Homefolder)
+// Helper to make breadcrumbs droppable
+const BreadcrumbItem = ({ uuid, children, isHome = false }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: isHome ? "home" : uuid,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`rounded-md transition-all ${isOver ? "bg-blue-100 scale-105 text-blue-700 shadow-sm" : ""}`}
+    >
+      {children}
+    </div>
+  );
+};
+
 const SubFolder = () => {
   const { uuid } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  // Do this so that the btton inside File is stil clik
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
+      activationConstraint: { distance: 5 },
     })
   );
 
@@ -39,35 +51,27 @@ const SubFolder = () => {
         setLoading(false);
       }
     };
-
     fetchFolderData();
   }, [uuid]);
 
-  useEffect(() => {
-    if (data && uuid) {
-      document.title = "File Storage App - " + data.name;
-    } else {
-      document.title = "File Storage App";
-    }
-  }, [data, uuid]);
-
   async function handleDragEnd(event) {
     const { active, over } = event;
+    if (!over) return;
 
-    // Not over something that is droppable
-    if (!over) return
+    const fileUuid = active.id;
+    const folderUuid = over.id === "home" ? null : over.id;
 
-    const fileUuid = active.id
-    const folderUuid = over.id
+    if (folderUuid === uuid) return;
 
     setLoading(true);
-
     try {
-      // Change the file stuff in the backend here when done dragging
-      const response = await api.post("drag/move-file", { fileUuid: fileUuid, folderUuid: folderUuid })
-      setData(response.data)
+      const response = await api.post("drag/move-file", {
+        fileUuid: fileUuid,
+        folderUuid: folderUuid
+      });
+      setData(response.data);
     } catch (err) {
-      console.error("Failed to fetch folders:", err);
+      console.error("Failed to move file:", err);
     } finally {
       setLoading(false);
     }
@@ -80,18 +84,22 @@ const SubFolder = () => {
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="p-6">
         <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
-          <Link to="/" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
-            <Home size={16} />
-          </Link>
+          <BreadcrumbItem isHome={true}>
+            <Link to="/" className="flex items-center gap-1.5 px-2 py-1 hover:text-blue-600 transition-colors">
+              <Home size={16} />
+            </Link>
+          </BreadcrumbItem>
           {data.parentFolders?.map((folder) => (
             <div key={folder.uuid} className="flex items-center">
               <ChevronRight size={14} className="mx-1 text-slate-400 shrink-0" />
-              <Link
-                to={`/folders/${folder.uuid}`}
-                className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate"
-              >
-                {folder.name}
-              </Link>
+              <BreadcrumbItem uuid={folder.uuid}>
+                <Link
+                  to={`/folders/${folder.uuid}`}
+                  className="hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-md transition-all max-w-30 truncate block"
+                >
+                  {folder.name}
+                </Link>
+              </BreadcrumbItem>
             </div>
           ))}
           {data.name && (
@@ -108,11 +116,7 @@ const SubFolder = () => {
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('folders')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               {data.folders.map((folder) => (
-                <Folder
-                  key={folder.uuid}
-                  uuid={folder.uuid}
-                  name={folder.name}
-                />
+                <Folder key={folder.uuid} uuid={folder.uuid} name={folder.name} />
               ))}
             </div>
           </>
@@ -140,12 +144,7 @@ const SubFolder = () => {
             <p className="text-slate-400 font-medium">{t('folderEmpty')}</p>
           </div>
         )}
-        {selectedId && (
-          <FileViewPage
-            uuid={selectedId}
-            onClose={() => setSelectedId(null)}
-          />
-        )}
+        {selectedId && <FileViewPage uuid={selectedId} onClose={() => setSelectedId(null)} />}
       </div>
     </DndContext>
   );

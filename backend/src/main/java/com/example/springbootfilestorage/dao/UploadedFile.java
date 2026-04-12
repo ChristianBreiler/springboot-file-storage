@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.dao;
 
 import com.example.springbootfilestorage.security.dao.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -49,16 +51,6 @@ public class UploadedFile extends BaseDAO {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt;
-
-    public UploadedFile(String originalFilename, String storagePath, Long size, Folder folder,
-                        Filetype filetype, String storedName) {
-        this.originalFilename = originalFilename;
-        this.storagePath = storagePath;
-        this.size = size;
-        this.folder = folder;
-        this.filetype = filetype;
-        this.storedName = storedName;
-    }
 
     public String probeContentType() {
         return switch (this.filetype) {

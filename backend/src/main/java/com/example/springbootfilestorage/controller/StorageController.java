@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling storage-related API endpoints.
+ * This class provides endpoints to retrieve storage usage information and detailed storage statistics.
+ */
 @RestController
 @RequestMapping("/storage")
 public class StorageController {
