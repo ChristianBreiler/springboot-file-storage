@@ -4,7 +4,6 @@ import com.example.springbootfilestorage.dto.profile.EditProfileDTO;
 import com.example.springbootfilestorage.dto.profile.ProfileDTO;
 import com.example.springbootfilestorage.security.service.UserService;
 import com.example.springbootfilestorage.service.FileService;
-import com.example.springbootfilestorage.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,12 +14,10 @@ public class ProfileController {
 
     private final FileService fileService;
     private final int MAX_MESSAGES = 10;
-    private final MessageService messageService;
     private final UserService userService;
 
-    public ProfileController(FileService fileService, MessageService messageService, UserService userService) {
+    public ProfileController(FileService fileService, UserService userService) {
         this.fileService = fileService;
-        this.messageService = messageService;
         this.userService = userService;
     }
 

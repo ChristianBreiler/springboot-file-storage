@@ -1,6 +1,5 @@
 package com.example.springbootfilestorage.security.service;
 
-import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.dto.mappers.IsAdminDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.ProfileDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UserInformationDTOMappers;
@@ -13,10 +12,8 @@ import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import com.example.springbootfilestorage.service.FileService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -67,17 +64,5 @@ public class UserService {
             e.printStackTrace();
         }
         return null;
-    }
-
-
-    private UploadedFile initializeUploadedProfilePic(MultipartFile file) {
-        UploadedFile uploadedFile = new UploadedFile();
-        uploadedFile.setOriginalFilename(file.getOriginalFilename());
-        uploadedFile.setStoredName(file.getOriginalFilename());
-        uploadedFile.setSize(file.getSize());
-        // uploadedFile.setOwner(userContext.getAuthenticatedUser());
-        uploadedFile.setFileShareCode(UUID.randomUUID().toString());
-        uploadedFile.setProfilePic(true);
-        return uploadedFile;
     }
 }

@@ -9,16 +9,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * A Spring Boot component that initializes a file storage folder during the application startup.
- * Implements the {@link CommandLineRunner} interface to execute the folder
- * initialization process after the Spring Boot application has started.
+ * The InitializeFolder class is a Spring Component that implements CommandLineRunner.
+ * It is used to ensure the existence of a specific folder in the user's home directory
+ * upon application startup. If the folder does not exist, it will be created.
  * <p>
- * This class checks if a specific folder (by default, located in the user's home directory and named
- * "file_storage_folder") exists. If the folder does not exist, it creates the folder. If the folder already
- * exists, it logs its location.
+ * The folder created or referenced is named "file_storage_folder".
+ * This functionality is intended to set up the storage directory required
+ * for other components of the application to function properly.
  * <p>
- * The folder created or accessed via this component is typically used for file storage purposes in
- * the application.
+ * The run method, inherited from CommandLineRunner, is automatically executed
+ * by the Spring Boot framework during application startup.
+ * <p>
+ * Methods:
+ * - run(String... args): This method invokes the initialization logic to ensure
+ * the presence of the storage folder. It delegates the operation to a private method.
+ * - initializeFileFolder(): A private method responsible for checking the existence
+ * of the storage folder and creating it if it does not already exist.
  */
 @Component
 public class InitializeFolder implements CommandLineRunner {

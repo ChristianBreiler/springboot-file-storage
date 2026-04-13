@@ -32,15 +32,9 @@ public class UploadedFile extends BaseDAO {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    private boolean isProfilePic;
-
     // Gets used in the front end to display the file image
     @Transient
     private String fileImage;
-
-    // Used to share files with other users
-    @Column(name = "file_share_code", unique = true, nullable = true)
-    private String fileShareCode;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
@@ -48,9 +42,6 @@ public class UploadedFile extends BaseDAO {
     // Date at which the file will be deleted from the database and server
     @Column(name = "final_deletion_date", nullable = true)
     private LocalDate finalDeletionDate;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDate createdAt;
 
     public String probeContentType() {
         return switch (this.filetype) {

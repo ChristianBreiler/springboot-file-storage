@@ -4,7 +4,6 @@ import com.example.springbootfilestorage.dao.Language;
 import com.example.springbootfilestorage.dao.PageLayout;
 import com.example.springbootfilestorage.dao.Settings;
 import com.example.springbootfilestorage.exception_handling.exceptions.SignUpException;
-import com.example.springbootfilestorage.mail.EmailService;
 import com.example.springbootfilestorage.security.dao.Role;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.dto.LoginUserDTO;
@@ -18,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -27,17 +25,15 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final EmailService emailService;
     private final SettingsService settingsService;
     private final JwtService jwtService;
 
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                                 AuthenticationManager authenticationManager, EmailService emailService,
+                                 AuthenticationManager authenticationManager,
                                  SettingsService settingsService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.emailService = emailService;
         this.settingsService = settingsService;
         this.jwtService = jwtService;
     }

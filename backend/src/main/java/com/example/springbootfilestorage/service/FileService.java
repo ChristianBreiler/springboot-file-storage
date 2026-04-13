@@ -57,10 +57,6 @@ public class FileService {
         this.folderDTOMapper = folderDTOMapper;
     }
 
-    public UploadedFile getFileByFileShareCode(String fileShareCode) {
-        return fileRepository.finaByFileShareCode(fileShareCode);
-    }
-
     public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
         MultipartFile file = createFileDTO.file();
         if (fileExists(file.getOriginalFilename(), folderUuid))
@@ -76,7 +72,6 @@ public class FileService {
         uploadedFile.setSize(file.getSize());
 
         uploadedFile.setOwner(userContext.getAuthenticatedUser());
-        uploadedFile.setProfilePic(false);
 
         Path filePath = UPLOAD_DIR.resolve(storedName);
         try {
@@ -96,7 +91,6 @@ public class FileService {
             uploadedFile.setFolder(folder);
         }
 
-        uploadedFile.setFileShareCode(UUID.randomUUID().toString());
         uploadedFile.setDeleted(false);
         fileRepository.save(uploadedFile);
         return uploadFileDTOMapper.apply(uploadedFile);
@@ -167,7 +161,6 @@ public class FileService {
 
         User user = userContext.getAuthenticatedUser();
         uploadedFile.setOwner(user);
-        uploadedFile.setProfilePic(true);
 
         Path filePath = PROFILE_PIC_DIR.resolve(storedName);
         try {

@@ -16,9 +16,6 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.owner = ?1")
     List<Folder> findAllFoldersWithNoParents(User authenticatedUser);
 
-    @Query("SELECT f FROM Folder f WHERE f.parent IS NULL AND f.name LIKE %?1%")
-    List<Folder> findFoldersByNameOnHomePage(String name);
-
     @Query("SELECT f FROM Folder f WHERE f.name LIKE %?1%")
     List<Folder> searchFoldersByName(String name);
 
