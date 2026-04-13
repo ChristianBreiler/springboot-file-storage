@@ -36,22 +36,18 @@ public class FileService {
     private final FolderRepository folderRepository;
     private final Path UPLOAD_DIR;
     private final Path PROFILE_PIC_DIR;
-    private final UserRepository userRepository;
-    private final SettingsService settingsService;
     private final UserContext userContext;
     private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
 
     public FileService(FileRepository fileRepository, FolderService folderService, FolderRepository folderRepository,
-                       StoragePathBean storagePathBean, UserRepository userRepository, SettingsService settingsService,
-                       UserContext userContext, UploadFileDTOMapper uploadFileDTOMapper, FolderDTOMapper folderDTOMapper) {
+                       StoragePathBean storagePathBean, UserContext userContext, UploadFileDTOMapper uploadFileDTOMapper,
+                       FolderDTOMapper folderDTOMapper) {
         this.fileRepository = fileRepository;
         this.folderService = folderService;
         this.folderRepository = folderRepository;
         UPLOAD_DIR = storagePathBean.getStorageFolderPath();
         PROFILE_PIC_DIR = storagePathBean.getProfilePicFolderPath();
-        this.userRepository = userRepository;
-        this.settingsService = settingsService;
         this.userContext = userContext;
         this.uploadFileDTOMapper = uploadFileDTOMapper;
         this.folderDTOMapper = folderDTOMapper;
@@ -65,6 +61,7 @@ public class FileService {
         UploadedFile uploadedFile = new UploadedFile();
 
         String originalName = file.getOriginalFilename();
+        if (originalName == null) throw new IllegalArgumentException("File name is null");
         String storedName = generateUniqueFileName(originalName);
 
         uploadedFile.setOriginalFilename(originalName);
@@ -153,6 +150,7 @@ public class FileService {
         UploadedFile uploadedFile = new UploadedFile();
 
         String originalName = file.getOriginalFilename();
+        if (originalName == null) throw new IllegalArgumentException("File name is null");
         String storedName = generateUniqueFileName(originalName);
 
         uploadedFile.setOriginalFilename(originalName);
@@ -175,39 +173,30 @@ public class FileService {
         uploadedFile.setFiletype(filetype);
 
         fileRepository.save(uploadedFile);
-        // To update the user in the database with the new profile pic
-        // userRepository.save(user);
     }
 
     public FolderDTO moveFileToFolder(MoveFileDto moveFileDto) {
-        try {
-            System.out.println("Debug");
-            System.out.println(moveFileDto);
-            UploadedFile file = fileRepository.findByUuid(moveFileDto.fileUuid()).orElseThrow(()
-                    -> new RuntimeException("File not found"));
-            if (file == null) throw new IllegalArgumentException("File not found");
-            Folder folder = moveFileDto.folderUuid() != null ? folderService.findByUuid(moveFileDto.folderUuid()) : null;
-            Folder originalFolder = file.getFolder();
-            file.setFolder(folder);
-            fileRepository.save(file);
-            // Return the original folder to update the UI
-            if (originalFolder == null) {
-                // In case the file was originally in the home folder, update the home folder
-                User currentUser = userContext.getAuthenticatedUser();
-                List<Folder> folders = folderRepository.findAllFoldersWithNoParents(currentUser);
-                List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder(currentUser);
-                Folder homeFolder = new Folder();
-                homeFolder.setOwner(currentUser);
-                homeFolder.setParent(null);
-                homeFolder.setSubfolders(folders);
-                homeFolder.setFiles(subfolderIds);
-                return folderDTOMapper.apply(homeFolder);
-            } else
-                return folderDTOMapper.apply(originalFolder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        UploadedFile file = fileRepository.findByUuid(moveFileDto.fileUuid()).orElseThrow(()
+                -> new RuntimeException("File not found"));
+        if (file == null) throw new IllegalArgumentException("File not found");
+        Folder folder = moveFileDto.folderUuid() != null ? folderService.findByUuid(moveFileDto.folderUuid()) : null;
+        Folder originalFolder = file.getFolder();
+        file.setFolder(folder);
+        fileRepository.save(file);
+        // Return the original folder to update the UI
+        if (originalFolder == null) {
+            // In case the file was originally in the home folder, update the home folder
+            User currentUser = userContext.getAuthenticatedUser();
+            List<Folder> folders = folderRepository.findAllFoldersWithNoParents(currentUser);
+            List<UploadedFile> subfolderIds = fileRepository.findAllFilesWithNoFolder(currentUser);
+            Folder homeFolder = new Folder();
+            homeFolder.setOwner(currentUser);
+            homeFolder.setParent(null);
+            homeFolder.setSubfolders(folders);
+            homeFolder.setFiles(subfolderIds);
+            return folderDTOMapper.apply(homeFolder);
+        } else
+            return folderDTOMapper.apply(originalFolder);
     }
 
     public UploadedFileDTO renameFile(UUID uuid, RenameFileDTO renameFileDTO) {
