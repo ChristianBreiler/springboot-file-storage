@@ -10,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [canRegister, setCanRegister] = useState(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -19,6 +20,22 @@ const Login = () => {
       navigate("/", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const canRegisterCheck = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get("system_settings/can_register")
+        setCanRegister(response.data.canRegister);
+      } catch (err) {
+        console.log(err);
+        setCanRegister(false);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    canRegisterCheck()
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -125,15 +142,17 @@ const Login = () => {
           {isLoading ? "Signing in..." : t('signIn')}
         </button>
       </form>
-      <p className="text-center text-sm text-gray-600 mt-6">
-        {t('dontHaveAccount')}{" "}
-        <Link
-          to="/register"
-          className="text-indigo-600 font-medium hover:underline"
-        >
-          {t('createAccount')}
-        </Link>
-      </p>
+      {canRegister && (
+        <p className="text-center text-sm text-gray-600 mt-6">
+          {t('dontHaveAccount')}{" "}
+          <Link
+            to="/register"
+            className="text-indigo-600 font-medium hover:underline"
+          >
+            {t('createAccount')}
+          </Link>
+        </p>
+      )}
     </div>
   );
 };

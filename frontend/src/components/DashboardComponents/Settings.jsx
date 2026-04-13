@@ -3,7 +3,6 @@ import api from "../../api/axiosConfig";
 import { CheckCircle, Layout, List, Globe, Save } from "lucide-react";
 import LoadingBar from "../loading/LoadingBar";
 import i18n from "../../utils/i18n";
-import { data } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const Settings = () => {
@@ -14,6 +13,10 @@ const Settings = () => {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null);
     const { t } = useTranslation();
+
+    useEffect(() => {
+        document.title = `File Storage App - Settings`
+    }, []);
 
     useEffect(() => {
         const fetchSettings = async () => {

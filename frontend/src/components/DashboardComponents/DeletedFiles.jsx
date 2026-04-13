@@ -27,6 +27,10 @@ const DeletedFiles = () => {
     fetchFolderData();
   }, []);
 
+  useEffect(() => {
+    document.title = `File Storage App - Deleted Files`
+  }, []);
+
 
   if (loading) return <div className="p-8 text-slate-500 font-medium animate-pulse">Loading storage...</div>;
   if (!data) return <div className="p-8 text-red-500">Error while loading deleted Folders</div>;

@@ -30,6 +30,7 @@ const SubFolder = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
+  const [cardLayout, setCardLayout] = useState(false);
   const { t } = useTranslation();
 
   const sensors = useSensors(
@@ -37,6 +38,11 @@ const SubFolder = () => {
       activationConstraint: { distance: 5 },
     })
   );
+
+  useEffect(() => {
+    if (data?.name) document.title = `File Storage App - ${data.name}`;
+    else document.title = `File Storage App - Home`
+  }, [data?.name]);
 
   useEffect(() => {
     const fetchFolderData = async () => {
@@ -53,6 +59,14 @@ const SubFolder = () => {
     };
     fetchFolderData();
   }, [uuid]);
+
+  useEffect(() => {
+    const fetchCardLayout = () => {
+      const layout = localStorage.getItem("pageLayout");
+      setCardLayout(layout === "cards");
+    };
+    fetchCardLayout();
+  }, []);
 
   async function handleDragEnd(event) {
     const { active, over } = event;
@@ -124,7 +138,10 @@ const SubFolder = () => {
         {data.files?.length > 0 && (
           <>
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('files')}</h2>
-            <div className="grid grid-cols-1 gap-2">
+            <div className={cardLayout
+              ? "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
+              : "grid grid-cols-1 gap-2"
+            }>
               {data.files.map((file) => (
                 <File
                   key={file.uuid}
@@ -133,6 +150,7 @@ const SubFolder = () => {
                   size={file.size}
                   filetype={file.filetype}
                   isDeleted={file.isDeleted}
+                  cardLayout={cardLayout}
                   onClick={(uuid) => setSelectedId(uuid)}
                 />
               ))}

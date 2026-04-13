@@ -11,6 +11,7 @@ const EditProfile = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [status, setStatus] = useState(null);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [formData, setFormData] = useState({
         firstname: "",
@@ -36,10 +37,28 @@ const EditProfile = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (errorMsg) setErrorMsg("");
+    };
+
+    const isEmailAddressValid = (email) => {
+        const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        return regex.test(email);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMsg("");
+
+        if (!formData.firstname.trim() || !formData.lastname.trim()) {
+            setErrorMsg(t('namesRequired') || "Names cannot be empty");
+            return;
+        }
+
+        if (!isEmailAddressValid(formData.email)) {
+            setErrorMsg(t('enterValidEmail') || "Please enter a valid email address");
+            return;
+        }
+
         setSubmitting(true);
 
         const data = new FormData();
@@ -52,7 +71,7 @@ const EditProfile = () => {
             setStatus("success");
             setTimeout(() => navigate("/profile"), 1500);
         } catch (err) {
-            console.log(err)
+            console.log(err);
             setStatus("error");
         } finally {
             setSubmitting(false);
@@ -75,7 +94,6 @@ const EditProfile = () => {
                                 <X size={24} className="text-gray-400" />
                             </button>
                         </div>
-
                         <div className="flex flex-col items-center py-4">
                             <div className="relative group">
                                 <img
@@ -85,7 +103,6 @@ const EditProfile = () => {
                                 />
                             </div>
                         </div>
-
                         <div className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1">
@@ -120,13 +137,16 @@ const EditProfile = () => {
                                 />
                             </div>
                         </div>
-
+                        {errorMsg && (
+                            <div className="p-4 rounded-2xl text-sm font-semibold border bg-amber-50 border-amber-100 text-amber-700">
+                                {errorMsg}
+                            </div>
+                        )}
                         {status && (
                             <div className={`p-4 rounded-2xl text-sm font-semibold border ${status === 'success' ? 'bg-green-50 border-green-100 text-green-700' : 'bg-red-50 border-red-100 text-red-700'}`}>
                                 {status === 'success' ? "Changes saved successfully!" : "Something went wrong. Please try again."}
                             </div>
                         )}
-
                         <div className="flex flex-col gap-3 pt-4">
                             <button
                                 type="submit"

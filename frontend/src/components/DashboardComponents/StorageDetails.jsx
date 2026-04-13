@@ -9,6 +9,10 @@ const StorageDetails = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    document.title = `File Storage App - Storage Management`
+  }, []);
+
+  useEffect(() => {
     const fetchStorage = async () => {
       try {
         const response = await api.get("/storage/details");

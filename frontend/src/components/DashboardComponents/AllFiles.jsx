@@ -24,6 +24,10 @@ const AllFiles = () => {
     fetchFolderData();
   }, []);
 
+  useEffect(() => {
+    document.title = `File Storage App - All Files`
+  }, []);
+
   if (loading) return <LoadingBar />
 
   return (

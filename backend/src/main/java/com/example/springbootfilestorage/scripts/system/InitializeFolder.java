@@ -9,18 +9,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * InitializeFolder is a Spring Component that implements CommandLineRunner.
- * It is responsible for creating and initializing specific folders in the user's home directory
- * upon application startup.
+ * A Spring Boot component that initializes a file storage folder during the application startup.
+ * Implements the {@link CommandLineRunner} interface to execute the folder
+ * initialization process after the Spring Boot application has started.
  * <p>
- * The class ensures that a root folder named "file_storage_folder" exists,
- * and within it, another folder named "profile_pics" is created.
- * If these folders already exist, it logs their locations.
+ * This class checks if a specific folder (by default, located in the user's home directory and named
+ * "file_storage_folder") exists. If the folder does not exist, it creates the folder. If the folder already
+ * exists, it logs its location.
  * <p>
- * If the root folder "file_storage_folder" does not exist during the initialization
- * of "profile_pics", a runtime exception is thrown.
- * <p>
- * This functionality is triggered during the application startup phase.
+ * The folder created or accessed via this component is typically used for file storage purposes in
+ * the application.
  */
 @Component
 public class InitializeFolder implements CommandLineRunner {
@@ -28,7 +26,6 @@ public class InitializeFolder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         initializeFileFolder();
-        initializeProfilePicFolder();
     }
 
     private void initializeFileFolder() throws IOException {
@@ -38,16 +35,5 @@ public class InitializeFolder implements CommandLineRunner {
             Files.createDirectories(storageFolder);
             System.out.println("file_storage_folder created at: " + storageFolder.toAbsolutePath());
         } else System.out.println("file_storage_folder exists at: " + storageFolder.toAbsolutePath());
-    }
-
-    private void initializeProfilePicFolder() throws IOException {
-        String homeDir = System.getProperty("user.home");
-        Path storageFolder = Paths.get(homeDir, "file_storage_folder");
-        if (!storageFolder.toFile().exists()) throw new RuntimeException("file_storage_folder does not exist");
-        Path profilePicFolder = storageFolder.resolve("profile_pics");
-        if (!profilePicFolder.toFile().exists()) {
-            Files.createDirectories(profilePicFolder);
-            System.out.println("profile_pics created at: " + profilePicFolder.toAbsolutePath());
-        } else System.out.println("profile_pics exists at: " + profilePicFolder.toAbsolutePath());
     }
 }

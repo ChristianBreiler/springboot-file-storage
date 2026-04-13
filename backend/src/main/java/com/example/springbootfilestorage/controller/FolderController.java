@@ -4,8 +4,6 @@ import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
-import com.example.springbootfilestorage.scripts.view_beans.SettingsViewBean;
-import com.example.springbootfilestorage.service.FileService;
 import com.example.springbootfilestorage.service.FolderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +16,9 @@ import java.util.UUID;
 public class FolderController {
 
     private final FolderService folderService;
-    private final FileService fileService;
-    private final SettingsViewBean settingsViewBean;
 
-    public FolderController(FolderService folderService, FileService fileService, SettingsViewBean settingsViewBean) {
+    public FolderController(FolderService folderService) {
         this.folderService = folderService;
-        this.fileService = fileService;
-        this.settingsViewBean = settingsViewBean;
     }
 
     @GetMapping("/home")
@@ -51,7 +45,7 @@ public class FolderController {
 
     @PostMapping({"/create", "/create/{folderUuid}"})
     public ResponseEntity<FolderDTO> create(@RequestBody CreateFolderDTO createFolderDTO,
-                                                  @PathVariable(required = false) UUID folderUuid) {
+                                            @PathVariable(required = false) UUID folderUuid) {
         return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderUuid));
     }
 

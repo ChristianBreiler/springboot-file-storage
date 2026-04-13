@@ -2,12 +2,12 @@ import { FileText, FileImage, File as FileIcon, MoreVertical, Trash2, Undo2, Pen
 import { useState, useMemo, useRef, useEffect } from "react";
 import DeleteFileModal from "../modals/DeleteFileModal";
 import RestoreFileModal from "../modals/RestoreFileModal";
-import RenameFileModal from "../modals/RenameFileModal"
+import RenameFileModal from "../modals/RenameFileModal";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
 
-const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) => {
+const File = ({ uuid, originalFilename, size, filetype, isDeleted, cardLayout, onClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -41,18 +41,18 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
   };
 
   const trimFileName = (name) => {
-    // Slice off the file extension here so users cant accidentally change the filetype or break the file entirely
     return name.split('.').slice(0, -1).join('.');
   }
 
   const iconConfig = useMemo(() => {
+    const iconSize = cardLayout ? 32 : 20;
     switch (filetype) {
-      case "PDF": return { icon: <FileText size={20} />, color: "text-red-500", bg: "bg-red-50" };
+      case "PDF": return { icon: <FileText size={iconSize} />, color: "text-red-500", bg: "bg-red-50" };
       case "JPG":
-      case "PNG": return { icon: <FileImage size={20} />, color: "text-blue-500", bg: "bg-blue-50" };
-      default: return { icon: <FileIcon size={20} />, color: "text-slate-500", bg: "bg-slate-50" };
+      case "PNG": return { icon: <FileImage size={iconSize} />, color: "text-blue-500", bg: "bg-blue-50" };
+      default: return { icon: <FileIcon size={iconSize} />, color: "text-slate-500", bg: "bg-slate-50" };
     }
-  }, [filetype]);
+  }, [filetype, cardLayout]);
 
   return (
     <>
@@ -61,16 +61,19 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
         style={style}
         {...listeners}
         {...attributes}
-        className={`group flex items-center justify-between p-3 bg-white border rounded-xl transition-all mb-2 relative touch-none ${isDragging ? "opacity-50 border-blue-500 shadow-2xl scale-105 cursor-grabbing" : "border-slate-100 hover:border-blue-200 hover:shadow-sm cursor-grab"
+        className={`group bg-white border transition-all relative touch-none ${isDragging ? "opacity-50 border-blue-500 shadow-2xl scale-105 cursor-grabbing" : "border-slate-100 hover:border-blue-200 hover:shadow-sm cursor-grab"
+          } ${cardLayout
+            ? "flex flex-col items-center justify-center p-6 rounded-2xl text-center"
+            : "flex items-center justify-between p-3 rounded-xl mb-2"
           }`}
         onClick={() => onClick(uuid)}
       >
-        <div className="flex items-center gap-4 flex-1 min-w-0">
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden ${iconConfig.bg} ${iconConfig.color}`}>
+        <div className={`flex items-center min-w-0 ${cardLayout ? "flex-col gap-3" : "gap-4 flex-1"}`}>
+          <div className={`${cardLayout ? "h-16 w-16" : "h-10 w-10"} flex shrink-0 items-center justify-center rounded-lg overflow-hidden ${iconConfig.bg} ${iconConfig.color}`}>
             {iconConfig.icon}
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-slate-700 truncate">
+          <div className={`flex flex-col min-w-0 ${cardLayout ? "items-center" : ""}`}>
+            <span className={`text-sm font-semibold text-slate-700 truncate ${cardLayout ? "max-w-[140px]" : ""}`}>
               {originalFilename}
             </span>
             <div className="flex items-center gap-2 text-[11px] text-slate-400">
@@ -80,7 +83,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
             </div>
           </div>
         </div>
-        <div className="relative" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
+        <div className={`${cardLayout ? "absolute top-2 right-2" : "relative"}`} ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -96,11 +99,11 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
                 onClick={() => { setIsDeleteModalOpen(true); setIsDropdownOpen(false); }}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <Trash2 size={14} /> {isDeleted ? t('deleteFileForever') : t('restoreFile') }
+                <Trash2 size={14} /> {isDeleted ? t('deleteFileForever') : t('restoreFile')}
               </button>
               {!isDeleted && (
                 <button
-                  className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   onClick={(e) => {
                     e.preventDefault(); e.stopPropagation();
                     setIsDropdownOpen(false); setIsRenameOpen(true);
@@ -108,8 +111,7 @@ const File = ({ uuid, originalFilename, size, filetype, isDeleted, onClick }) =>
                 >
                   <Pencil size={14} /> Rename
                 </button>
-              )
-              }
+              )}
               {isDeleted && (
                 <button
                   onClick={() => { setIsRestoreModalOpen(true); setIsDropdownOpen(false); }}

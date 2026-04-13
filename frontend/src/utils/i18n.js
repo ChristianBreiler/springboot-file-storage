@@ -83,6 +83,7 @@ const resources = {
       selected: "Selected: ",
       delete: "Delete",
       rename: "Rename",
+      namesRequired: "The Name Fields are required",
     },
   },
   de: {
@@ -168,6 +169,7 @@ const resources = {
       selected: "Ausgewählt: ",
       delete: "Löschen",
       rename: "Umbenennen",
+      namesRequired: "Die Namensfelder werden benötigt",
     },
   },
 };

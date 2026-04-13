@@ -53,6 +53,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        // Allow access to the frontend since it's also used for the login and signup page
+                        .requestMatchers("/system_settings/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

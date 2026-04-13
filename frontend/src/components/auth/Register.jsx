@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,24 @@ const Register = () => {
   const [showRepeatedPassword, setShowRepeatedPassword] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const canRegisterCheck = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get("system_settings/can_register")
+        if (!response.data.canRegister) {
+          navigate("/login");
+        }
+      } catch (err) {
+        console.log(err);
+        navigate("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    canRegisterCheck()
+  }, [])
 
   const isEmailAddressValid = (email) => {
     const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;

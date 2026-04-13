@@ -17,6 +17,10 @@ const SearchResults = () => {
     const { t } = useTranslation();
 
     useEffect(() => {
+        document.title = `File Storage App - Search Results: ${searchTerm}` 
+    }, []);
+
+    useEffect(() => {
         const fetchSearchResults = async () => {
             if (!searchTerm) return;
 
