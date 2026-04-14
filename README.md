@@ -56,9 +56,9 @@ Default location:
 Enter the URL of your frontend under 'app.frontend.url'
 
 # Deployment
-* 1. Start database
-* 2. Configure backend (application.properties)
-* 3. Run the backend (./mvnw spring-boot:run or run it through your IDE).
-* 4. Configure frontend (axiosConfig)
-* 5. Run the frontend (npm install + npm run dev).
+* Start database
+* Configure backend (application.properties)
+* Run the backend (./mvnw spring-boot:run or run it through your IDE).
+* Configure frontend (axiosConfig)
+* Run the frontend (npm install + npm run dev).
 
