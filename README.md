@@ -4,11 +4,10 @@ This is a Web application to upload files and manage them in a Filesystem with S
 
 
 
-## Features
-* **Hierarchical Storage:** Create and manage subfolders dynamically.
-* **Multi-format Upload:** Support for various file types.
-* **Relational Mapping:** File metadata is stored in MariaDB for fast indexing and retrieval.
-* **Responsive UI:** Built with React for a smooth user experience.
+## Project Structure
+springboot-file-storage/
+├── frontend/             # React application (Vite)
+└── backend/              # Spring Boot application
 
 ---
 
