@@ -46,19 +46,14 @@ public class AuthenticationService {
         User user = new User();
         user.setFirstname(handleName(input.getFirstname()));
         user.setLastname(handleName(input.getLastname()));
-        // TODO: Change this
         user.setUsername(input.getEmail());
         user.setEmailaddress(input.getEmail());
-        // user.setCreatedAt(LocalDate.now());
-        // user.setUpdatedAt(LocalDate.now());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
         user.setSettings(generateDefaultSettings());
         user.setRole(Role.USER);
-        // TODO: Should be false because of verification email not verified
         user.setEnabled(true);
-        // TODO: Email
         try {
             userRepository.save(user);
             return true;
@@ -76,16 +71,9 @@ public class AuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
-        // if (!user.isEnabled()) {
-        // TODO: Email here + return in login response
-        //}
         String jwt = jwtService.generateToken(user, input.rememberMe());
         return new LoginResponse(jwt, jwtService.getExpirationTime(), user.isEnabled());
     }
-
-    // TODO: Verify email method
-
-    // TODO: With resend
 
     private String generateVerificationCode() {
         Random random = new Random();
@@ -108,11 +96,9 @@ public class AuthenticationService {
 
     private Settings generateDefaultSettings() {
         Settings settings = new Settings();
-        settings.setPageLayout(PageLayout.CARDS);
+        settings.setPageLayout(PageLayout.LIST);
         settings.setLanguage(Language.EN);
         settings.setDeleteFilesAfterXWeeks(2);
-        // settings.setCreatedAt(LocalDate.now());
-        // settings.setUpdatedAt(LocalDate.now());
         settingsService.saveSettings(settings);
         return settings;
     }

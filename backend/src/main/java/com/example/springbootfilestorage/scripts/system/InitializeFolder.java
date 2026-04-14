@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.scripts.system;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,29 +10,46 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * The InitializeFolder class is a Spring Component that implements CommandLineRunner.
- * It is used to ensure the existence of a specific folder in the user's home directory
- * upon application startup. If the folder does not exist, it will be created.
+ * The InitializeFolder class is responsible for ensuring that a required folder structure
+ * exists in the file system when the application starts. It implements the {@link CommandLineRunner}
+ * interface to execute its logic during application initialization.
  * <p>
- * The folder created or referenced is named "file_storage_folder".
- * This functionality is intended to set up the storage directory required
- * for other components of the application to function properly.
+ * The folder path can be customized using the `spring.files.folder.custom.folder.path` configuration property.
+ * If the custom folder path is not provided or is empty, a default folder named "file_storage_folder" is
+ * created in the user's home directory. Otherwise, the specified custom folder path is initialized.
  * <p>
- * The run method, inherited from CommandLineRunner, is automatically executed
- * by the Spring Boot framework during application startup.
+ * Functionality:
+ * - Ensures that the default or custom folder exists.
+ * - Creates the folder if it does not already exist.
+ * - Logs the status of folder creation to the console.
  * <p>
  * Methods:
- * - run(String... args): This method invokes the initialization logic to ensure
- * the presence of the storage folder. It delegates the operation to a private method.
- * - initializeFileFolder(): A private method responsible for checking the existence
- * of the storage folder and creating it if it does not already exist.
+ * - `run(String... args)`: Entry point triggered during application startup to check and initialize the folder structure.
+ * - `initializeFileFolder()`: Initializes the default folder in the user's home directory if no custom folder path is specified.
+ * - `initializeCustomFileFolder()`: Initializes a folder at the specified custom path if provided.
+ * <p>
+ * This class relies on Java NIO for file and directory handling and provides console feedback for operations performed.
  */
 @Component
 public class InitializeFolder implements CommandLineRunner {
 
+    @Value(value = "${spring.files.folder.custom.folder.path}")
+    String customFolderPath;
+
+
     @Override
     public void run(String... args) throws Exception {
-        initializeFileFolder();
+        if (customFolderPath == null || customFolderPath.isEmpty())
+            initializeFileFolder();
+        else
+            initializeCustomFileFolder();
+    }
+
+    private void initializeCustomFileFolder() {
+        Path customFolder = Paths.get(customFolderPath);
+        if (!customFolder.toFile().exists())
+            throw new IllegalArgumentException("Custom folder path does not exist: " + customFolderPath);
+        else System.out.println("Custom folder exists at: " + customFolder.toAbsolutePath());
     }
 
     private void initializeFileFolder() throws IOException {

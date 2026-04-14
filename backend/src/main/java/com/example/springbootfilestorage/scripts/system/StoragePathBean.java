@@ -1,5 +1,6 @@
 package com.example.springbootfilestorage.scripts.system;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -11,20 +12,21 @@ import java.nio.file.Paths;
 @Component
 public class StoragePathBean {
 
+    @Value(value = "${spring.files.folder.custom.folder.path}")
+    String customFolderPath;
+
     private final Path storageFolder;
-    private final Path profilePicFolder;
 
     public StoragePathBean() {
-        String homeDir = System.getProperty("user.home");
-        this.storageFolder = Paths.get(homeDir, "file_storage_folder");
-        this.profilePicFolder = Paths.get(homeDir, "file_storage_folder", "profile_pics");
+        if (customFolderPath == null || customFolderPath.isEmpty()) {
+            String homeDir = System.getProperty("user.home");
+            this.storageFolder = Paths.get(homeDir, "file_storage_folder");
+        } else {
+            this.storageFolder = Paths.get(customFolderPath)    ;
+        }
     }
 
     public Path getStorageFolderPath() {
         return storageFolder;
-    }
-
-    public Path getProfilePicFolderPath() {
-        return profilePicFolder;
     }
 }
