@@ -35,7 +35,6 @@ public class FileService {
     private final FolderService folderService;
     private final FolderRepository folderRepository;
     private final Path UPLOAD_DIR;
-    private final Path PROFILE_PIC_DIR;
     private final UserContext userContext;
     private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
@@ -47,7 +46,6 @@ public class FileService {
         this.folderService = folderService;
         this.folderRepository = folderRepository;
         UPLOAD_DIR = storagePathBean.getStorageFolderPath();
-        PROFILE_PIC_DIR = storagePathBean.getProfilePicFolderPath();
         this.userContext = userContext;
         this.uploadFileDTOMapper = uploadFileDTOMapper;
         this.folderDTOMapper = folderDTOMapper;
@@ -160,14 +158,6 @@ public class FileService {
         User user = userContext.getAuthenticatedUser();
         uploadedFile.setOwner(user);
 
-        Path filePath = PROFILE_PIC_DIR.resolve(storedName);
-        try {
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            return;
-        }
-
-        uploadedFile.setStoragePath(filePath.toString());
         Filetype filetype = getFileType(file);
         if (filetype == null) return;
         uploadedFile.setFiletype(filetype);
