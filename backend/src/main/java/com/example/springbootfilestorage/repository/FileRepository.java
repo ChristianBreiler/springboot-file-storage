@@ -26,9 +26,6 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.owner = ?1")
     List<UploadedFile> findAllDeletedFiles(User authenticatedUser);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.finalDeletionDate <= ?1")
-    List<UploadedFile> findAllFilesToBeDeletedToday(LocalDate now);
-
     @Query("SELECT COUNT(f) FROM UploadedFile f WHERE f.deleted = false")
     int numberOfFiles();
 
@@ -43,4 +40,6 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
 
     @Query("SELECT f FROM UploadedFile f WHERE  f.originalFilename LIKE %?1% AND f.folder.uuid = ?2 AND f.deleted = false")
     UploadedFile findByNameAndFolderUuid(String name, UUID folderUuid);
+
+    void deleteAllByDeletedTrueAndDeletedAtBefore(LocalDate threshold);
 }

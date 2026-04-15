@@ -6,8 +6,8 @@ This is a web application to upload files and manage them in a file system with 
 
 ## Project Structure
 * **springboot-file-storage/** 
-* **frontend/**           # React application (Vite)
-* **backend/**            # Spring Boot application
+* **frontend/**           React application (Vite)
+* **backend/**            Spring Boot application
 
 ---
 

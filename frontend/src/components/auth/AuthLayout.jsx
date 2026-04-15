@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import backgroundImage from "../../assets/img.jpg"
-import i18n from "../../utils/i18n";
 
 function AuthLayout() {
 

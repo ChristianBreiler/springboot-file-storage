@@ -14,7 +14,6 @@ import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
 import com.example.springbootfilestorage.security.dao.User;
-import com.example.springbootfilestorage.security.repository.UserRepository;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,8 +102,8 @@ public class FileService {
         if (file == null) return false;
 
         file.setDeleted(true);
-        // TODO: Handle deleting folders with deleted files
-        file.setFinalDeletionDate(LocalDate.now().plusWeeks(3));
+        file.setDeletedAt(LocalDate.now());
+
         try {
             fileRepository.save(file);
         } catch (Exception e) {
@@ -117,7 +116,7 @@ public class FileService {
         UploadedFile file = fileRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("File not found"));
 
         file.setDeleted(false);
-        file.setFinalDeletionDate(null);
+        file.setDeletedAt(null);
         fileRepository.save(file);
         return uploadFileDTOMapper.apply(file);
     }

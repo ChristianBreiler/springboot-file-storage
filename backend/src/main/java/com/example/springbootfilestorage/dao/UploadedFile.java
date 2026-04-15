@@ -39,9 +39,8 @@ public class UploadedFile extends BaseDAO {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
-    // Date at which the file will be deleted from the database and server
-    @Column(name = "final_deletion_date", nullable = true)
-    private LocalDate finalDeletionDate;
+    @Column(name = "deleted_at")
+    private LocalDate deletedAt;
 
     public String probeContentType() {
         return switch (this.filetype) {

@@ -1,35 +1,29 @@
 package com.example.springbootfilestorage.scripts.schedules;
 
-import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.repository.FileRepository;
-import com.example.springbootfilestorage.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 // Schedule that automatically deletes all files that are marked as "deleted" and their date is due
 
 @Service
 public class DeleteDeletedFiles {
 
-    private final FileService fileService;
     private final FileRepository fileRepository;
 
     @Value("${spring.files.delete.after.weeks}")
     private int deleteAfterWeeks;
 
-    public DeleteDeletedFiles(FileService fileService, FileRepository fileRepository) {
-        this.fileService = fileService;
+    public DeleteDeletedFiles(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
     }
 
-    @Scheduled(cron = "0 0 5 * * ?")
+    @Scheduled(cron = "0 0 3 * * ?")
     public void deleteDeletedFiles() {
-        // TODO: Fix this
-        List<UploadedFile> files = fileRepository.findAllFilesToBeDeletedToday(LocalDate.now());
-        files.forEach(f -> fileService.deleteFilePermanently(f.getUuid()));
+        LocalDate threshold = LocalDate.now().minusWeeks(deleteAfterWeeks);
+        fileRepository.deleteAllByDeletedTrueAndDeletedAtBefore(threshold);
     }
 }
