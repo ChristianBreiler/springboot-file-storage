@@ -130,7 +130,7 @@ public class FileService {
     }
 
     public List<UploadedFileDTO> searchFilesByName(String searchTerm) {
-        return fileRepository.findByNameAndId(searchTerm)
+        return fileRepository.findByName(searchTerm, userContext.getAuthenticatedUser())
                 .stream()
                 .map(uploadFileDTOMapper)
                 .toList();

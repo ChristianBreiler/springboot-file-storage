@@ -4,6 +4,7 @@ import com.example.springbootfilestorage.dao.UploadedFile;
 import com.example.springbootfilestorage.security.dao.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -17,8 +18,17 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE f.folder IS NULL AND f.deleted = false AND f.owner = ?1")
     List<UploadedFile> findAllFilesWithNoFolder(User currentUser);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.originalFilename LIKE %?1% AND f.deleted = false")
-    List<UploadedFile> findByNameAndId(String name);
+    @Query("""
+                SELECT f
+                FROM UploadedFile f
+                WHERE LOWER(f.originalFilename) LIKE LOWER(CONCAT('%', :name, '%'))
+                AND f.deleted = false
+                AND f.owner = :user
+            """)
+    List<UploadedFile> findByName(
+            @Param("name") String name,
+            @Param("user") User user
+    );
 
     @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM UploadedFile f WHERE f.storagePath = ?1 AND f.deleted = false")
     boolean physicalFileExists(String path);

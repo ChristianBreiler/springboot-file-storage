@@ -2,13 +2,11 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.dto.MoveFolderDto;
 import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
-import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.security.dao.User;
@@ -25,16 +23,14 @@ public class FolderService {
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
     private final UserContext userContext;
-    private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
     private final int MAX_PARENT_FOLDERS = 5;
 
     public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext,
-                         UploadFileDTOMapper uploadFileDTOMapper, FolderDTOMapper folderDTOMapper) {
+                         FolderDTOMapper folderDTOMapper) {
         this.folderRepository = folderRepository;
         this.fileRepository = fileRepository;
         this.userContext = userContext;
-        this.uploadFileDTOMapper = uploadFileDTOMapper;
         this.folderDTOMapper = folderDTOMapper;
     }
 
@@ -71,12 +67,8 @@ public class FolderService {
         folderRepository.delete(folder);
     }
 
-    public Folder findById(Long id) {
-        return folderRepository.findById(id).orElseThrow(() -> new RuntimeException("Folder not found"));
-    }
-
     public List<FolderDTO> searchFoldersByName(String searchTerm) {
-        return folderRepository.searchFoldersByName(searchTerm)
+        return folderRepository.searchFoldersByName(searchTerm, userContext.getAuthenticatedUser())
                 .stream()
                 .map(folderDTOMapper)
                 .toList();
@@ -92,14 +84,6 @@ public class FolderService {
         homeFolder.setSubfolders(folders);
         homeFolder.setFiles(subfolderIds);
         return folderDTOMapper.apply(homeFolder);
-    }
-
-    public FolderDTO moveFolderToFolder(MoveFolderDto moveFolderDto) {
-        Folder folder = folderRepository.findByUuid(moveFolderDto.folderUuid()).orElseThrow(() -> new RuntimeException("Folder not found"));
-        Folder targetFolder = folderRepository.findByUuid(moveFolderDto.targetFolderUuid()).orElseThrow(() -> new RuntimeException("Folder not found"));
-        folder.setParent(targetFolder);
-        folderRepository.save(folder);
-        return folderDTOMapper.apply(folder);
     }
 
     public CanDeleteFolderDTO canFolderBeDeleted(UUID uuid) {
