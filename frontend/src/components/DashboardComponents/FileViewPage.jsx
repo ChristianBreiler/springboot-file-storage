@@ -3,7 +3,7 @@ import api from "../../api/axiosConfig";
 import LoadingBar from "../loading/LoadingBar";
 import { X, FileText, Download } from "lucide-react";
 
-const FileViewPage = ({ uuid, onClose }) => {
+const FileViewPage = ({ uuid, filename, onClose }) => {
     const [blobUrl, setBlobUrl] = useState(null);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
@@ -68,7 +68,7 @@ const FileViewPage = ({ uuid, onClose }) => {
                             <FileText size={20} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-800 leading-none">File Preview</h3>
+                            <h3 className="font-semibold text-slate-800 leading-none">{filename}</h3>
                             <p className="text-[11px] text-slate-400 mt-1 uppercase font-bold tracking-wider">Document Viewer</p>
                         </div>
                     </div>

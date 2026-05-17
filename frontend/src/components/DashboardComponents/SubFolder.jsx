@@ -29,7 +29,7 @@ const SubFolder = () => {
   const { uuid } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [cardLayout, setCardLayout] = useState(false);
   const { t } = useTranslation();
 
@@ -144,15 +144,20 @@ const SubFolder = () => {
             }>
               {data.files.map((file) => (
                 <File
-                  key={file.uuid}
-                  uuid={file.uuid}
-                  originalFilename={file.originalFilename}
-                  size={file.size}
-                  filetype={file.filetype}
-                  isDeleted={file.isDeleted}
-                  cardLayout={cardLayout}
-                  onClick={(uuid) => setSelectedId(uuid)}
-                />
+  key={file.uuid}
+  uuid={file.uuid}
+  originalFilename={file.originalFilename}
+  size={file.size}
+  filetype={file.filetype}
+  isDeleted={file.isDeleted}
+  cardLayout={cardLayout}
+  onClick={() =>
+    setSelectedFile({
+      uuid: file.uuid,
+      filename: file.originalFilename,
+    })
+  }
+/>
               ))}
             </div>
           </>
@@ -162,7 +167,13 @@ const SubFolder = () => {
             <p className="text-slate-400 font-medium">{t('folderEmpty')}</p>
           </div>
         )}
-        {selectedId && <FileViewPage uuid={selectedId} onClose={() => setSelectedId(null)} />}
+        {selectedFile && (
+  <FileViewPage
+    uuid={selectedFile.uuid}
+    filename={selectedFile.filename}
+    onClose={() => setSelectedFile(null)}
+  />
+)}
       </div>
     </DndContext>
   );
