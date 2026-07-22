@@ -46,10 +46,10 @@ public class FileController {
                                                   @PathVariable(required = false) UUID folderUuid) {
         // if (createFileDTO == null || createFileDTO.file().isEmpty()) return ResponseEntity.badRequest().build();
 
-        UploadedFileDTO file = fileService.saveFile(createFileDTO, folderUuid);
-        if (file == null) return ResponseEntity.badRequest().build();
+        List<UploadedFileDTO> files = fileService.saveFile(createFileDTO, folderUuid);
+        if (files == null) return ResponseEntity.badRequest().build();
 
-        return ResponseEntity.ok(file);
+        return ResponseEntity.ok(files.get(0));
     }
 
     @GetMapping("/download/{uuid}")

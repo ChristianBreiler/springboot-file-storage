@@ -50,44 +50,15 @@ public class FileService {
         this.folderDTOMapper = folderDTOMapper;
     }
 
-    public UploadedFileDTO saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
-        MultipartFile file = createFileDTO.file();
-        if (fileExists(file.getOriginalFilename(), folderUuid))
-            throw new IllegalArgumentException("File already exists");
+    public List<UploadedFileDTO> saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
+        User user = userContext.getAuthenticatedUser();
 
-        UploadedFile uploadedFile = new UploadedFile();
+        Folder targetFolder = resolveTargetFolder(createFileDTO.folderName(), folderUuid, user);
 
-        String originalName = file.getOriginalFilename();
-        if (originalName == null) throw new IllegalArgumentException("File name is null");
-        String storedName = generateUniqueFileName(originalName);
-
-        uploadedFile.setOriginalFilename(originalName);
-        uploadedFile.setStoredName(storedName);
-        uploadedFile.setSize(file.getSize());
-
-        uploadedFile.setOwner(userContext.getAuthenticatedUser());
-
-        Path filePath = UPLOAD_DIR.resolve(storedName);
-        try {
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            return null;
-        }
-
-        uploadedFile.setStoragePath(filePath.toString());
-        Filetype filetype = getFileType(file);
-        if (filetype == null) return null;
-        uploadedFile.setFiletype(filetype);
-
-        if (folderUuid != null) {
-            Folder folder = folderService.findByUuid(folderUuid);
-            if (folder == null) return null;
-            uploadedFile.setFolder(folder);
-        }
-
-        uploadedFile.setDeleted(false);
-        fileRepository.save(uploadedFile);
-        return uploadFileDTOMapper.apply(uploadedFile);
+        return createFileDTO.files().stream()
+                .map(file -> processAndSaveFile(file, targetFolder, folderUuid, user))
+                .map(uploadFileDTOMapper)
+                .toList();
     }
 
     public List<UploadedFileDTO> findAllDeletedFiles() {
@@ -210,6 +181,65 @@ public class FileService {
     public UploadedFile findByUuid(UUID uuid) {
         return fileRepository.findByUuid(uuid).orElse(null);
     }
+
+    private Folder resolveTargetFolder(String folderName, UUID folderUuid, User user) {
+        if (folderName == null || folderName.trim().isEmpty()) {
+            return null;
+        }
+
+        Folder folder = new Folder();
+        folder.setName(folderName.trim());
+        folder.setOwner(user);
+
+        if (folderUuid != null) {
+            folder.setParent(folderService.findByUuid(folderUuid));
+        }
+
+        return folderRepository.save(folder);
+    }
+
+    private UploadedFile processAndSaveFile(MultipartFile file, Folder folder, UUID folderUuid, User user) {
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File name is missing or file is empty");
+        }
+
+        if (fileExists(originalName, folderUuid)) {
+            throw new IllegalArgumentException("File '" + originalName + "' already exists");
+        }
+
+        Filetype filetype = getFileType(file);
+        if (filetype == null) {
+            throw new IllegalArgumentException("Unsupported or invalid file type for " + originalName);
+        }
+
+        String storedName = generateUniqueFileName(originalName);
+        Path filePath = UPLOAD_DIR.resolve(storedName);
+
+        try {
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file " + originalName + " on disk", e);
+        }
+
+        UploadedFile uploadedFile = new UploadedFile();
+        uploadedFile.setOriginalFilename(originalName);
+        uploadedFile.setStoredName(storedName);
+        uploadedFile.setSize(file.getSize());
+        uploadedFile.setOwner(user);
+        uploadedFile.setStoragePath(filePath.toString());
+        uploadedFile.setFiletype(filetype);
+        uploadedFile.setDeleted(false);
+
+        if (folder != null) {
+            uploadedFile.setFolder(folder);
+        } else if (folderUuid != null) {
+            uploadedFile.setFolder(folderService.findByUuid(folderUuid));
+        }
+
+        return fileRepository.save(uploadedFile);
+    }
+
 
     // Delete the physical file on the machine in the given directory
     private boolean deleteFileOnMachine(String filepath) {
