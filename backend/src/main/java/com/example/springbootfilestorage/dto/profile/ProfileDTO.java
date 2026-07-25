@@ -3,7 +3,6 @@ package com.example.springbootfilestorage.dto.profile;
 import com.example.springbootfilestorage.security.dao.Role;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record ProfileDTO(
         String firstname,

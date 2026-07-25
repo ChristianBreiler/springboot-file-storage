@@ -92,12 +92,11 @@ public class FileService {
         return uploadFileDTOMapper.apply(file);
     }
 
-    public void deleteFilePermanently(UUID uuid) {
+    public boolean deleteFilePermanently(UUID uuid) {
         UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
-        if (file == null) throw new IllegalArgumentException("File not found: " + uuid);
-        if (!deleteFileOnMachine(file.getStoragePath()))
-            throw new RuntimeException("Failed to delete file from machine");
+        if (file == null || !deleteFileOnMachine(file.getStoragePath())) return false;
         fileRepository.delete(file);
+        return true;
     }
 
     public List<UploadedFileDTO> searchFilesByName(String searchTerm) {
@@ -180,6 +179,15 @@ public class FileService {
 
     public UploadedFile findByUuid(UUID uuid) {
         return fileRepository.findByUuid(uuid).orElse(null);
+    }
+
+    public int deleteAllDeletedFiles() {
+        // Return the number of successfully deleted files
+        return (int) fileRepository.findAllDeletedFiles(userContext.getAuthenticatedUser())
+                .stream()
+                .map(UploadedFile::getUuid)
+                .filter(this::deleteFilePermanently)
+                .count();
     }
 
     private Folder resolveTargetFolder(String folderName, UUID folderUuid, User user) {

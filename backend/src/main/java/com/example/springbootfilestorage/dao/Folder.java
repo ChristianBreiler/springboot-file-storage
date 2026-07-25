@@ -3,7 +3,6 @@ package com.example.springbootfilestorage.dao;
 import com.example.springbootfilestorage.security.dao.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

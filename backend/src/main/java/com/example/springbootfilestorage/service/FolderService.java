@@ -61,6 +61,13 @@ public class FolderService {
         return folderDTOMapper.apply(folder);
     }
 
+    public List<FolderDTO> getAllFolders() {
+        return folderRepository.findAllFolders(userContext.getAuthenticatedUser())
+                .stream()
+                .map(folderDTOMapper)
+                .toList();
+    }
+
     public void deleteFolder(UUID uuid) {
         Folder folder = folderRepository.findByUuid(uuid).orElse(null);
         if (folder == null) throw new RuntimeException("Folder to be deleted not found");

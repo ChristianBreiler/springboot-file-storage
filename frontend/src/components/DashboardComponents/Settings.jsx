@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import api from "../../api/axiosConfig";
-import { CheckCircle, Layout, List, Globe, Save } from "lucide-react";
+import {CheckCircle, Layout, List, Globe, Save} from "lucide-react";
 import LoadingBar from "../loading/LoadingBar";
 import i18n from "../../utils/i18n";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 const Settings = () => {
     const [settings, setSettings] = useState({
@@ -12,7 +12,7 @@ const Settings = () => {
     });
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null);
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     useEffect(() => {
         document.title = `File Storage App - Settings`
@@ -22,8 +22,8 @@ const Settings = () => {
         const fetchSettings = async () => {
             setLoading(true);
             try {
-                const { data } = await api.get("/settings");
-                if (data) setSettings({ pageLayout: data.pageLayout, language: data.language });
+                const {data} = await api.get("/settings");
+                if (data) setSettings({pageLayout: data.pageLayout, language: data.language});
             } catch (err) {
                 console.error("Fetch failed:", err);
             } finally {
@@ -46,13 +46,14 @@ const Settings = () => {
             setTimeout(() => setStatus(null), 3000);
 
         } catch (err) {
+            console.error(err);
             setStatus("error");
         } finally {
             setLoading(false);
         }
     };
 
-    if (loading) return <LoadingBar />
+    if (loading) return <LoadingBar/>
 
     return (
         <div className="max-w-4xl mx-auto p-8 animate-in fade-in duration-500">
@@ -63,37 +64,39 @@ const Settings = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
                 <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <Globe className="text-indigo-600 w-5 h-5" />
+                        <Globe className="text-slate-600 w-5 h-5"/>
                         <h3 className="text-lg font-bold text-slate-800">{t('language')}</h3>
                     </div>
                     <select
-                        className="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all cursor-pointer hover:bg-slate-100"
+                        className="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-400/50 focus:border-slate-500 outline-none transition-all cursor-pointer hover:bg-slate-100 text-slate-800"
                         value={settings.language}
-                        onChange={(e) => setSettings({ ...settings, language: e.target.value })}
+                        onChange={(e) => setSettings({...settings, language: e.target.value})}
                     >
                         <option value="en">English (US)</option>
                         <option value="de">Deutsch (German)</option>
                     </select>
                 </section>
+
                 <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <Layout className="text-indigo-600 w-5 h-5" />
+                        <Layout className="text-slate-600 w-5 h-5"/>
                         <h3 className="text-lg font-bold text-slate-800">{t('pageLayout')}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                            { id: "cards", label: t('cardGrid'), icon: <Layout />, desc: t('cardDesc') },
-                            { id: "list", label: t('compactList'), icon: <List />, desc: t('listDesc') }
+                            {id: "cards", label: t('cardGrid'), icon: <Layout/>, desc: t('cardDesc')},
+                            {id: "list", label: t('compactList'), icon: <List/>, desc: t('listDesc')}
                         ].map((option) => (
                             <div
                                 key={option.id}
-                                onClick={() => setSettings({ ...settings, pageLayout: option.id })}
+                                onClick={() => setSettings({...settings, pageLayout: option.id})}
                                 className={`relative cursor-pointer p-5 rounded-xl border-2 transition-all flex items-start gap-4 
                                     ${settings.pageLayout === option.id
-                                        ? "border-indigo-600 bg-indigo-50/30"
-                                        : "border-slate-100 hover:border-slate-300 bg-white"}`}
+                                    ? "border-slate-500 bg-slate-50"
+                                    : "border-slate-100 hover:border-slate-200 bg-white"}`}
                             >
-                                <div className={`p-2 rounded-lg ${settings.pageLayout === option.id ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                                <div
+                                    className={`p-2 rounded-lg transition-colors ${settings.pageLayout === option.id ? "bg-slate-600 text-white" : "bg-slate-100 text-slate-400"}`}>
                                     {option.icon}
                                 </div>
                                 <div>
@@ -101,23 +104,26 @@ const Settings = () => {
                                     <p className="text-sm text-slate-500">{option.desc}</p>
                                 </div>
                                 {settings.pageLayout === option.id && (
-                                    <CheckCircle className="absolute top-4 right-4 w-5 h-5 text-indigo-600" />
+                                    <CheckCircle className="absolute top-4 right-4 w-5 h-5 text-slate-500"/>
                                 )}
                             </div>
                         ))}
                     </div>
                 </section>
+
                 <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                     <div>
-                        {status === "success" && <span className="text-emerald-600 font-medium flex items-center gap-2">{t('settingsChangesSavedSuccessfully')}</span>}
-                        {status === "error" && <span className="text-red-500 font-medium text-sm">{t('settingsChangesNotSaved')}</span>}
+                        {status === "success" && <span
+                            className="text-emerald-600 font-medium flex items-center gap-2">{t('settingsChangesSavedSuccessfully')}</span>}
+                        {status === "error" &&
+                            <span className="text-red-500 font-medium text-sm">{t('settingsChangesNotSaved')}</span>}
                     </div>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95 disabled:opacity-50"
+                        className="flex items-center gap-2 px-8 py-3 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
                     >
-                        {loading ? "Saving..." : <><Save size={18} />{t('saveChanges')}</>}
+                        {loading ? "Saving..." : <><Save size={18}/>{t('saveChanges')}</>}
                     </button>
                 </div>
             </form>

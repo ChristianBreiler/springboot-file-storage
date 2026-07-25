@@ -44,7 +44,7 @@ public class FileController {
     @PostMapping(value = {"/upload", "/upload/{folderUuid}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadedFileDTO> upload(@ModelAttribute CreateFileDTO createFileDTO,
                                                   @PathVariable(required = false) UUID folderUuid) {
-        // if (createFileDTO == null || createFileDTO.file().isEmpty()) return ResponseEntity.badRequest().build();
+        if (createFileDTO == null || createFileDTO.files().isEmpty()) return ResponseEntity.badRequest().build();
 
         List<UploadedFileDTO> files = fileService.saveFile(createFileDTO, folderUuid);
         if (files == null) return ResponseEntity.badRequest().build();

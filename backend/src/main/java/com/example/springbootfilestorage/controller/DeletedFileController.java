@@ -39,4 +39,9 @@ public class DeletedFileController {
     public void delete(@PathVariable UUID uuid) {
         fileService.deleteFilePermanently(uuid);
     }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<?> clearDeletedFiles() {
+        return ResponseEntity.ok(fileService.deleteAllDeletedFiles());
+    }
 }

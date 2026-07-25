@@ -33,4 +33,7 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     @Query("SELECT f FROM Folder f WHERE f.uuid = ?1")
     Optional<Folder> findByUuid(UUID uuid);
+
+    @Query("SELECT f FROM Folder f WHERE f.owner = ?1")
+    Optional<Folder> findAllFolders(User user);
 }

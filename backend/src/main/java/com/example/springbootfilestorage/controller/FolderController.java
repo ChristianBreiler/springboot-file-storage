@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +20,11 @@ public class FolderController {
 
     public FolderController(FolderService folderService) {
         this.folderService = folderService;
+    }
+
+    @GetMapping("/index")
+    public ResponseEntity<List<FolderDTO>> index() {
+        return ResponseEntity.ok(folderService.getAllFolders());
     }
 
     @GetMapping("/home")
@@ -38,7 +44,7 @@ public class FolderController {
     }
 
     @DeleteMapping("/delete/{uuid}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 204 No Content
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFolderHome(@PathVariable UUID uuid) {
         folderService.deleteFolder(uuid);
     }

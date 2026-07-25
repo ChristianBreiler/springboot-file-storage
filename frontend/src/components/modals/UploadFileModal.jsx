@@ -2,7 +2,7 @@ import {createPortal} from "react-dom";
 import {useParams} from "react-router-dom";
 import api from "../../api/axiosConfig";
 import {useState} from "react";
-import {X} from "lucide-react";
+import {Trash2, X} from "lucide-react";
 import {useTranslation} from "react-i18next";
 
 const UploadFileModal = ({isOpen, onClose}) => {
@@ -124,13 +124,25 @@ const UploadFileModal = ({isOpen, onClose}) => {
 
                         {files.length > 0 && (
                             <div className="mt-3 max-h-32 overflow-y-auto space-y-1 rounded-xl bg-slate-950/40 p-2">
-                                <p className="text-xs font-semibold text-slate-400 px-1">
-                                    {t("selected")} ({files.length}):
-                                </p>
                                 {files.map((file, index) => (
-                                    <p key={index} className="text-xs italic text-blue-400 truncate px-1">
-                                        • {file.name}
-                                    </p>
+                                    <div
+                                        key={index}
+                                        className="flex items-center justify-between text-xs text-blue-400 px-1 py-0.5">
+                                        <span className="italic truncate mr-2">
+                                            • {file.name}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFiles((prevFiles) =>
+                                                    prevFiles.filter((_, i) => i !== index)
+                                                );
+                                            }}
+                                            className="text-red-400 hover:text-red-500 font-medium focus:outline-none shrink-0"
+                                        >
+                                            <Trash2 size={14}/>
+                                        </button>
+                                    </div>
                                 ))}
                             </div>
                         )}
