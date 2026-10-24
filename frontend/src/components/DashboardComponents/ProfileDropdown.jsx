@@ -1,4 +1,4 @@
-import { LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, ChevronDown, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
@@ -54,6 +54,14 @@ function ProfileDropdown() {
               {t('viewProfile')}
             </button>
           </Link>
+          {data?.role === "ADMIN" && (
+            <Link to="/admin">
+              <button className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">
+                <Shield size={18} className="text-slate-400" />
+                {t('adminPanel')}
+              </button>
+            </Link>
+          )}
           <div className="my-1 border-t border-slate-100" />
           <button
             onClick={logOut}

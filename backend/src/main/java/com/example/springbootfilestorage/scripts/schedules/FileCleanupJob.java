@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static java.lang.System.out;
+
 /**
  * The FileCleanupJob class is a scheduled service responsible for maintaining file consistency
  * between the application database and the physical file storage on disk.
@@ -45,7 +47,7 @@ public class FileCleanupJob {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanupFiles() {
-        System.out.println("Cleaning up files...");
+        out.println("Cleaning up files...");
 
         cleanUpIncorrectFilepaths();
         cleanUpFilesWithNoPath();

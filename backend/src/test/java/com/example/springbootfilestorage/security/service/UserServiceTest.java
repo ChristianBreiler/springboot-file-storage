@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.security.service;
 
 import com.example.springbootfilestorage.dto.mappers.IsAdminDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.ProfileDTOMapper;
+import com.example.springbootfilestorage.dto.mappers.UserDTOMapper;
 import com.example.springbootfilestorage.dto.mappers.UserInformationDTOMappers;
 import com.example.springbootfilestorage.dto.profile.EditProfileDTO;
 import com.example.springbootfilestorage.dto.profile.ProfileDTO;
@@ -41,7 +42,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService = new UserService(userRepository, userContext, new IsAdminDTOMapper(),
-                new ProfileDTOMapper(), new UserInformationDTOMappers());
+                new ProfileDTOMapper(), new UserInformationDTOMappers(), new UserDTOMapper());
 
         authenticatedUser = new User();
         authenticatedUser.setUuid(UUID.randomUUID());
@@ -115,9 +116,10 @@ class UserServiceTest {
         UUID uuid = authenticatedUser.getUuid();
         when(userRepository.findByUuid(uuid)).thenReturn(Optional.of(authenticatedUser));
 
-        userService.timeOutUser(uuid);
+        boolean currentEnabled = authenticatedUser.isEnabled();
+        userService.toggleTimeout(uuid);
 
-        assertThat(authenticatedUser.isEnabled()).isFalse();
+        assertThat(authenticatedUser.isEnabled() != currentEnabled).isTrue();
         verify(userRepository).save(authenticatedUser);
     }
 
@@ -126,7 +128,7 @@ class UserServiceTest {
         UUID uuid = UUID.randomUUID();
         when(userRepository.findByUuid(uuid)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.timeOutUser(uuid))
+        assertThatThrownBy(() -> userService.toggleTimeout(uuid))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("User not found");
         verify(userRepository, never()).save(any());

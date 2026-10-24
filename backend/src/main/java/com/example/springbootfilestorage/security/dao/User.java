@@ -2,7 +2,6 @@ package com.example.springbootfilestorage.security.dao;
 
 import com.example.springbootfilestorage.dao.BaseDAO;
 import com.example.springbootfilestorage.dao.Settings;
-import com.example.springbootfilestorage.dao.UploadedFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

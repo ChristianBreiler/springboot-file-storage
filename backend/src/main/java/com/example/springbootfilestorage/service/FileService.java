@@ -9,7 +9,9 @@ import com.example.springbootfilestorage.dto.file.RenameFileDTO;
 import com.example.springbootfilestorage.dto.file.UploadedFileDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
+import com.example.springbootfilestorage.dto.mappers.MetaDataDTOPMapper;
 import com.example.springbootfilestorage.dto.mappers.UploadFileDTOMapper;
+import com.example.springbootfilestorage.dto.metadata.MetaDataDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
@@ -37,10 +39,11 @@ public class FileService {
     private final UserContext userContext;
     private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
+    private final MetaDataDTOPMapper metaDataDTOPMapper;
 
     public FileService(FileRepository fileRepository, FolderService folderService, FolderRepository folderRepository,
                        StoragePathBean storagePathBean, UserContext userContext, UploadFileDTOMapper uploadFileDTOMapper,
-                       FolderDTOMapper folderDTOMapper) {
+                       FolderDTOMapper folderDTOMapper, MetaDataDTOPMapper metaDataDTOPMapper) {
         this.fileRepository = fileRepository;
         this.folderService = folderService;
         this.folderRepository = folderRepository;
@@ -48,6 +51,7 @@ public class FileService {
         this.userContext = userContext;
         this.uploadFileDTOMapper = uploadFileDTOMapper;
         this.folderDTOMapper = folderDTOMapper;
+        this.metaDataDTOPMapper = metaDataDTOPMapper;
     }
 
     public List<UploadedFileDTO> saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
@@ -188,6 +192,12 @@ public class FileService {
                 .map(UploadedFile::getUuid)
                 .filter(this::deleteFilePermanently)
                 .count();
+    }
+
+    public MetaDataDTO getMetaData(UUID uuid) {
+        UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
+        if (file == null) throw new IllegalArgumentException("File not found");
+        return metaDataDTOPMapper.apply(file);
     }
 
     private Folder resolveTargetFolder(String folderName, UUID folderUuid, User user) {

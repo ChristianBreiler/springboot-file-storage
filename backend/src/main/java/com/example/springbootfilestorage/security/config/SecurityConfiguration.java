@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/**").permitAll()
                         // Allow access to the frontend since it's also used for the login and signup page
                         .requestMatchers("/system_settings/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

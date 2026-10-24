@@ -15,6 +15,8 @@ import { AuthProvider } from "./components/auth/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Register from "./components/auth/Register";
 import AuthLayout from "./components/auth/AuthLayout";
+import AdminRoute from "./components/auth/AdminRoute";
+import AdminPanel from "./components/DashboardComponents/AdminPanel";
 import { useTranslation } from "react-i18next";
 import i18n from "./utils/i18n";
 
@@ -50,6 +52,10 @@ const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
           { path: "profile/edit", element: <EditProfile /> },
           { path: "search", element: <SearchResults /> }, // Added Search Route
+          {
+            element: <AdminRoute />,
+            children: [{ path: "admin", element: <AdminPanel /> }],
+          },
         ],
       },
     ],

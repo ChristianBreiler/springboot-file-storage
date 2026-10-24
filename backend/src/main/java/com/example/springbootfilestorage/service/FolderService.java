@@ -13,7 +13,6 @@ import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,8 +37,6 @@ public class FolderService {
         Folder folder = new Folder();
         folder.setName(createFolderDTO.folderName());
         folder.setOwner(userContext.getAuthenticatedUser());
-        folder.setCreatedAt(LocalDate.now());
-        folder.setUpdatedAt(LocalDate.now());
         if (parentUuid != null) {
             Folder parent = folderRepository.findByUuid(parentUuid).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
