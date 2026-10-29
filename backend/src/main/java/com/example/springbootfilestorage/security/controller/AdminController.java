@@ -23,6 +23,12 @@ public class AdminController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @DeleteMapping("/delete/{userUuid}")
+    public ResponseEntity<?> delete(@PathVariable UUID userUuid) {
+        userService.deleteUser(userUuid);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/toggle_timeout/{userUuid}")
     public ResponseEntity<Void> toggleTimeout(@PathVariable UUID userUuid) {
         userService.toggleTimeout(userUuid);

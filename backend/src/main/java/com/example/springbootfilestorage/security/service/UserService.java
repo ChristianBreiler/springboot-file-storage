@@ -46,10 +46,6 @@ public class UserService {
         return profileDTOMapper.apply(userContext.getAuthenticatedUser());
     }
 
-    public List<User> allUsers() {
-        return userRepository.findAll();
-    }
-
     public IsAdminDTO isAdmin() {
         return isAdminDTOMapper.apply(userContext.getAuthenticatedUser());
     }
@@ -75,5 +71,11 @@ public class UserService {
                 .filter(u -> u.getRole() != Role.ADMIN)
                 .map(userDTOMapper)
                 .toList();
+    }
+
+    public void deleteUser(UUID userUuid) {
+        User user = userRepository.findByUuid(userUuid).orElseThrow(() -> new RuntimeException("User not found"));
+        // TODO: Delete the user resources too
+        userRepository.delete(user);
     }
 }

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,15 +71,7 @@ class UserServiceTest {
         ProfileDTO result = userService.getProfile();
 
         assertThat(result).isEqualTo(new ProfileDTO("John", "Doe", "john@example.com", Role.USER,
-                LocalDate.of(2024, 1, 1)));
-    }
-
-    @Test
-    void allUsers_delegatesToRepository() {
-        List<User> users = List.of(authenticatedUser);
-        when(userRepository.findAll()).thenReturn(users);
-
-        assertThat(userService.allUsers()).isSameAs(users);
+                LocalDate.of(2024, Month.JANUARY, 1)));
     }
 
     @Test

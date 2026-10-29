@@ -8,23 +8,26 @@ const User = ({
                   emailaddress,
                   enabled,
                   role,
+                  onToggle,
               }) => {
 
     const handleTimeOut = async () => {
         try {
-            const response = await api.post(`admin/toggle_timeout/${userUuid}`, {})
-
-            if (!response.ok) {
-                throw new Error("Failed to time out");
-            }
+            // axios throws on non-2xx responses, no need to check the status here
+            await api.post(`admin/toggle_timeout/${userUuid}`, {})
+            onToggle();
         } catch (error) {
             console.log(error);
         }
     }
 
+    // Mock: deleting users is not implemented yet
+    const handleDelete = () => {
+    }
+
     return (
         <div
-            className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            className="w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
             <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">
@@ -61,12 +64,20 @@ const User = ({
                     </p>
                 </div>
             </div>
-            <button
-                onClick={handleTimeOut}
-                className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-                Time Out
-            </button>
+            <div className="mt-6 flex gap-2">
+                <button
+                    onClick={handleTimeOut}
+                    className="inline-flex flex-1 items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    {enabled ? "Time Out" : "Enable"}
+                </button>
+                <button
+                    onClick={handleDelete}
+                    className="inline-flex items-center justify-center rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                    Delete
+                </button>
+            </div>
         </div>
     );
 };

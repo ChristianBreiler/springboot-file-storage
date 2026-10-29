@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RequestMapping("/users")
 @RestController
 public class UserController {
@@ -27,11 +25,6 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         return ResponseEntity.ok(currentUser);
-    }
-
-    @GetMapping("")
-    public ResponseEntity<List<User>> allUsers() {
-        return ResponseEntity.ok(userService.allUsers());
     }
 
     @GetMapping("/me/is_admin")
