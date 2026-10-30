@@ -3,10 +3,10 @@ import { ChevronRight, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Folder from "./Folder";
-import File from "./File";
+import File, { FileDragPreview } from "./File";
 import FileViewPage from "./FileViewPage";
 import LoadingBar from "../loading/LoadingBar";
-import { DndContext, PointerSensor, useSensor, useSensors, useDroppable } from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, useDroppable } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
 // Helper to make breadcrumbs droppable
@@ -31,6 +31,7 @@ const SubFolder = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [cardLayout, setCardLayout] = useState(false);
+  const [draggedFile, setDraggedFile] = useState(null);
   const { t } = useTranslation();
 
   const sensors = useSensors(
@@ -68,16 +69,23 @@ const SubFolder = () => {
     fetchCardLayout();
   }, []);
 
+  function handleDragStart(event) {
+    setDraggedFile(event.active.data.current);
+  }
+
   async function handleDragEnd(event) {
+    setDraggedFile(null);
     const { active, over } = event;
     if (!over) return;
 
     const fileUuid = active.id;
     const folderUuid = over.id === "home" ? null : over.id;
 
-    if (folderUuid === uuid) return;
+    if (folderUuid === (uuid ?? null)) return;
 
-    setLoading(true);
+    // Remove the file right away instead of showing the full-page loading bar
+    const previousData = data;
+    setData({ ...data, files: data.files.filter((file) => file.uuid !== fileUuid) });
     try {
       const response = await api.post("drag/move-file", {
         fileUuid: fileUuid,
@@ -86,8 +94,7 @@ const SubFolder = () => {
       setData(response.data);
     } catch (err) {
       console.error("Failed to move file:", err);
-    } finally {
-      setLoading(false);
+      setData(previousData);
     }
   }
 
@@ -95,7 +102,12 @@ const SubFolder = () => {
   if (!data) return <div className="p-8 text-red-500">Folder not found.</div>;
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setDraggedFile(null)}
+    >
       <div className="p-6">
         <nav className="flex items-center space-x-1 text-sm font-medium text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
           <BreadcrumbItem isHome={true}>
@@ -175,6 +187,9 @@ const SubFolder = () => {
   />
 )}
       </div>
+      <DragOverlay dropAnimation={null}>
+        {draggedFile && <FileDragPreview {...draggedFile} cardLayout={cardLayout} />}
+      </DragOverlay>
     </DndContext>
   );
 };
