@@ -131,7 +131,7 @@ public class FileService {
         User user = userContext.getAuthenticatedUser();
         uploadedFile.setOwner(user);
 
-        Filetype filetype = getFileType(file);
+        Filetype filetype = getFileType(file.getOriginalFilename());
         if (filetype == null) return;
         uploadedFile.setFiletype(filetype);
 
@@ -200,6 +200,53 @@ public class FileService {
         return metaDataDTOPMapper.apply(file);
     }
 
+
+    public Filetype getFileType(String fileName) {
+        if (fileName == null) return null;
+        String[] split = fileName.split("\\.");
+        if (split.length < 2) return null;
+        String extension = split[split.length - 1];
+        return switch (extension.toLowerCase()) {
+            case "pdf" -> Filetype.PDF;
+            case "png" -> Filetype.PNG;
+            case "jpg" -> Filetype.PNG;
+            case "jpeg" -> Filetype.PNG;
+            case "mp3" -> Filetype.MP3;
+            default -> null;
+        };
+    }
+
+    public void saveFileFromBytes(String name, byte[] content, UUID folderUuid) {
+        // Just quietly return here
+        if (name.isEmpty() || content.length == 0 || fileExists(name, folderUuid)) return;
+
+        Filetype filetype = getFileType(name);
+        if (filetype == null) return;
+
+        String storedName = generateUniqueFileName(name);
+        Path filePath = UPLOAD_DIR.resolve(storedName);
+        try {
+            Files.write(filePath, content);
+        } catch (IOException e) {
+            return;
+        }
+        UploadedFile uploadedFile = new UploadedFile();
+        uploadedFile.setOriginalFilename(name);
+        uploadedFile.setStoredName(storedName);
+        uploadedFile.setSize((long) content.length);
+        uploadedFile.setOwner(userContext.getAuthenticatedUser());
+        uploadedFile.setStoragePath(filePath.toString());
+        uploadedFile.setFiletype(filetype);
+        uploadedFile.setDeleted(false);
+
+        if (folderUuid != null) {
+            uploadedFile.setFolder(folderService.findByUuid(folderUuid));
+        } else if (folderUuid != null) {
+            uploadedFile.setFolder(folderService.findByUuid(folderUuid));
+        }
+        fileRepository.save(uploadedFile);
+    }
+
     private Folder resolveTargetFolder(String folderName, UUID folderUuid, User user) {
         if (folderName == null || folderName.trim().isEmpty()) {
             return null;
@@ -226,7 +273,7 @@ public class FileService {
             throw new IllegalArgumentException("File '" + originalName + "' already exists");
         }
 
-        Filetype filetype = getFileType(file);
+        Filetype filetype = getFileType(file.getOriginalFilename());
         if (filetype == null) {
             throw new IllegalArgumentException("Unsupported or invalid file type for " + originalName);
         }
@@ -283,19 +330,4 @@ public class FileService {
         return UUID.randomUUID().toString() + extension;
     }
 
-    private Filetype getFileType(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        if (fileName == null) return null;
-        String[] split = fileName.split("\\.");
-        if (split.length < 2) return null;
-        String extension = split[split.length - 1];
-        return switch (extension.toLowerCase()) {
-            case "pdf" -> Filetype.PDF;
-            case "png" -> Filetype.PNG;
-            case "jpg" -> Filetype.PNG;
-            case "jpeg" -> Filetype.PNG;
-            case "mp3" -> Filetype.MP3;
-            default -> null;
-        };
-    }
 }

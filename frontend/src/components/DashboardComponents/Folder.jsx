@@ -1,5 +1,6 @@
 import {Link} from "react-router-dom";
-import {Folder as FolderIcon, MoreVertical, Pencil, Trash2} from "lucide-react";
+import {Folder as FolderIcon, MoreVertical, Pencil, Trash2, Download} from "lucide-react";
+import api from "../../api/axiosConfig";
 import {useState, useEffect, useRef} from "react";
 import RenameFolderModal from "../modals/RenameFolderModal";
 import DeleteFolderModal from "../modals/DeleteFolderModal";
@@ -27,12 +28,28 @@ const Folder = ({uuid, name = "New Folder"}) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isMenuOpen]);
 
+    const handleExportZip = async () => {
+        try {
+            const response = await api.get(`/zip/export/${uuid}`, {responseType: "blob"});
+            const url = window.URL.createObjectURL(new Blob([response.data], {type: "application/zip"}));
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${name}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("ZIP export error", err);
+        }
+    };
+
     return (
         <>
             <div
                 ref={setNodeRef}
                 className={`relative group/card rounded-2xl transition-all duration-200 ${isOver ? "ring-2 ring-blue-500 bg-blue-50/50 scale-105 z-10" : ""
-                }`}
+                } ${isMenuOpen ? "z-40" : ""}`}
             >
                 <Link
                     to={`/folders/${uuid}`}
@@ -71,7 +88,7 @@ const Folder = ({uuid, name = "New Folder"}) => {
                     </button>
                     {isMenuOpen && (
                         <div
-                            className="absolute right-0 mt-2 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden z-50">
+                            className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden z-50">
                             <button
                                 className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
                                 onClick={(e) => {
@@ -82,6 +99,17 @@ const Folder = ({uuid, name = "New Folder"}) => {
                                 }}
                             >
                                 <Pencil size={14}/>{t('rename')}
+                            </button>
+                            <button
+                                className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-slate-200 hover:bg-slate-800"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsMenuOpen(false);
+                                    handleExportZip();
+                                }}
+                            >
+                                <Download size={14}/>{t('exportZip')}
                             </button>
                             <button
                                 className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10"
