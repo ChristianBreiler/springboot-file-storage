@@ -70,7 +70,7 @@ class FileServiceTest {
         MetaDataDTOPMapper metaDataDTOPMapper = new MetaDataDTOPMapper();
 
         fileService = new FileService(fileRepository, folderService, folderRepository, storagePathBean, userContext,
-                uploadFileDTOMapper, folderDTOMapper, metaDataDTOPMapper);
+                uploadFileDTOMapper, folderDTOMapper, metaDataDTOPMapper, new DeleteFileService(fileRepository));
 
         user = new User();
         user.setUuid(UUID.randomUUID());

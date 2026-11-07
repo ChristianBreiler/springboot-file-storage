@@ -33,7 +33,14 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM UploadedFile f WHERE f.storagePath = ?1 AND f.deleted = false")
     boolean physicalFileExists(String path);
 
-    @Query("SELECT f FROM UploadedFile f WHERE f.deleted = true AND f.owner = ?1")
+    @Query("""
+                SELECT f
+                FROM UploadedFile f
+                LEFT JOIN f.folder fo
+                WHERE f.deleted = true
+                AND f.owner = ?1
+                AND (fo IS NULL OR fo.deleted = false)
+            """)
     List<UploadedFile> findAllDeletedFiles(User authenticatedUser);
 
     @Query("SELECT COUNT(f) FROM UploadedFile f WHERE f.deleted = false")
@@ -51,5 +58,5 @@ public interface FileRepository extends JpaRepository<UploadedFile, Long> {
     @Query("SELECT f FROM UploadedFile f WHERE  f.originalFilename LIKE %?1% AND f.folder.uuid = ?2 AND f.deleted = false")
     UploadedFile findByNameAndFolderUuid(String name, UUID folderUuid);
 
-    void deleteAllByDeletedTrueAndDeletedAtBefore(LocalDate threshold);
+    List<UploadedFile> findAllByDeletedTrueAndDeletedAtBefore(LocalDate threshold);
 }

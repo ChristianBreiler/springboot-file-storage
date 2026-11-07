@@ -29,7 +29,8 @@ public class UserService {
     private final UserDTOMapper userDTOMapper;
 
     public UserService(UserRepository userRepository, UserContext userContext, IsAdminDTOMapper isAdminDTOMapper,
-                       ProfileDTOMapper profileDTOMapper, UserInformationDTOMappers userInformationDTOMappers, UserDTOMapper userDTOMapper) {
+                       ProfileDTOMapper profileDTOMapper, UserInformationDTOMappers userInformationDTOMappers,
+                       UserDTOMapper userDTOMapper) {
         this.userRepository = userRepository;
         this.userContext = userContext;
         this.isAdminDTOMapper = isAdminDTOMapper;

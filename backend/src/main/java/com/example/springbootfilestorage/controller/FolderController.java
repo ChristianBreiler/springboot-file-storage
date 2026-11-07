@@ -1,6 +1,5 @@
 package com.example.springbootfilestorage.controller;
 
-import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
@@ -53,11 +52,5 @@ public class FolderController {
     public ResponseEntity<FolderDTO> create(@RequestBody CreateFolderDTO createFolderDTO,
                                             @PathVariable(required = false) UUID folderUuid) {
         return ResponseEntity.ok(folderService.saveFolder(createFolderDTO, folderUuid));
-    }
-
-    @GetMapping("/delete_folder_info/{uuid}")
-    public ResponseEntity<CanDeleteFolderDTO> deleteFolderInfo(@PathVariable UUID uuid) {
-        // Shows the user if the folder is empty and if it can therefore be deleted
-        return ResponseEntity.ok(folderService.canFolderBeDeleted(uuid));
     }
 }

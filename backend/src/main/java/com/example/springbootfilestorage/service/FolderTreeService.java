@@ -39,6 +39,7 @@ public class FolderTreeService {
         FolderNode node = new FolderNode(folder.getName());
         node.setUuid(folder.getUuid());
         for (Folder sub : folder.getSubfolders()) {
+            if (sub.isDeleted()) continue;
             node.getSubfolders().add(buildNode(sub));
         }
         return node;

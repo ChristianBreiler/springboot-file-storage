@@ -2,7 +2,6 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
@@ -37,6 +36,8 @@ class FolderServiceTest {
     private FileRepository fileRepository;
     @Mock
     private UserContext userContext;
+    @Mock
+    private DeleteFileService deleteFileService;
 
     private FolderService folderService;
     private User user;
@@ -44,7 +45,8 @@ class FolderServiceTest {
     @BeforeEach
     void setUp() {
         FolderDTOMapper folderDTOMapper = new FolderDTOMapper(userContext, new UploadFileDTOMapper());
-        folderService = new FolderService(folderRepository, fileRepository, userContext, folderDTOMapper);
+        folderService = new FolderService(folderRepository, fileRepository, userContext, folderDTOMapper,
+                deleteFileService);
 
         user = new User();
         user.setUuid(UUID.randomUUID());
@@ -135,15 +137,86 @@ class FolderServiceTest {
     }
 
     @Test
-    void deleteFolder_found_deletesIt() {
+    void deleteFolder_found_marksFolderSubfoldersAndFilesAsDeleted() {
         UUID uuid = UUID.randomUUID();
         Folder folder = new Folder();
         folder.setUuid(uuid);
+        Folder subfolder = new Folder();
+        UploadedFile subFile = new UploadedFile();
+        subfolder.setFiles(new ArrayList<>(List.of(subFile)));
+        UploadedFile file = new UploadedFile();
+        folder.setSubfolders(new ArrayList<>(List.of(subfolder)));
+        folder.setFiles(new ArrayList<>(List.of(file)));
         when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
 
         folderService.deleteFolder(uuid);
 
+        assertThat(folder.isDeleted()).isTrue();
+        assertThat(subfolder.isDeleted()).isTrue();
+        assertThat(file.isDeleted()).isTrue();
+        assertThat(subFile.isDeleted()).isTrue();
+        assertThat(file.getDeletedAt()).isNotNull();
+        verify(folderRepository).save(folder);
+        verify(folderRepository, never()).delete(any());
+    }
+
+    @Test
+    void restoreFolder_found_restoresFolderSubfoldersAndFiles() {
+        UUID uuid = UUID.randomUUID();
+        Folder folder = new Folder();
+        folder.setUuid(uuid);
+        folder.setDeleted(true);
+        Folder subfolder = new Folder();
+        subfolder.setDeleted(true);
+        UploadedFile file = new UploadedFile();
+        file.setDeleted(true);
+        folder.setSubfolders(new ArrayList<>(List.of(subfolder)));
+        folder.setFiles(new ArrayList<>(List.of(file)));
+        when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
+
+        folderService.restoreFolder(uuid);
+
+        assertThat(folder.isDeleted()).isFalse();
+        assertThat(subfolder.isDeleted()).isFalse();
+        assertThat(file.isDeleted()).isFalse();
+        assertThat(file.getDeletedAt()).isNull();
+        verify(folderRepository).save(folder);
+    }
+
+    @Test
+    void deleteFolderPermanently_rootFolder_deletesPhysicalFilesAndFolder() {
+        UUID uuid = UUID.randomUUID();
+        Folder folder = new Folder();
+        folder.setUuid(uuid);
+        Folder subfolder = new Folder();
+        UploadedFile subFile = new UploadedFile();
+        subfolder.setFiles(new ArrayList<>(List.of(subFile)));
+        UploadedFile file = new UploadedFile();
+        folder.setSubfolders(new ArrayList<>(List.of(subfolder)));
+        folder.setFiles(new ArrayList<>(List.of(file)));
+        when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
+
+        folderService.deleteFolderPermanently(uuid);
+
+        verify(deleteFileService).deleteFileOnMachine(file);
+        verify(deleteFileService).deleteFileOnMachine(subFile);
         verify(folderRepository).delete(folder);
+    }
+
+    @Test
+    void deleteFolderPermanently_withParent_removesFromParent() {
+        UUID uuid = UUID.randomUUID();
+        Folder parent = new Folder();
+        Folder folder = new Folder();
+        folder.setUuid(uuid);
+        folder.setParent(parent);
+        parent.setSubfolders(new ArrayList<>(List.of(folder)));
+        when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
+
+        folderService.deleteFolderPermanently(uuid);
+
+        assertThat(parent.getSubfolders()).doesNotContain(folder);
+        verify(folderRepository).save(parent);
     }
 
     @Test
@@ -190,30 +263,7 @@ class FolderServiceTest {
         assertThat(result.parentFolders()).isEmpty();
     }
 
-    @Test
-    void canFolderBeDeleted_emptyFolder_returnsTrue() {
-        UUID uuid = UUID.randomUUID();
-        Folder folder = new Folder();
-        folder.setUuid(uuid);
-        when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
 
-        CanDeleteFolderDTO result = folderService.canFolderBeDeleted(uuid);
-
-        assertThat(result.empty()).isTrue();
-    }
-
-    @Test
-    void canFolderBeDeleted_nonEmptyFolder_returnsFalse() {
-        UUID uuid = UUID.randomUUID();
-        Folder folder = new Folder();
-        folder.setUuid(uuid);
-        folder.setSubfolders(List.of(new Folder()));
-        when(folderRepository.findByUuid(uuid)).thenReturn(Optional.of(folder));
-
-        CanDeleteFolderDTO result = folderService.canFolderBeDeleted(uuid);
-
-        assertThat(result.empty()).isFalse();
-    }
 
     @Test
     void findByUuid_found_returnsFolder() {

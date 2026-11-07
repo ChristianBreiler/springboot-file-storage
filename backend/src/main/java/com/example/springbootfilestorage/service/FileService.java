@@ -17,13 +17,14 @@ import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
@@ -40,10 +41,11 @@ public class FileService {
     private final UploadFileDTOMapper uploadFileDTOMapper;
     private final FolderDTOMapper folderDTOMapper;
     private final MetaDataDTOPMapper metaDataDTOPMapper;
+    private final DeleteFileService deleteFileService;
 
     public FileService(FileRepository fileRepository, FolderService folderService, FolderRepository folderRepository,
                        StoragePathBean storagePathBean, UserContext userContext, UploadFileDTOMapper uploadFileDTOMapper,
-                       FolderDTOMapper folderDTOMapper, MetaDataDTOPMapper metaDataDTOPMapper) {
+                       FolderDTOMapper folderDTOMapper, MetaDataDTOPMapper metaDataDTOPMapper, DeleteFileService deleteFileService) {
         this.fileRepository = fileRepository;
         this.folderService = folderService;
         this.folderRepository = folderRepository;
@@ -52,6 +54,7 @@ public class FileService {
         this.uploadFileDTOMapper = uploadFileDTOMapper;
         this.folderDTOMapper = folderDTOMapper;
         this.metaDataDTOPMapper = metaDataDTOPMapper;
+        this.deleteFileService = deleteFileService;
     }
 
     public List<UploadedFileDTO> saveFile(CreateFileDTO createFileDTO, UUID folderUuid) {
@@ -98,9 +101,7 @@ public class FileService {
 
     public boolean deleteFilePermanently(UUID uuid) {
         UploadedFile file = fileRepository.findByUuid(uuid).orElse(null);
-        if (file == null || !deleteFileOnMachine(file.getStoragePath())) return false;
-        fileRepository.delete(file);
-        return true;
+        return file != null && deleteFileService.delete(file);
     }
 
     public List<UploadedFileDTO> searchFilesByName(String searchTerm) {
@@ -186,7 +187,6 @@ public class FileService {
     }
 
     public int deleteAllDeletedFiles() {
-        // Return the number of successfully deleted files
         return (int) fileRepository.findAllDeletedFiles(userContext.getAuthenticatedUser())
                 .stream()
                 .map(UploadedFile::getUuid)
@@ -305,22 +305,6 @@ public class FileService {
         return fileRepository.save(uploadedFile);
     }
 
-
-    // Delete the physical file on the machine in the given directory
-    private boolean deleteFileOnMachine(String filepath) {
-        try {
-            Path path = Paths.get(filepath);
-            if (Files.exists(path)) {
-                Files.delete(path);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private String generateUniqueFileName(String originalFilename) {
         // Rename the file when storing it on the server to avoid name conflicts
         String extension = "";
@@ -330,4 +314,11 @@ public class FileService {
         return UUID.randomUUID().toString() + extension;
     }
 
+    public void deleteFilesToBeDeleted(LocalDate threshold) {
+        fileRepository.findAllByDeletedTrueAndDeletedAtBefore(threshold).forEach(file -> {
+            // TODO: Just ignores unsuccessfully deleted files for now -> fix later
+            deleteFileService.deleteFileOnMachine(file);
+            fileRepository.delete(file);
+        });
+    }
 }

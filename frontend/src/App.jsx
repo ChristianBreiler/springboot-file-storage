@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout";
 import SubFolder from "./components/DashboardComponents/SubFolder";
 import DeletedFiles from "./components/DashboardComponents/DeletedFiles";
+import DeletedFolders from "./components/DashboardComponents/DeletedFolders";
 import Settings from "./components/DashboardComponents/Settings";
 import StorageDetails from "./components/DashboardComponents/StorageDetails";
 import Profile from "./components/DashboardComponents/Profile";
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
           { path: "files/:uuid", element: <FileViewPage /> },
           { path: "settings", element: <Settings /> },
           { path: "deleted_files", element: <DeletedFiles /> },
+          { path: "deleted_folders", element: <DeletedFolders /> },
           { path: "storage_details", element: <StorageDetails /> },
           { path: "profile", element: <Profile /> },
           { path: "profile/edit", element: <EditProfile /> },

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Trash, FolderOpen, ChevronLeft, ChevronRight} from "lucide-react";
+import {Trash, FolderOpen, FolderX, ChevronLeft, ChevronRight} from "lucide-react";
 import {Link, useLocation} from "react-router-dom";
 import StorageBar from "../DashboardComponents/StorageBar";
 import {useTranslation} from "react-i18next";
@@ -43,6 +43,10 @@ const Sidebar = () => {
                 <Link to="/deleted_files" className={navLinkClass("/deleted_files")}>
                     <Trash size={18} className="shrink-0"/>
                     {isExpanded && <span className="text-sm font-medium">{t('trash')}</span>}
+                </Link>
+                <Link to="/deleted_folders" className={navLinkClass("/deleted_folders")}>
+                    <FolderX size={18} className="shrink-0"/>
+                    {isExpanded && <span className="text-sm font-medium">{t('deletedFolders')}</span>}
                 </Link>
                 <FolderTree isSidebarExpanded={isExpanded} />
             </nav>

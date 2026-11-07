@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,12 @@ public class Folder extends BaseDAO {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean deleted;
+
+    @Column(name = "deleted_at")
+    private LocalDate deletedAt;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Folder> subfolders = new ArrayList<>();

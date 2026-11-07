@@ -2,17 +2,19 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
-import com.example.springbootfilestorage.dto.folder.CanDeleteFolderDTO;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
 import com.example.springbootfilestorage.dto.mappers.FolderDTOMapper;
+import com.example.springbootfilestorage.dto.summary.FolderSummaryDTO;
 import com.example.springbootfilestorage.repository.FileRepository;
 import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,19 +26,22 @@ public class FolderService {
     private final UserContext userContext;
     private final FolderDTOMapper folderDTOMapper;
     private final int MAX_PARENT_FOLDERS = 5;
+    private final DeleteFileService deleteFileService;
 
     public FolderService(FolderRepository folderRepository, FileRepository fileRepository, UserContext userContext,
-                         FolderDTOMapper folderDTOMapper) {
+                         FolderDTOMapper folderDTOMapper, DeleteFileService deleteFileService) {
         this.folderRepository = folderRepository;
         this.fileRepository = fileRepository;
         this.userContext = userContext;
         this.folderDTOMapper = folderDTOMapper;
+        this.deleteFileService = deleteFileService;
     }
 
     public FolderDTO saveFolder(CreateFolderDTO createFolderDTO, UUID parentUuid) {
         Folder folder = new Folder();
         folder.setName(createFolderDTO.folderName());
         folder.setOwner(userContext.getAuthenticatedUser());
+        folder.setDeleted(false);
         if (parentUuid != null) {
             Folder parent = folderRepository.findByUuid(parentUuid).orElse(null);
             if (parent == null) throw new IllegalArgumentException("Parent folder not found");
@@ -65,10 +70,12 @@ public class FolderService {
                 .toList();
     }
 
+
     public void deleteFolder(UUID uuid) {
-        Folder folder = folderRepository.findByUuid(uuid).orElse(null);
+        Folder folder = setFolder(uuid);
         if (folder == null) throw new RuntimeException("Folder to be deleted not found");
-        folderRepository.delete(folder);
+        setDeletedRecursively(folder, true);
+        folderRepository.save(folder);
     }
 
     public List<FolderDTO> searchFoldersByName(String searchTerm) {
@@ -90,10 +97,6 @@ public class FolderService {
         return folderDTOMapper.apply(homeFolder);
     }
 
-    public CanDeleteFolderDTO canFolderBeDeleted(UUID uuid) {
-        Folder folder = folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
-        return new CanDeleteFolderDTO((folder.numberOfFolders() + folder.numberOfFiles()) == 0);
-    }
 
     public Folder findByUuid(UUID uuid) {
         return folderRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("Folder not found"));
@@ -102,5 +105,59 @@ public class FolderService {
     public FolderDTO findByDTOUuid(UUID uuid) {
         return folderDTOMapper.apply(folderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new RuntimeException("Folder not found")));
+    }
+
+    public List<FolderSummaryDTO> findAllDeletedFolders() {
+        return folderRepository.findAllDeletedFolders(userContext.getAuthenticatedUser())
+                .stream()
+                .map(f -> new FolderSummaryDTO(f.getUuid(), f.getName()))
+                .toList();
+    }
+
+    public void restoreFolder(UUID uuid) {
+        Folder folder = setFolder(uuid);
+        if (folder == null) throw new RuntimeException("Folder to be restored not found");
+        setDeletedRecursively(folder, false);
+        folderRepository.save(folder);
+    }
+
+    @Transactional
+    public void deleteFolderPermanently(UUID uuid) {
+        Folder folder = setFolder(uuid);
+        if (folder == null) return;
+        deleteFolderPermanently(folder);
+    }
+
+    @Transactional
+    public void deleteFoldersToBeDeleted(LocalDate threshold) {
+        folderRepository.findAllByDeletedTrueAndDeletedAtBefore(threshold).stream()
+                .filter(folder -> folder.getParent() == null || !folder.getParent().isDeleted())
+                .forEach(this::deleteFolderPermanently);
+    }
+
+    private void setDeletedRecursively(Folder folder, boolean deleted) {
+        folder.setDeleted(deleted);
+        folder.setDeletedAt(deleted ? LocalDate.now() : null);
+        folder.getFiles().forEach(f -> {
+            f.setDeleted(deleted);
+            f.setDeletedAt(deleted ? LocalDate.now() : null);
+        });
+        folder.getSubfolders().forEach(s -> setDeletedRecursively(s, deleted));
+    }
+
+    private void deleteFolderPermanently(Folder folder) {
+        folder.getSubfolders().forEach(this::deleteFolderPermanently);
+        folder.getFiles().forEach(deleteFileService::deleteFileOnMachine);
+        Folder parent = folder.getParent();
+        if (parent != null) {
+            parent.getSubfolders().remove(folder);
+            folderRepository.save(parent);
+        } else {
+            folderRepository.delete(folder);
+        }
+    }
+
+    private Folder setFolder(UUID uuid) {
+        return folderRepository.findByUuid(uuid).orElse(null);
     }
 }

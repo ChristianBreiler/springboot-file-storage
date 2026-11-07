@@ -1,33 +1,19 @@
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import {useState, useEffect} from "react";
+import {createPortal} from "react-dom";
 import api from "../../api/axiosConfig";
-import { X, AlertTriangle, Trash2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import {X, AlertTriangle, Trash2} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
-const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderUuid }) => {
-    const [folderDeletionInfo, setFolderDeletionInfo] = useState(null);
+// isDeleted: the folder is already in the trash and will be deleted permanently
+const DeleteFolderModal = ({isOpen, onClose, currentFolderName, folderUuid, isDeleted = false, onDeleted}) => {
     const [loading, setLoading] = useState(false);
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     useEffect(() => {
-        // Do this to prevent 403 erros since request with folderUuid = undefined cause issues
+        // Do this to prevent 403 errors since request with folderUuid = undefined cause issues
         if (!isOpen || !folderUuid || folderUuid === "undefined") {
             return;
         }
-
-        const fetchFolderInfo = async () => {
-            setLoading(true);
-            try {
-                const response = await api.get(`folders/delete_folder_info/${folderUuid}`);
-                setFolderDeletionInfo(response.data);
-            } catch (err) {
-                console.error("Error fetching folder info:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFolderInfo();
     }, [isOpen, folderUuid]);
 
     if (!isOpen) return null;
@@ -35,13 +21,13 @@ const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderUuid }) =
     const handleDelete = async (e) => {
         e.preventDefault();
 
-        if (!folderDeletionInfo?.empty) return;
-
         setLoading(true);
         try {
-            await api.delete(`folders/delete/${folderUuid}`);
+            const path = isDeleted ? `deleted_folders/delete/${folderUuid}` : `folders/delete/${folderUuid}`;
+            await api.delete(path);
             onClose();
-            window.location.reload();
+            if (onDeleted) onDeleted();
+            else window.location.reload();
         } catch (err) {
             console.error("Delete failed:", err);
         } finally {
@@ -49,59 +35,53 @@ const DeleteFolderModal = ({ isOpen, onClose, currentFolderName, folderUuid }) =
         }
     };
 
-    return createPortal(
-        <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
-            <div
-                className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
-            <div className="relative w-full max-w-md transform rounded-3xl bg-slate-900 p-8 shadow-2xl ring-1 ring-slate-800 animate-in fade-in zoom-in duration-200">
-                <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-500/10 rounded-lg">
-                            <Trash2 className="text-red-500" size={24} />
-                        </div>
-                        <h2 className="text-xl font-bold text-white">{t('deleteFolder')}</h2>
+    return createPortal(<div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+        <div
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+            onClick={onClose}
+        />
+        <div
+            className="relative w-full max-w-md transform rounded-3xl bg-slate-900 p-8 shadow-2xl ring-1 ring-slate-800 animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-red-500/10 rounded-lg">
+                        <Trash2 className="text-red-500" size={24}/>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
-                        <X size={20} />
-                    </button>
+                    <h2 className="text-xl font-bold text-white">{t('deleteFolder')}</h2>
                 </div>
-                <div className="mb-8">
-                    {!loading && folderDeletionInfo && folderDeletionInfo.empty && (
-                        <p className="text-slate-300">
-                            {t('deleteFolderConfirmation', { folderName: currentFolderName })}
-                        </p>
-                    )}
-                    {!loading && folderDeletionInfo && !folderDeletionInfo.empty && (
-                        <div className="mt-4 flex gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
-                            <AlertTriangle size={40} className="shrink-0" />
-                            <p className="text-sm">
-                                {t('folderNotEmpty')}
-                            </p>
-                        </div>
-                    )}
-                </div>
-                <div className="flex justify-end gap-3">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-6 py-3 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
-                        {t('cancel')}
-                    </button>
-                    <button
-                        onClick={handleDelete}
-                        disabled={loading || !folderDeletionInfo?.empty}
-                        className="rounded-2xl bg-red-600 px-8 py-3 text-sm font-bold text-white hover:bg-red-500 active:scale-95 transition-all shadow-lg shadow-red-600/20 disabled:opacity-30 disabled:cursor-not-allowed">
-                        {loading ? "Processing..." : t('deletePermanently')}
-                    </button>
-                </div>
+                <button
+                    onClick={onClose}
+                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors">
+                    <X size={20}/>
+                </button>
             </div>
-        </div>,
-        document.body
-    );
+            <div className="mb-8">
+                {!loading && (<p className="text-slate-300">
+                    {t('deleteFolderConfirmation', {folderName: currentFolderName})}
+                </p>)}
+                {isDeleted && (
+                    <div className="mt-4 flex items-center gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
+                        <AlertTriangle size={18} className="shrink-0"/>
+                        <p className="text-sm">{t('deleteFolderPermanentlyInfo')}</p>
+                    </div>
+                )}
+            </div>
+            <div className="flex justify-end gap-3">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-6 py-3 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                    {t('cancel')}
+                </button>
+                <button
+                    onClick={handleDelete}
+                    disabled={loading}
+                    className="rounded-2xl bg-red-600 px-8 py-3 text-sm font-bold text-white hover:bg-red-500 active:scale-95 transition-all shadow-lg shadow-red-600/20 disabled:opacity-30 disabled:cursor-not-allowed">
+                    {loading ? "Processing..." : (isDeleted ? t('deletePermanently') : t('moveToTrash'))}
+                </button>
+            </div>
+        </div>
+    </div>, document.body);
 };
 
 export default DeleteFolderModal;
