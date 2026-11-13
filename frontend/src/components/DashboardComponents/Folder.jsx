@@ -5,6 +5,7 @@ import {useState, useEffect, useRef} from "react";
 import RenameFolderModal from "../modals/RenameFolderModal";
 import DeleteFolderModal from "../modals/DeleteFolderModal";
 import {useDroppable} from "@dnd-kit/core";
+import {useDraggable} from "@dnd-kit/core";
 import {useTranslation} from "react-i18next";
 
 const Folder = ({uuid, name = "New Folder"}) => {
@@ -16,6 +17,11 @@ const Folder = ({uuid, name = "New Folder"}) => {
 
     const {setNodeRef, isOver} = useDroppable({
         id: uuid,
+    });
+
+    const {listeners, setNodeRef: setDragRef, isDragging} = useDraggable({
+        id: uuid,
+        data: {type: "folder", name},
     });
 
     useEffect(() => {
@@ -52,8 +58,11 @@ const Folder = ({uuid, name = "New Folder"}) => {
                 } ${isMenuOpen ? "z-40" : ""}`}
             >
                 <Link
+                    ref={setDragRef}
+                    {...listeners}
+                    draggable={false}
                     to={`/folders/${uuid}`}
-                    className={`flex items-center justify-between p-4 bg-white border rounded-2xl 
+                    className={`touch-none ${isDragging ? "opacity-40 cursor-grabbing" : "cursor-grab"} flex items-center justify-between p-4 bg-white border rounded-2xl
                      hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-200 active:scale-[0.98] ${isOver ? "border-blue-500" : "border-slate-200"
                     }`}
                 >

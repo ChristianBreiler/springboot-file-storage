@@ -17,8 +17,6 @@ import com.example.springbootfilestorage.repository.FolderRepository;
 import com.example.springbootfilestorage.scripts.system.StoragePathBean;
 import com.example.springbootfilestorage.security.dao.User;
 import com.example.springbootfilestorage.security.usercontext.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -247,6 +245,14 @@ public class FileService {
         fileRepository.save(uploadedFile);
     }
 
+    public void deleteFilesToBeDeleted(LocalDate threshold) {
+        fileRepository.findAllByDeletedTrueAndDeletedAtBefore(threshold).forEach(file -> {
+            // TODO: Just ignores unsuccessfully deleted files for now -> fix later
+            deleteFileService.deleteFileOnMachine(file);
+            fileRepository.delete(file);
+        });
+    }
+
     private Folder resolveTargetFolder(String folderName, UUID folderUuid, User user) {
         if (folderName == null || folderName.trim().isEmpty()) {
             return null;
@@ -312,13 +318,5 @@ public class FileService {
         if (dotIndex > 0) extension = originalFilename.substring(dotIndex);
 
         return UUID.randomUUID().toString() + extension;
-    }
-
-    public void deleteFilesToBeDeleted(LocalDate threshold) {
-        fileRepository.findAllByDeletedTrueAndDeletedAtBefore(threshold).forEach(file -> {
-            // TODO: Just ignores unsuccessfully deleted files for now -> fix later
-            deleteFileService.deleteFileOnMachine(file);
-            fileRepository.delete(file);
-        });
     }
 }

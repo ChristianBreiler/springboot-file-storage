@@ -79,4 +79,8 @@ public class UserService {
         // TODO: Delete the user resources too
         userRepository.delete(user);
     }
+
+    public boolean tokenValid(String token) {
+        return true;
+    }
 }

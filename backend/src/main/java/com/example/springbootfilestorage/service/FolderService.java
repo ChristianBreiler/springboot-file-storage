@@ -2,6 +2,7 @@ package com.example.springbootfilestorage.service;
 
 import com.example.springbootfilestorage.dao.Folder;
 import com.example.springbootfilestorage.dao.UploadedFile;
+import com.example.springbootfilestorage.dto.MoveFolderDto;
 import com.example.springbootfilestorage.dto.folder.CreateFolderDTO;
 import com.example.springbootfilestorage.dto.folder.FolderDTO;
 import com.example.springbootfilestorage.dto.folder.RenameFolderDTO;
@@ -133,6 +134,15 @@ public class FolderService {
         folderRepository.findAllByDeletedTrueAndDeletedAtBefore(threshold).stream()
                 .filter(folder -> folder.getParent() == null || !folder.getParent().isDeleted())
                 .forEach(this::deleteFolderPermanently);
+    }
+
+    public FolderDTO moveFolderToFolder(MoveFolderDto moveFolderDto) {
+        Folder folder = setFolder(moveFolderDto.folderUuid());
+        Folder targetFolder = setFolder(moveFolderDto.targetFolderUuid());
+        if (folder == null || targetFolder == null) throw new RuntimeException("Folder not found");
+        folder.setParent(targetFolder);
+        folderRepository.save(folder);
+        return folderDTOMapper.apply(folder);
     }
 
     private void setDeletedRecursively(Folder folder, boolean deleted) {
